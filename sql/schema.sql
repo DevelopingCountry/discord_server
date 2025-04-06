@@ -73,6 +73,6 @@ CREATE TABLE message (
                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          FOREIGN KEY (channel_id) REFERENCES channel(id) ON DELETE CASCADE,
-                         FOREIGN KEY (user_id) REFERENCES user(id),
+                         FOREIGN KEY (user_id) REFERENCES user(id)
 );
 

@@ -1,11 +1,11 @@
 package dev.discord_server.domain.friend.entity;
 
 import dev.discord_server.config.BaseEntity;
+import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.ColumnDefault;
 
 @Getter
 @Setter

@@ -29,3 +29,7 @@ jwt:
   refreshSecret: UnJycmluZyBkaW5nIGRvZyByacgZG9uZyByaW5nIGRpZ2lkaWpbmcuIGJ1dHRlcmZseSBubyBydWwgbWFuIG5hbiBjaG90IHN1biBnYW4gbW9tIGUgcHBhIHp6ZXIgYmVyIHJ1aXQgc28gbmUgbWF1bWRvIG11bHJ1aXRzbyBuYW4gbWFsIHlhIG11dCB6aW4gbm9tIGNoYWsgaGFuIG5vbSBncm9uIG5vbWRvIGFuaXppbWFu
   access_token_expired_at: 10800000       # 1000 * 60 * 60 * 3 → 3시간 (ms)
   refresh_token_expired_at: 604800000     # 1000 * 60 * 60 * 24 * 7 → 7일 (ms)
+
+error:
+  printStackTrace: true # Stack trace 출력 여부
+  printStackTraceLine: 10 # Stack trace 출력 줄 수
