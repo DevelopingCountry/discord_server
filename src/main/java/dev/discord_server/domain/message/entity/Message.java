@@ -32,24 +32,4 @@ public class Message extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-
-    // 답글 기능: 현재 메시지의 부모 메시지를 참조하는 컬럼
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "parent_message_id")
-    private Message parentMessage;
-
-    // 답글 기능: 현재 메시지를 부모로 가지는 답글 리스트
-    @OneToMany(mappedBy = "parentMessage")
-    private List<Message> replies;
-
-    // 쓰레드 기능: 쓰레드의 루트 메시지를 참조하는 컬럼
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "thread_root_id")
-    private Message threadRoot;
-
-    // 쓰레드 기능: 동일한 쓰레드 루트를 가지는 메시지 리스트
-    @OneToMany(mappedBy = "threadRoot")
-    private List<Message> threadReplies;
-
 }

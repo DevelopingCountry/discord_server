@@ -5,7 +5,7 @@ USE discord_server;
 -- User 테이블 생성
 CREATE TABLE User (
                       id INT PRIMARY KEY AUTO_INCREMENT,
-                      nickname VARCHAR(10) NOT NULL,
+                      nickname VARCHAR(10) NOT NULL UNIQUE,
                       password VARCHAR(20),
                       email VARCHAR(20) NOT NULL UNIQUE,
                       social_id INT,
@@ -42,6 +42,7 @@ CREATE TABLE Server_User (
                              id INT PRIMARY KEY AUTO_INCREMENT,
                              server_id INT NOT NULL,
                              user_id INT NOT NULL,
+                             alarm boolean NOT NULL,
                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                              FOREIGN KEY (server_id) REFERENCES Server(id) ON DELETE CASCADE,
@@ -69,13 +70,9 @@ CREATE TABLE message (
                          content VARCHAR(50),
                          channel_id INT NOT NULL,
                          user_id INT NOT NULL,
-                         parent_message_id INT NULL,
-                         thread_root_id INT NULL,
                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          FOREIGN KEY (channel_id) REFERENCES channel(id) ON DELETE CASCADE,
                          FOREIGN KEY (user_id) REFERENCES user(id),
-                         FOREIGN KEY (parent_message_id) REFERENCES message(id) ON DELETE SET NULL,
-                         FOREIGN KEY (thread_root_id) REFERENCES message(id) ON DELETE SET NULL
 );
 

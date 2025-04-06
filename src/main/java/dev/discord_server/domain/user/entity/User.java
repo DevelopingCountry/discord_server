@@ -37,9 +37,6 @@ public class User extends BaseEntity {
     @Column(name = "email", nullable = false, length = 20)
     private String email;
 
-    @Column(name = "social_id")
-    private Integer socialId;
-
     @Enumerated(EnumType.STRING)
     private Role role;
 
