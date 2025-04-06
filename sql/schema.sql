@@ -6,7 +6,7 @@ USE discord_server;
 CREATE TABLE User (
                       id INT PRIMARY KEY AUTO_INCREMENT,
                       nickname VARCHAR(10) NOT NULL,
-                      password VARCHAR(20) NOT NULL,
+                      password VARCHAR(20),
                       email VARCHAR(20) NOT NULL UNIQUE,
                       social_id INT,
                       role ENUM('USER', 'ADMIN') DEFAULT 'USER',
@@ -19,12 +19,11 @@ CREATE TABLE Friend (
                         id INT PRIMARY KEY AUTO_INCREMENT,
                         from_user_id INT NOT NULL,
                         to_user_id INT NOT NULL,
-                        is_friend BOOLEAN DEFAULT FALSE,
+                        status ENUM('PENDING', 'ACCEPTED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (from_user_id) REFERENCES User(id),
                         FOREIGN KEY (to_user_id) REFERENCES User(id)
-
 );
 
 -- Server 테이블 생성
@@ -32,8 +31,10 @@ CREATE TABLE Server (
                         id INT PRIMARY KEY AUTO_INCREMENT,
                         name VARCHAR(20) NOT NULL,
                         image_url VARCHAR(50),
+                        host_id INT NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (host_id) REFERENCES User(id)
 );
 
 -- Server_User 테이블 생성 (서버 내 사용자 관계)
@@ -50,23 +51,31 @@ CREATE TABLE Server_User (
 -- Channel 테이블 생성
 CREATE TABLE Channel (
                          id INT PRIMARY KEY AUTO_INCREMENT,
-                         server_id INT,
+                         server_id INT NOT NULL,
+                         creator_id INT NOT NULL,
                          name VARCHAR(20) NOT NULL,
-                         type ENUM('CHAT', 'VOICE', 'DM') NOT NULL default 'DM',
+                         type ENUM('CHAT', 'VOICE', 'DM') NOT NULL DEFAULT 'DM',
                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                         FOREIGN KEY (server_id) REFERENCES Server(id) ON DELETE CASCADE
+                         FOREIGN KEY (server_id) REFERENCES Server(id),
+                         FOREIGN KEY (creator_id) REFERENCES User(id)
 );
 
 
+
 -- Message 테이블 생성
-CREATE TABLE Message (
+CREATE TABLE message (
                          id INT PRIMARY KEY AUTO_INCREMENT,
                          content VARCHAR(50),
                          channel_id INT NOT NULL,
                          user_id INT NOT NULL,
+                         parent_message_id INT NULL,
+                         thread_root_id INT NULL,
                          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                          updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                         FOREIGN KEY (channel_id) REFERENCES Channel(id) ON DELETE CASCADE,
-                         FOREIGN KEY (user_id) REFERENCES User(id)
+                         FOREIGN KEY (channel_id) REFERENCES channel(id) ON DELETE CASCADE,
+                         FOREIGN KEY (user_id) REFERENCES user(id),
+                         FOREIGN KEY (parent_message_id) REFERENCES message(id) ON DELETE SET NULL,
+                         FOREIGN KEY (thread_root_id) REFERENCES message(id) ON DELETE SET NULL
 );
+

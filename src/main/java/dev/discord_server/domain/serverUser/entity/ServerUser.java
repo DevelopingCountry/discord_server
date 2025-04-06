@@ -15,7 +15,7 @@ import org.hibernate.annotations.OnDeleteAction;
 @Table(name = "server_user")
 public class ServerUser extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private int id;
 

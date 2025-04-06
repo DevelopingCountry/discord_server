@@ -13,7 +13,7 @@ import org.hibernate.annotations.ColumnDefault;
 @Table(name = "friend")
 public class Friend extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", nullable = false)
     private int id;
 
@@ -25,9 +25,9 @@ public class Friend extends BaseEntity {
     @JoinColumn(name = "to_user_id", nullable = false)
     private User toUser;
 
-    @ColumnDefault("0")
-    @Column(name = "is_friend")
-    private Boolean isFriend;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "status", nullable = false)
+    private FriendStatus status;
 
 
 

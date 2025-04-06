@@ -1,5 +1,6 @@
 package dev.discord_server.domain.server.controller;
 
+import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.server.dto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,12 @@ public class ServerController {
     public ResponseEntity<List<ResponseDto>> getServerList() {
         List<ResponseDto> servers = serverService.findServers();
         return ResponseEntity.status(HttpStatus.OK).body(servers);
+    }
+
+    @GetMapping("/server2")
+    public CommonResponse<List<ResponseDto>> getServerList2() {
+        List<ResponseDto> servers = serverService.findServers();
+        return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
     }
 
 }
