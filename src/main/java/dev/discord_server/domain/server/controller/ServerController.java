@@ -24,7 +24,7 @@ public class ServerController {
     private final ServerService serverService;
 
     @GetMapping("/server")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<ServerResponse>> getServerList2() {
         List<ServerResponse> servers = serverService.findServers();
         return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
