@@ -10,11 +10,13 @@ import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.entity.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
@@ -36,6 +38,9 @@ public class AuthService {
         // Access Token & Refresh Token 생성
         String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole());
         String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getEmail(), user.getRole());
+        log.info("Access token: {}", accessToken);
+        log.info("Refresh token: {}", refreshToken);
+
 
         // Refresh Token을 Redis에 저장
         refreshTokenRepository.saveRefreshToken(user.getEmail(), refreshToken);
