@@ -10,7 +10,9 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import java.util.ArrayList;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -29,7 +31,10 @@ public class Channel extends BaseEntity {
     private Server server;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "creator_id", nullable = false)
+    @JoinColumn(name = "creator_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private User creator;
 
     @Column(name = "name", nullable = false, length = 20)
@@ -41,6 +46,6 @@ public class Channel extends BaseEntity {
 
 
     @OneToMany(mappedBy = "channel")
-    private Set<Message> messages = new LinkedHashSet<>();
+    private List<Message> messages = new ArrayList<>();
 
 }

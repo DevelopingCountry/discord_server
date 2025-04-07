@@ -8,7 +8,6 @@ CREATE TABLE User (
                       nickname VARCHAR(10) NOT NULL UNIQUE,
                       password VARCHAR(20),
                       email VARCHAR(20) NOT NULL UNIQUE,
-                      social_id INT,
                       role ENUM('USER', 'ADMIN') DEFAULT 'USER',
                       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

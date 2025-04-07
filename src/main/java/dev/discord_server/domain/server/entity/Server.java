@@ -27,8 +27,16 @@ public class Server extends BaseEntity {
     @Column(name = "image_url", nullable = false, length = 50)
     private String imageUrl;
 
+
+    /*
+    foreignKey의 제약조건을 제외함으로써 조회는 가볍게 할 수 있음
+     */
     @ManyToOne
-    @JoinColumn(name = "host_id", nullable = false)
+    @JoinColumn(
+            name = "host_id",
+            nullable = false,
+            foreignKey = @ForeignKey(ConstraintMode.NO_CONSTRAINT)
+    )
     private User host;
 
     @OneToMany(mappedBy = "server")

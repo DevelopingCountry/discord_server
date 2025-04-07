@@ -16,12 +16,9 @@ import java.util.List;
 import java.util.Set;
 
 @Getter
-@Setter
 @Entity
 @Table(name = "user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
-@Builder
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -42,10 +39,10 @@ public class User extends BaseEntity {
 
 
     @OneToMany(mappedBy = "host")
-    private List<Server> hostedServers;
+    private List<Server> hostedServers = new ArrayList<>();
 
     @OneToMany(mappedBy = "creator")
-    private List<Channel> createdChannels;
+    private List<Channel> createdChannels = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "fromUser")
@@ -55,13 +52,13 @@ public class User extends BaseEntity {
     private Set<Friend> from_friends = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
-    private Set<Message> messages = new LinkedHashSet<>();
+    private List<Message> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     private Set<ServerUser> serverUsers = new LinkedHashSet<>();
 
 
-
+    @Builder
     public static User createUser(String email, String nickname, Role role) {
         return User.builder()
                 .email(email)
@@ -69,5 +66,7 @@ public class User extends BaseEntity {
                 .role(role)
                 .build();
     }
+
+
 
 }

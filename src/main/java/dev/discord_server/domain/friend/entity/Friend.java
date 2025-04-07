@@ -4,6 +4,7 @@ import dev.discord_server.config.BaseEntity;
 import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.user.entity.User;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,6 +12,7 @@ import lombok.Setter;
 @Setter
 @Entity
 @Table(name = "friend")
+@EqualsAndHashCode(of = {"fromUser", "toUser"}, callSuper = false)
 public class Friend extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
