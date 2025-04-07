@@ -4,6 +4,7 @@ import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.server.dto.ServerResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import dev.discord_server.domain.server.service.ServerService;
@@ -23,6 +24,7 @@ public class ServerController {
     private final ServerService serverService;
 
     @GetMapping("/server")
+    @PreAuthorize("hasRole('ADMIN')")
     public CommonResponse<List<ServerResponse>> getServerList2() {
         List<ServerResponse> servers = serverService.findServers();
         return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
