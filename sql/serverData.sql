@@ -1,8 +1,8 @@
 use discord_server;
 
-INSERT INTO User (nickname, password, email, social_id, role)
+INSERT INTO User (nickname, password, email, role)
 VALUES
-    ('admin', 'adminpass', 'admin@example.com', 12345, 'USER');
+    ('admin', 'adminpass', 'admin@example.com','USER');
 
 
 

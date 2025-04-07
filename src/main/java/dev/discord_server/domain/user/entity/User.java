@@ -19,6 +19,8 @@ import java.util.Set;
 @Entity
 @Table(name = "user")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -58,7 +60,7 @@ public class User extends BaseEntity {
     private Set<ServerUser> serverUsers = new LinkedHashSet<>();
 
 
-    @Builder
+
     public static User createUser(String email, String nickname, Role role) {
         return User.builder()
                 .email(email)
