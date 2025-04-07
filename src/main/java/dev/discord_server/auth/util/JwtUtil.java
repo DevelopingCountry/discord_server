@@ -17,8 +17,7 @@ public class JwtUtil {
 
     @Value("${jwt.accessSecret}")
     private String SECRET_KEY;
-    @Value("${jwt.refreshSecret}")
-    private String REFRESH_SECRET;
+
     @Value("${jwt.access_token_expired_at}")
     private long ACCESS_TOKEN_EXPIRED_AT;
     @Value("${jwt.refresh_token_expired_at}")
@@ -44,7 +43,7 @@ public class JwtUtil {
                 .claim("role", role)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + REFRESH_TOKEN_EXPIRED_AT))
-                .signWith(refreshGetSigningKey(), SignatureAlgorithm.HS256)
+                .signWith(accessGetSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
@@ -54,7 +53,7 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody();
-        return claims.getSubject();
+        return claims.get("email", String.class);
     }
 
     public String getRoleFromToken(String token) {
@@ -73,10 +72,7 @@ public class JwtUtil {
         byte[] keyBytes = SECRET_KEY.getBytes(StandardCharsets.UTF_8);
         return Keys.hmacShaKeyFor(keyBytes);
     }
-    private Key refreshGetSigningKey() {
-        byte[] keyBytes = REFRESH_SECRET.getBytes(StandardCharsets.UTF_8);
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
+
 
 
     public Long getUserIdFromToken(String token) {
@@ -91,6 +87,7 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+
 
 
 }

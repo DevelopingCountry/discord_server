@@ -49,6 +49,7 @@ public class AuthService {
     }
 
     public String refreshAccessToken(String refreshToken) {
+
         String email;
         try {
             email = jwtUtil.getEmailFromToken(refreshToken);
@@ -56,7 +57,17 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid JWT");
         }
 
+        System.out.println(email);
+
         String storedToken = refreshTokenRepository.getRefreshToken(email);
+
+        System.out.println(storedToken);
+
+        // ✅ 여기 로그 추가!
+        System.out.println("📩 요청된 refreshToken: " + refreshToken);
+        System.out.println("📦 Redis에 저장된 refreshToken: " + storedToken);
+        System.out.println("⛔ equals 비교 결과: " + refreshToken.equals(storedToken));
+
         if (storedToken != null && storedToken.equals(refreshToken)) {
             User user = userRepository.findByEmail(email)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "User not found"));
@@ -65,6 +76,7 @@ public class AuthService {
 
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh Token Expired or Not Found");
     }
+
 
 
     private User createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
