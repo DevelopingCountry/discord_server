@@ -1,5 +1,7 @@
 package dev.discord_server.domain.friend.service;
 
+import dev.discord_server.common.response.ErrorDefineCode;
+import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.domain.dto.FriendResponse;
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.repository.FriendRepository;
@@ -9,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -20,7 +21,7 @@ public class FriendService {
 
     public List<FriendResponse> findFriends(UUID currentUserId) {
         User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR));
 
         List<Friend> friends = friendRepository.findByFromUserOrToUser(currentUser, currentUser);
 

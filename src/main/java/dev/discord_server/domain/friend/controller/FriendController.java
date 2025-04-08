@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -26,4 +27,6 @@ public class FriendController {
         List<FriendResponse> friends = friendService.findFriends(uuid);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 친구가 반환되었습니다.",friends);
     }
+
+
 }
