@@ -1,5 +1,6 @@
 package dev.discord_server.domain.server.controller;
 
+import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.server.dto.ServerResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +30,8 @@ public class ServerController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<ServerResponse>> getServerList2() {
-        List<ServerResponse> servers = serverService.findServers();
+        Long userId = SecurityUtil.getCurrentUserId();
+        List<ServerResponse> servers = serverService.findServers(userId);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
     }
 }

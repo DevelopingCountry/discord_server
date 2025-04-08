@@ -5,6 +5,7 @@ import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundEx
 import dev.discord_server.domain.server.dto.ServerResponse;
 import dev.discord_server.domain.server.entity.Server;
 import dev.discord_server.domain.server.repository.ServerRepository;
+import dev.discord_server.domain.serverUser.entity.ServerUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -23,17 +24,25 @@ public class ServerService {
 
     private final ServerRepository serverRepository;
 
-    public List<ServerResponse> findServers() {
+    public List<ServerResponse> findServers(Long userId) {
         List<Server> all = serverRepository.findAll();
-        if(all.isEmpty()) {
+        if (all.isEmpty()) {
             throw new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR);
         }
 
-        List<ServerResponse> responseDtoStream = all.stream()
-                .map((ServerResponse::toResponseDto))
+        return all.stream()
+                .map(server -> {
+                    boolean alarm = server.getServerUsers().stream()
+                            .filter(su -> su.getUser().getId().equals(userId))
+                            .findFirst()
+                            .map(ServerUser::isAlarm) // 또는 getAlarm()
+                            .orElse(false);
+
+                    return ServerResponse.toResponseDto(server, alarm);
+                })
                 .toList();
-        return responseDtoStream;
     }
+
 
 
 
