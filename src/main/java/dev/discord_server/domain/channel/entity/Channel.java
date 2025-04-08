@@ -18,8 +18,8 @@ import java.util.*;
 @Table(name = "channel")
 public class Channel extends BaseEntity {
     @Id
-    @GeneratedValue
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", columnDefinition = "BINARY(16)")
     private UUID id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

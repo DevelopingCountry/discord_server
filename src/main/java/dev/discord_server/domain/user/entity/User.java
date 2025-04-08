@@ -20,8 +20,8 @@ import java.util.*;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User extends BaseEntity {
     @Id
-    @GeneratedValue
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", columnDefinition = "BINARY(16)")
     private UUID id;
 
     @Column(name = "nickname", nullable = false, length = 10)

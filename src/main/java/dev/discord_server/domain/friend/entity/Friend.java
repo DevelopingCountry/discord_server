@@ -17,9 +17,9 @@ import java.util.UUID;
 @EqualsAndHashCode(of = {"fromUser", "toUser"}, callSuper = false)
 public class Friend extends BaseEntity {
     @Id
-    @GeneratedValue
-    @Column(name = "id", nullable = false)
-    private UUID id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "from_user_id", nullable = false)

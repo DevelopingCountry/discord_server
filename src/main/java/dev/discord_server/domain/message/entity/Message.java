@@ -18,8 +18,8 @@ import java.util.UUID;
 @Table(name = "message")
 public class Message extends BaseEntity {
     @Id
-    @GeneratedValue
-    @Column(name = "id", nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", columnDefinition = "BINARY(16)")
     private UUID id;
 
     @Column(name = "content", length = 50)
