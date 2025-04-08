@@ -8,8 +8,28 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update  # 필요에 따라 create, update, validate, none 선택
+      ddl-auto: none  # 필요에 따라 create, update, validate, none 선택
     show-sql: true  # 콘솔에서 실행되는 SQL 보기
     properties:
       hibernate:
         format_sql: true  # SQL을 보기 좋게 출력
+
+  kakao:
+    auth:
+      client: d0e33acc669d3d7994242e6879cefb32
+      redirect: http://localhost:8080/auth/login/kakao
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+jwt:
+  accessSecret: UGxlYXNlIGRvIG5vdCBkZWNyeXB0IHRoaIEl0J3MgY29uZmlkZW50aG91ciBzZWNyZXQuIGl0IGlzIGNjQgYnl0ZXMuIHNvIHNhZC4gaG93IGFyZSB5b3UgaSdtIG5vdCBmaW5lIHRoYW5rIHlvdSBhbmQgeW91PyBpIHdhbnQgZ28gaG9tZSBmZg==
+  refreshSecret: UnJycmluZyBkaW5nIGRvZyByacgZG9uZyByaW5nIGRpZ2lkaWpbmcuIGJ1dHRlcmZseSBubyBydWwgbWFuIG5hbiBjaG90IHN1biBnYW4gbW9tIGUgcHBhIHp6ZXIgYmVyIHJ1aXQgc28gbmUgbWF1bWRvIG11bHJ1aXRzbyBuYW4gbWFsIHlhIG11dCB6aW4gbm9tIGNoYWsgaGFuIG5vbSBncm9uIG5vbWRvIGFuaXppbWFu
+  access_token_expired_at: 10800000       # 1000 * 60 * 60 * 3 → 3시간 (ms)
+  refresh_token_expired_at: 604800000     # 1000 * 60 * 60 * 24 * 7 → 7일 (ms)
+
+error:
+  printStackTrace: true # Stack trace 출력 여부
+  printStackTraceLine: 10 # Stack trace 출력 줄 수

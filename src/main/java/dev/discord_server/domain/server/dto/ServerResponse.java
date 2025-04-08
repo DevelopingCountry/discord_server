@@ -4,13 +4,18 @@ import dev.discord_server.domain.server.entity.Server;
 import lombok.Builder;
 import lombok.Getter;
 
+/**
+ * DTO 이름은 domain이름 + request OR response로 정한다.
+ * 각자에 필요한 필드들 작성
+ */
+
 @Getter
 @Builder
-public class ResponseDto {
+public class ServerResponse {
     private String name;
 
-    public static ResponseDto toResponseDto(Server server) {
-        return ResponseDto.builder()
+    public static ServerResponse toResponseDto(Server server) {
+        return ServerResponse.builder()
                 .name(server.getName())
                 .build();
     }
