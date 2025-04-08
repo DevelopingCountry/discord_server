@@ -8,6 +8,7 @@
                           nickname VARCHAR(10) NOT NULL UNIQUE,
                           password VARCHAR(20),
                           email VARCHAR(20) NOT NULL UNIQUE,
+                          image_url VARCHAR(255),
                           role ENUM('USER', 'ADMIN') DEFAULT 'USER',
                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                           updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -74,4 +75,5 @@
                              FOREIGN KEY (channel_id) REFERENCES channel(id) ON DELETE CASCADE,
                              FOREIGN KEY (user_id) REFERENCES user(id)
     );
+
 

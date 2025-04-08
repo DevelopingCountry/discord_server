@@ -4,15 +4,16 @@ import dev.discord_server.config.BaseEntity;
 import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.UUID;
 
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "friend")
 @EqualsAndHashCode(of = {"fromUser", "toUser"}, callSuper = false)
 public class Friend extends BaseEntity {
@@ -32,7 +33,5 @@ public class Friend extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
     private FriendStatus status;
-
-
 
 }
