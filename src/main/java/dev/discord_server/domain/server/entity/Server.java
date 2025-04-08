@@ -10,6 +10,7 @@ import lombok.Setter;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -17,9 +18,9 @@ import java.util.Set;
 @Table(name = "server")
 public class Server extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue
     @Column(name = "id")
-    private Long id;
+    private UUID id;
 
     @Column(name = "name", nullable = false, length = 20)
     private String name;
