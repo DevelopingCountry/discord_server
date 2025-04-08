@@ -17,7 +17,7 @@ spring:
   kakao:
     auth:
       client: d0e33acc669d3d7994242e6879cefb32
-      redirect: http://localhost:8080/auth/login/kakao
+      redirect: http://localhost:3000/auth/kakao
 
   data:
     redis:
