@@ -76,10 +76,13 @@ public class JwtUtil {
 
 
 
-    public Long getUserIdFromToken(String token) {
-        return Long.parseLong(getAllClaims(token).getSubject());
+    public UUID getUserIdFromToken(String token) {
+        try {
+            return UUID.fromString(getAllClaims(token).getSubject());
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid UUID format in token subject", e);
+        }
     }
-
 
     private Claims getAllClaims(String token) {
         return Jwts.parserBuilder()
