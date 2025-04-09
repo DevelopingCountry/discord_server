@@ -10,11 +10,13 @@ import dev.discord_server.domain.friend.repository.FriendRepository;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.entity.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class FriendService {
@@ -22,10 +24,7 @@ public class FriendService {
     private final UserRepository userRepository;
 
     public List<FriendResponse> findFriends(UUID currentUserId) {
-        User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
-
-        List<Friend> friends = friendRepository.findByFromUserOrToUser(currentUser, currentUser);
+        List<Friend> friends = friendRepository.findByFromUserIdOrToUserId(currentUserId, currentUserId);
 
         return friends.stream()
                 .map(friend -> FriendResponse.toFriendResponse(friend, currentUserId))
