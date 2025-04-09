@@ -15,6 +15,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
@@ -72,18 +73,17 @@ public class FriendService {
     }
 
     public void changeFriendRequest(UUID uuid, UUID friendId, FriendStatus status) {
-        User currentUser = userRepository.findById(uuid)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+        Friend friend = friendRepository
+                .findByFromUserIdAndToUserIdOrFromUserIdAndToUserId(
+                        uuid, friendId,
+                        friendId, uuid
+                )
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.NOT_VALID_FRIEND));
 
-        User targetUser = userRepository.findById(friendId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
-
-        Friend friend = friendRepository.findByFromUserAndToUserOrToUserAndFromUser(
-                currentUser, targetUser, targetUser, currentUser
-        ).orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.NOT_VALID_FRIEND));
 
         // 친구 신청을 받은 사람만 상태값을 변경할 수 있도록 함
-        if (!friend.getToUser().getId().equals(currentUser.getId())) {
+
+        if (!friend.getToUser().getId().equals(uuid)) {
             throw new ForbiddenException403(ErrorDefineCode.AUTH_NOT_CHANGE_FRIEND_STATUS);
         }
 
