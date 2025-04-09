@@ -3,7 +3,7 @@ package dev.discord_server.domain.friend.service;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.exception.custom.exception.AlreadyExistElementException409;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
-import dev.discord_server.domain.dto.FriendResponse;
+import dev.discord_server.domain.friend.dto.FriendResponse;
 import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.repository.FriendRepository;
@@ -23,7 +23,7 @@ public class FriendService {
 
     public List<FriendResponse> findFriends(UUID currentUserId) {
         User currentUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         List<Friend> friends = friendRepository.findByFromUserOrToUser(currentUser, currentUser);
 
@@ -34,9 +34,9 @@ public class FriendService {
 
     public void sendFriendRequest(UUID currentUserId, UUID toUserId) {
         User fromUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
         User toUser = userRepository.findById(toUserId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         boolean exists = friendRepository.existsByFromUserAndToUser(fromUser, toUser);
 
@@ -56,5 +56,19 @@ public class FriendService {
                 .build();
 
         friendRepository.save(friend);
+    }
+
+
+    public void deleteFriendRequest(UUID currentUserId, UUID toUserId) {
+        User fromUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+        User toUser = userRepository.findById(toUserId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+
+        Friend friend = friendRepository
+                .findByFromUserAndToUserOrToUserAndFromUser(fromUser, toUser, toUser, fromUser)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_FRIEND));
+
+        friendRepository.delete(friend);
     }
 }

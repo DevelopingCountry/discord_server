@@ -1,4 +1,4 @@
-package dev.discord_server.domain.dto;
+package dev.discord_server.domain.friend.dto;
 
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.user.entity.User;

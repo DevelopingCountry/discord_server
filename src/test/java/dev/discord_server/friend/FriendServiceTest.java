@@ -1,8 +1,8 @@
 package dev.discord_server.friend;
 
-import dev.discord_server.config.exception.custom.CustomExceptionHandler;
 import dev.discord_server.config.exception.custom.exception.AlreadyExistElementException409;
-import dev.discord_server.domain.dto.FriendResponse;
+import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
+import dev.discord_server.domain.friend.dto.FriendResponse;
 import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.repository.FriendRepository;
@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -87,9 +88,10 @@ public class FriendServiceTest {
         friendService.sendFriendRequest(userA.getId(), userB.getId());
 
         // then
-        List<Friend> results = friendRepository.findByFromUserAndToUser(userA, userB);
-        assertThat(results).hasSize(1);
-        assertThat(results.get(0).getStatus()).isEqualTo(FriendStatus.PENDING);
+        Optional<Friend> optionalFriend = friendRepository.findByFromUserAndToUser(userA, userB);
+
+        assertThat(optionalFriend).isPresent();
+        assertThat(optionalFriend.get().getStatus()).isEqualTo(FriendStatus.PENDING);
     }
 
     @Test
@@ -130,5 +132,61 @@ public class FriendServiceTest {
                 .isInstanceOf(AlreadyExistElementException409.class)
                 .hasMessageContaining("자신에게 친구 신청 할 수 없습니다.");
     }
+    @Test
+    void 친구_삭제_성공() {
+        // given
+        User userA = userRepository.save(User.builder()
+                .email("a@example.com")
+                .nickname("userA")
+                .imageUrl("img-a")
+                .role(Role.USER)
+                .build());
+
+        User userB = userRepository.save(User.builder()
+                .email("b@example.com")
+                .nickname("userB")
+                .imageUrl("img-b")
+                .role(Role.USER)
+                .build());
+
+        Friend friend = friendRepository.save(Friend.builder()
+                .fromUser(userA)
+                .toUser(userB)
+                .status(FriendStatus.ACCEPTED)
+                .build());
+
+        // when
+        friendService.deleteFriendRequest(userA.getId(), userB.getId());
+
+        // then
+        boolean exists = friendRepository.existsByFromUserAndToUser(userA, userB)
+                || friendRepository.existsByFromUserAndToUser(userB, userA);
+
+        assertThat(exists).isFalse();
+    }
+
+    @Test
+    void 친구_삭제_예외_존재하지_않는_관계() {
+        // given
+        User userA = userRepository.save(User.builder()
+                .email("a@example.com")
+                .nickname("userA")
+                .imageUrl("img-a")
+                .role(Role.USER)
+                .build());
+
+        User userB = userRepository.save(User.builder()
+                .email("b@example.com")
+                .nickname("userB")
+                .imageUrl("img-b")
+                .role(Role.USER)
+                .build());
+
+        // when & then
+        assertThatThrownBy(() -> friendService.deleteFriendRequest(userA.getId(), userB.getId()))
+                .isInstanceOf(NoSuchElementFoundException404.class)
+                .hasMessageContaining("존재하지 않는 친구 입니다.");
+    }
+
 
 }

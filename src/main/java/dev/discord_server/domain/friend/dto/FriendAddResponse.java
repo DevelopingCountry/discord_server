@@ -1,4 +1,4 @@
-package dev.discord_server.domain.dto;
+package dev.discord_server.domain.friend.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
