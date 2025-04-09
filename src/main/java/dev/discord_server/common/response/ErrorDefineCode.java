@@ -15,6 +15,8 @@ public enum ErrorDefineCode {
     AUTH_NOT_FOUND_EMAIL("ERR_04", "해당 이메일을 찾을 수 없습니다."),
     AUTHORIZATION_FAIL("ERR_05", "해당 권한이 없습니다."),
     AUTHENTICATE_FAIL("ERR_06", "권한 인증에 실패했습니다."),
+    SELF_FRIEND_REQUEST("FRI_01","자신에게 친구 신청 할 수 없습니다."),
+    DUPLICATE_FRIEND("FRI_02","이미 친구 요청이 존재합니다.")
     ;
 
     private final String code;

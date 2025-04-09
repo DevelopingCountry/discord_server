@@ -9,4 +9,6 @@ import java.util.UUID;
 
 public interface FriendRepository extends JpaRepository<Friend, UUID> {
     List<Friend> findByFromUserOrToUser(User fromUser, User toUser);
+    List<Friend> findByFromUserAndToUser(User fromUser, User toUser);
+    boolean existsByFromUserAndToUser(User fromUser, User toUser);
 }

@@ -1,8 +1,10 @@
 package dev.discord_server.domain.friend.service;
 
 import dev.discord_server.common.response.ErrorDefineCode;
+import dev.discord_server.config.exception.custom.exception.AlreadyExistElementException409;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.domain.dto.FriendResponse;
+import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.repository.FriendRepository;
 import dev.discord_server.domain.user.entity.User;
@@ -28,5 +30,31 @@ public class FriendService {
         return friends.stream()
                 .map(friend -> FriendResponse.toFriendResponse(friend, currentUserId))
                 .toList();
+    }
+
+    public void sendFriendRequest(UUID currentUserId, UUID toUserId) {
+        User fromUser = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR));
+        User toUser = userRepository.findById(toUserId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR));
+
+        boolean exists = friendRepository.existsByFromUserAndToUser(fromUser, toUser);
+
+        // custom 에러처리로 수정
+        if (exists) {
+            throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_FRIEND);
+        }
+
+        if (currentUserId.equals(toUserId)) {
+            throw new AlreadyExistElementException409(ErrorDefineCode.SELF_FRIEND_REQUEST);
+        }
+
+        Friend friend = Friend.builder()
+                .fromUser(fromUser)
+                .toUser(toUser)
+                .status(FriendStatus.PENDING)
+                .build();
+
+        friendRepository.save(friend);
     }
 }
