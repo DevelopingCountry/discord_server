@@ -14,17 +14,18 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/friend")
 public class FriendController {
     private final FriendService friendService;
 
-    @GetMapping("/friend")
+    @GetMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<FriendResponse>> getFriendList() {
         UUID uuid = SecurityUtil.getCurrentUserId();
         List<FriendResponse> friends = friendService.findFriends(uuid);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 친구가 반환되었습니다.",friends);
     }
-    @PostMapping("/friend")
+    @PostMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendAddResponse> postFriend(
             @RequestBody FriendAddRequest request) {
@@ -39,7 +40,7 @@ public class FriendController {
      * @param request
      * @return
      */
-    @DeleteMapping("/friend")
+    @DeleteMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendDeleteResponse> deleteFriend(@RequestBody FriendDeleteRequest request) {
         UUID uuid = SecurityUtil.getCurrentUserId();
