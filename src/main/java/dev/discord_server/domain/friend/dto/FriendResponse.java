@@ -20,6 +20,7 @@ public class FriendResponse {
                 : friend.getFromUser();
 
         return FriendResponse.builder()
+                .friendId(friend.getId())
                 .name(targetUser.getNickname())
                 .imageUrl(targetUser.getImageUrl())
                 .build();
