@@ -2,6 +2,7 @@ package dev.discord_server.domain.friend.service;
 
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.exception.custom.exception.AlreadyExistElementException409;
+import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.domain.friend.dto.FriendResponse;
 import dev.discord_server.domain.friend.Enum.FriendStatus;
@@ -68,5 +69,31 @@ public class FriendService {
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_FRIEND));
 
         friendRepository.delete(friend);
+    }
+
+    public void changeFriendRequest(UUID uuid, UUID friendId, FriendStatus status) {
+        User currentUser = userRepository.findById(uuid)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+
+        User targetUser = userRepository.findById(friendId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+
+        Friend friend = friendRepository.findByFromUserAndToUserOrToUserAndFromUser(
+                currentUser, targetUser, targetUser, currentUser
+        ).orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.NOT_VALID_FRIEND));
+
+        // 친구 신청을 받은 사람만 상태값을 변경할 수 있도록 함
+        if (!friend.getToUser().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException403(ErrorDefineCode.AUTH_NOT_CHANGE_FRIEND_STATUS);
+        }
+
+        switch (status) {
+            case ACCEPTED -> friend.setStatus(FriendStatus.ACCEPTED);
+            case REJECTED -> friend.setStatus(FriendStatus.REJECTED);
+            default -> throw new NoSuchElementFoundException404(ErrorDefineCode.NOT_VALID_FRIEND_STATUS);
+        }
+
+        friendRepository.save(friend);
+
     }
 }

@@ -48,6 +48,18 @@ public class FriendController {
         return new CommonResponse<>(true,HttpStatus.OK,"친구 삭제 성공했습니다.",null);
     }
 
+    /**
+     * 친구 신청 수락, 거절
+     * @param request
+     * @return
+     */
+    @PatchMapping
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<FriendStatusResponse> changeFriendStatus(@RequestBody FriendStatusRequest request) {
+        UUID uuid = SecurityUtil.getCurrentUserId();
+        friendService.changeFriendRequest(uuid,request.getFriendId(),request.getStatus());
+        return new CommonResponse<>(true,HttpStatus.OK,"친구 상태 변경에 성공했습니다.",null);
 
+    }
 
 }
