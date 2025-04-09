@@ -4,15 +4,17 @@
     import dev.discord_server.domain.server.entity.Server;
     import dev.discord_server.domain.user.entity.User;
     import jakarta.persistence.*;
-    import lombok.EqualsAndHashCode;
-    import lombok.Getter;
-    import lombok.Setter;
+    import lombok.*;
     import org.hibernate.annotations.OnDelete;
     import org.hibernate.annotations.OnDeleteAction;
     import java.util.UUID;
 
 @Getter
+@Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "server_user")
 @EqualsAndHashCode(of = {"user", "server"}, callSuper = false)
 public class ServerUser extends BaseEntity {

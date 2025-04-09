@@ -2,10 +2,7 @@ package dev.discord_server.domain.server.controller;
 
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
-import dev.discord_server.domain.server.dto.ServerImageUpdateRequest;
-import dev.discord_server.domain.server.dto.ServerNameUpdateRequest;
-import dev.discord_server.domain.server.dto.ServerRequest;
-import dev.discord_server.domain.server.dto.ServerResponse;
+import dev.discord_server.domain.server.dto.*;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.http.HttpStatus;
@@ -63,6 +60,16 @@ public class ServerController {
         serverService.updateServerImage(serverId, request);
         return new CommonResponse<>(true, HttpStatus.OK, "서버 이미지가 변경되었습니다.",null);
     }
+
+
+    @PostMapping("/server/{serverId}/invite")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<Void> inviteUserToServer(@PathVariable UUID serverId,
+                                                   @RequestBody ServerInviteRequest request) {
+        serverService.inviteUser(serverId, request);
+        return new CommonResponse<>(true, HttpStatus.OK, "참여자 초대가 완료되었습니다.", null);
+    }
+
 
 
 

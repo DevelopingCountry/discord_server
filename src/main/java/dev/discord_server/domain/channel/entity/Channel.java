@@ -1,12 +1,12 @@
 package dev.discord_server.domain.channel.entity;
 
 import dev.discord_server.config.BaseEntity;
+import dev.discord_server.domain.channel.Enum.ChannelType;
 import dev.discord_server.domain.message.entity.Message;
 import dev.discord_server.domain.server.entity.Server;
 import dev.discord_server.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -15,6 +15,9 @@ import java.util.*;
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "channel")
 public class Channel extends BaseEntity {
     @Id
@@ -37,9 +40,9 @@ public class Channel extends BaseEntity {
     @Column(name = "name", nullable = false, length = 20)
     private String name;
 
-    @Lob
+    @Enumerated(EnumType.STRING)
     @Column(name = "type", nullable = false)
-    private String type;
+    private ChannelType type;
 
 
     @OneToMany(mappedBy = "channel")

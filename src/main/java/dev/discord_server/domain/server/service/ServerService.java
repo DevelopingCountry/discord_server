@@ -3,11 +3,13 @@ package dev.discord_server.domain.server.service;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.domain.server.dto.ServerImageUpdateRequest;
+import dev.discord_server.domain.server.dto.ServerInviteRequest;
 import dev.discord_server.domain.server.dto.ServerRequest;
 import dev.discord_server.domain.server.dto.ServerResponse;
 import dev.discord_server.domain.server.entity.Server;
 import dev.discord_server.domain.server.repository.ServerRepository;
 import dev.discord_server.domain.serverUser.entity.ServerUser;
+import dev.discord_server.domain.serverUser.entity.ServerUserRepository;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.entity.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -31,6 +33,7 @@ public class ServerService {
 
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
+    private final ServerUserRepository serverUserRepository;
 
     public List<ServerResponse> findServers(UUID userId) {
         List<Server> all = serverRepository.findAll();
@@ -89,5 +92,28 @@ public class ServerService {
         server.setImage(request.getImage());
         serverRepository.save(server);
     }
+
+
+    public void inviteUser(UUID serverId, ServerInviteRequest request) {
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new EntityNotFoundException("서버를 찾을 수 없습니다."));
+
+        if (!server.getHost().getId().equals(request.getHostId())) {
+            throw new AccessDeniedException("해당 서버에 초대할 권한이 없습니다.");
+        }
+
+        User guest = userRepository.findById(request.getGuestId())
+                .orElseThrow(() -> new EntityNotFoundException("초대할 유저가 존재하지 않습니다."));
+
+        ServerUser invited = ServerUser.builder()
+                .server(server)
+                .user(guest)
+                .alarm(true)
+                .build();
+
+        serverUserRepository.save(invited);
+    }
+
+
 
 }
