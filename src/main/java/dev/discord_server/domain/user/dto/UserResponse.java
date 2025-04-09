@@ -6,11 +6,14 @@ import dev.discord_server.domain.user.entity.User;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.util.UUID;
+
 @Getter
 public class UserResponse {
-    private Long id;
+    private UUID id;
     private String email;
     private String nickname;
+    private String imageUrl;
     private Role role;
 
     @Builder
@@ -18,6 +21,7 @@ public class UserResponse {
         this.id = user.getId();
         this.nickname = user.getNickname();
         this.email = user.getEmail();
+        this.imageUrl = user.getImageUrl();
         this.role = user.getRole(); // Enum이면 .name() 또는 toString()
     }
 }
