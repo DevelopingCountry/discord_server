@@ -1,17 +1,13 @@
 use discord_server;
 
-INSERT INTO User (nickname, password, email, role)
+INSERT INTO User (id,nickname, password, email, role)
 VALUES
-    ('admin', 'adminpass', 'admin@example.com','USER');
+    (UUID_TO_BIN(UUID()),'admin', 'adminpass', 'admin@example.com','USER');
 
 
 
-INSERT INTO server (id, name, image_url, host_id)
+INSERT INTO server (id,name, image_url, host_id)
 VALUES
-    (1, 'server1', 'server1_image_url', 1),
-    (2, 'server2', 'server2_image_url', 1),
-    (3, 'server3', 'server3_image_url', 1),
-    (4, 'server4', 'server4_image_url', 1),
-    (5, 'server5', 'server5_image_url', 1);
-
-
+    ( UUID_TO_BIN(UUID()),'server1', 'server1_image_url',UUID_TO_BIN('2ce693c0-1451-11f0-a6da-3544b8cddce4'))
+;
+# server의 host_id는 테스트하려면 User먼저 만들고 그 user의 uuid 복사해서 UUID_TO_BIN()에 넣어서 만들어보세요

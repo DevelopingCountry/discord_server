@@ -10,10 +10,7 @@ import dev.discord_server.domain.user.Enum.Role;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.ArrayList;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Getter
 @Entity
@@ -23,9 +20,9 @@ import java.util.Set;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", nullable = false)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", columnDefinition = "BINARY(16)")
+    private UUID id;
 
     @Column(name = "nickname", nullable = false, length = 10)
     private String nickname;
@@ -36,27 +33,36 @@ public class User extends BaseEntity {
     @Column(name = "email", nullable = false, length = 20)
     private String email;
 
+    @Column(name="image_url")
+    private String imageUrl;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
 
     @OneToMany(mappedBy = "host")
+    @Builder.Default
     private List<Server> hostedServers = new ArrayList<>();
 
     @OneToMany(mappedBy = "creator")
+    @Builder.Default
     private List<Channel> createdChannels = new ArrayList<>();
 
 
     @OneToMany(mappedBy = "fromUser")
+    @Builder.Default
     private Set<Friend> to_friends = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "toUser")
+    @Builder.Default
     private Set<Friend> from_friends = new LinkedHashSet<>();
 
     @OneToMany(mappedBy = "user")
+    @Builder.Default
     private List<Message> messages = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
+    @Builder.Default
     private Set<ServerUser> serverUsers = new LinkedHashSet<>();
 
 
