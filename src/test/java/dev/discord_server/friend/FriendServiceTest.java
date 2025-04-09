@@ -10,7 +10,7 @@ import dev.discord_server.domain.friend.repository.FriendRepository;
 import dev.discord_server.domain.friend.service.FriendService;
 import dev.discord_server.domain.user.Enum.Role;
 import dev.discord_server.domain.user.entity.User;
-import dev.discord_server.domain.user.entity.UserRepository;
+import dev.discord_server.domain.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

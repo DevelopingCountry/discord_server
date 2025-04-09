@@ -1,5 +1,6 @@
-package dev.discord_server.domain.user.entity;
+package dev.discord_server.domain.user.repository;
 
+import dev.discord_server.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

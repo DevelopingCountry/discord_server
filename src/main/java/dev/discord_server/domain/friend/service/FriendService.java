@@ -9,13 +9,12 @@ import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.repository.FriendRepository;
 import dev.discord_server.domain.user.entity.User;
-import dev.discord_server.domain.user.entity.UserRepository;
+import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Slf4j
