@@ -3,10 +3,10 @@ package dev.discord_server.domain.server.entity;
 import dev.discord_server.domain.channel.entity.Channel;
 import dev.discord_server.config.BaseEntity;
 import dev.discord_server.domain.serverUser.entity.ServerUser;
+import dev.discord_server.domain.user.Enum.Role;
 import dev.discord_server.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -15,6 +15,9 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Builder
+@AllArgsConstructor
+@NoArgsConstructor
 @Table(name = "server")
 public class Server extends BaseEntity {
     @Id
@@ -46,6 +49,14 @@ public class Server extends BaseEntity {
     @OneToMany(mappedBy = "server")
     private Set<ServerUser> serverUsers = new LinkedHashSet<>();
 
+    //TODO: host_id로 안해도되는지
+    public static Server createServer(String name, String image, User host) {
+        return Server.builder()
+                .name(name)
+                .image(image)
+                .host(host)
+                .build();
+    }
 
 
 }

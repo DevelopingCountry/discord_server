@@ -2,14 +2,21 @@ package dev.discord_server.domain.server.service;
 
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
+import dev.discord_server.domain.server.dto.ServerImageUpdateRequest;
+import dev.discord_server.domain.server.dto.ServerRequest;
 import dev.discord_server.domain.server.dto.ServerResponse;
 import dev.discord_server.domain.server.entity.Server;
 import dev.discord_server.domain.server.repository.ServerRepository;
 import dev.discord_server.domain.serverUser.entity.ServerUser;
+import dev.discord_server.domain.user.entity.User;
+import dev.discord_server.domain.user.entity.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 예외처리 사용 방법
@@ -23,8 +30,9 @@ import java.util.List;
 public class ServerService {
 
     private final ServerRepository serverRepository;
+    private final UserRepository userRepository;
 
-    public List<ServerResponse> findServers(Long userId) {
+    public List<ServerResponse> findServers(UUID userId) {
         List<Server> all = serverRepository.findAll();
         if (all.isEmpty()) {
             throw new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR);
@@ -44,7 +52,42 @@ public class ServerService {
     }
 
 
+    public UUID addServer(UUID userId, ServerRequest serverRequest) {
 
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 유저가 존재하지 않습니다."));
 
+        Server server = Server.createServer(
+                serverRequest.getServerName(),
+                serverRequest.getImage(),
+                user
+                );
+
+        serverRepository.save(server);
+        return server.getId();
+    }
+
+    public void updateServerName(UUID userId, UUID serverId, String newName) {
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 서버가 존재하지 않습니다."));
+
+        if (!server.getHost().equals(userId)) {
+            throw new AccessDeniedException("해당 서버를 수정할 권한이 없습니다.");
+        }
+        server.setName(newName);
+        serverRepository.save(server);
+    }
+
+    public void updateServerImage(UUID serverId, ServerImageUpdateRequest request) {
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new EntityNotFoundException("해당 서버가 존재하지 않습니다."));
+
+        if (!server.getHost().getId().equals(request.getUserId())) {
+            throw new AccessDeniedException("해당 서버를 수정할 권한이 없습니다.");
+        }
+
+        server.setImage(request.getImage());
+        serverRepository.save(server);
+    }
 
 }

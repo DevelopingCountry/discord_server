@@ -2,17 +2,19 @@ package dev.discord_server.domain.server.controller;
 
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
+import dev.discord_server.domain.server.dto.ServerImageUpdateRequest;
+import dev.discord_server.domain.server.dto.ServerNameUpdateRequest;
+import dev.discord_server.domain.server.dto.ServerRequest;
 import dev.discord_server.domain.server.dto.ServerResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import dev.discord_server.domain.server.service.ServerService;
 
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -30,8 +32,39 @@ public class ServerController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<ServerResponse>> getServerList2() {
-        Long userId = SecurityUtil.getCurrentUserId();
-        List<ServerResponse> servers = serverService.findServers(userId);
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+        List<ServerResponse> servers = serverService.findServers(currentUserId);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
     }
+
+
+    @PostMapping
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<UUID> addServer(@RequestBody ServerRequest serverRequest) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+        UUID serverId = serverService.addServer(currentUserId, serverRequest);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버가 생성되었습니다.", serverId);
+    }
+
+    @PatchMapping("/server/{serverId}")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<String> updateServerName(@PathVariable UUID serverId,
+                                                 @RequestBody ServerNameUpdateRequest request) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+        serverService.updateServerName(currentUserId, serverId, request.getName());
+        return new CommonResponse<>(true, HttpStatus.OK, "서버 이름이 변경되었습니다.", null);
+    }
+
+
+    @PatchMapping("/server/{serverId}/image")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<Void> updateServerImage(@PathVariable UUID serverId,
+                                                  @RequestBody ServerImageUpdateRequest request) {
+        serverService.updateServerImage(serverId, request);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버 이미지가 변경되었습니다.",null);
+    }
+
+
+
+
 }
