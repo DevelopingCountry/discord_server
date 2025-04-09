@@ -1,11 +1,14 @@
 package dev.discord_server.domain.server.controller;
 
+import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.server.dto.ServerResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import dev.discord_server.domain.server.service.ServerService;
 
@@ -20,14 +23,15 @@ import java.util.List;
  */
 @RequiredArgsConstructor
 @RestController
+@RequestMapping("/server")
 public class ServerController {
     private final ServerService serverService;
 
-    @GetMapping("/server")
+    @GetMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<ServerResponse>> getServerList2() {
-        List<ServerResponse> servers = serverService.findServers();
+        Long userId = SecurityUtil.getCurrentUserId();
+        List<ServerResponse> servers = serverService.findServers(userId);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
     }
-
 }

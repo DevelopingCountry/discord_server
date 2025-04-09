@@ -2,6 +2,7 @@ package dev.discord_server.auth.service;
 
 import dev.discord_server.auth.converter.AuthConverter;
 import dev.discord_server.auth.dto.KakaoDTO;
+import dev.discord_server.auth.dto.TokenResponse;
 import dev.discord_server.auth.repository.RefreshTokenRepository;
 import dev.discord_server.auth.util.JwtUtil;
 import dev.discord_server.auth.util.KakaoUtil;
@@ -26,7 +27,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
 
-    public User oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
+    public TokenResponse oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
         String email = kakaoProfile.getKakao_account().getEmail();
@@ -46,10 +47,7 @@ public class AuthService {
         refreshTokenRepository.saveRefreshToken(user.getEmail(), refreshToken);
 
         // Access Token을 응답 헤더에 추가
-        httpServletResponse.setHeader("Authorization", accessToken);
-        httpServletResponse.setHeader("Refresh-Token", refreshToken);
-
-        return user;
+        return new TokenResponse(accessToken, refreshToken);
 
     }
 

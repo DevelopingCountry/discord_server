@@ -1,6 +1,7 @@
 package dev.discord_server.auth.controller;
 
 import dev.discord_server.auth.dto.RefreshRequestDTO;
+import dev.discord_server.auth.dto.TokenResponse;
 import dev.discord_server.auth.service.AuthService;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.user.dto.UserResponse;
@@ -20,10 +21,9 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/login/kakao")
-    public CommonResponse<UserResponse> kakaoLogin(@RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) {
-        User user = authService.oAuthLogin(accessCode, httpServletResponse);
-        UserResponse userResponse = new UserResponse(user);
-        return new CommonResponse<>(true, HttpStatus.OK, "로그인 완료되었습니다.", userResponse);
+    public CommonResponse<TokenResponse> kakaoLogin(@RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) {
+        TokenResponse tokenResponse = authService.oAuthLogin(accessCode, httpServletResponse);
+        return new CommonResponse<>(true, HttpStatus.OK, "로그인 완료되었습니다.", tokenResponse);
     }
 
     // Refresh Token을 이용한 Access Token 재발급
