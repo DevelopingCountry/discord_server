@@ -40,7 +40,6 @@ public class FriendService {
 
         boolean exists = friendRepository.existsByFromUserAndToUser(fromUser, toUser);
 
-        // custom 에러처리로 수정
         if (exists) {
             throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_FRIEND);
         }

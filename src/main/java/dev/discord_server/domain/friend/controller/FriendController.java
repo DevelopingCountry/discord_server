@@ -2,10 +2,7 @@ package dev.discord_server.domain.friend.controller;
 
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
-import dev.discord_server.domain.friend.dto.FriendAddRequest;
-import dev.discord_server.domain.friend.dto.FriendAddResponse;
-import dev.discord_server.domain.friend.dto.FriendDeleteRequest;
-import dev.discord_server.domain.friend.dto.FriendResponse;
+import dev.discord_server.domain.friend.dto.*;
 import dev.discord_server.domain.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,7 +41,7 @@ public class FriendController {
      */
     @DeleteMapping("/friend")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<FriendResponse> deleteFriend(@RequestBody FriendDeleteRequest request) {
+    public CommonResponse<FriendDeleteResponse> deleteFriend(@RequestBody FriendDeleteRequest request) {
         UUID uuid = SecurityUtil.getCurrentUserId();
         friendService.deleteFriendRequest(uuid,request.getUserId());
         return new CommonResponse<>(true,HttpStatus.OK,"친구 삭제 성공했습니다.",null);
