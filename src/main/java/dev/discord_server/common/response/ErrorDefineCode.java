@@ -18,8 +18,12 @@ public enum ErrorDefineCode {
     SELF_FRIEND_REQUEST("FRI_01","자신에게 친구 신청 할 수 없습니다."),
     DUPLICATE_FRIEND("FRI_02","이미 친구 요청이 존재합니다."),
     EMPTY_FRIEND("FRI_03", "존재하지 않는 친구 입니다."),
-    EMPTY_USER("user_01","존재하지 않는 유저입니다.")
-    ;
+    EMPTY_USER("user_01","존재하지 않는 유저입니다."),
+    EMPTY_SERVER("SER_01","서버가 존재하지 않습니다."),
+    EMPTY_CHANNEL("CHA_01", "채널이 존재하지 않습니다."),
+    CHANNEL_NOT_IN_SERVER("CHA_02", "해당 서버에 속한 채널이 아닙니다.")
+
+            ;
 
     private final String code;
     private final String message;

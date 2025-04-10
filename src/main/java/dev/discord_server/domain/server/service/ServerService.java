@@ -2,6 +2,7 @@ package dev.discord_server.domain.server.service;
 
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.ErrorDefineCode;
+import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.domain.server.dto.ServerImageUpdateRequest;
 import dev.discord_server.domain.server.dto.ServerInviteRequest;
@@ -18,6 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
+import java.awt.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -39,7 +41,7 @@ public class ServerService {
     public List<ServerResponse> findServers(UUID userId) {
         List<Server> all = serverRepository.findAll();
         if (all.isEmpty()) {
-            throw new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR);
+            throw new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER);
         }
 
         return all.stream()
@@ -59,7 +61,7 @@ public class ServerService {
     public UUID addServer(UUID userId, ServerRequest serverRequest) {
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         Server server = Server.createServer(
                 serverRequest.getServerName(),
@@ -73,10 +75,10 @@ public class ServerService {
 
     public void updateServerName(UUID userId, UUID serverId, String newName) {
         Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 서버가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
         if (!server.getHost().getId().equals(userId)) {
-            throw new AccessDeniedException("해당 서버를 수정할 권한이 없습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
         server.setName(newName);
         serverRepository.save(server);
@@ -86,10 +88,10 @@ public class ServerService {
         UUID currentUserId = SecurityUtil.getCurrentUserId();
 
         Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new EntityNotFoundException("해당 서버가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
         if (!server.getHost().getId().equals(currentUserId)) {
-            throw new AccessDeniedException("해당 서버를 수정할 권한이 없습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
 
         server.setName(request.getServerName());
@@ -100,16 +102,16 @@ public class ServerService {
 
     public void inviteUser(UUID serverId, ServerInviteRequest request) {
         Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new EntityNotFoundException("서버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
         UUID currentUserId = SecurityUtil.getCurrentUserId();
 
         if (!server.getHost().getId().equals(currentUserId)) {
-            throw new AccessDeniedException("해당 서버에 초대할 권한이 없습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
 
         User guest = userRepository.findById(request.getGuestId())
-                .orElseThrow(() -> new EntityNotFoundException("초대할 유저가 존재하지 않습니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         ServerUser invited = ServerUser.builder()
                 .server(server)

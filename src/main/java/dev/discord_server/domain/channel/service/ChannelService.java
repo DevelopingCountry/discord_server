@@ -1,6 +1,9 @@
 package dev.discord_server.domain.channel.service;
 
 import dev.discord_server.auth.util.SecurityUtil;
+import dev.discord_server.common.response.ErrorDefineCode;
+import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
+import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.domain.channel.dto.ChannelCreateRequest;
 import dev.discord_server.domain.channel.dto.ChannelDeleteRequest;
 import dev.discord_server.domain.channel.entity.Channel;
@@ -26,16 +29,16 @@ public class ChannelService {
 
     public void createChannel(UUID serverId, ChannelCreateRequest request) {
         Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new EntityNotFoundException("서버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
         UUID currentUserId = SecurityUtil.getCurrentUserId();
 
         if (!server.getHost().getId().equals(currentUserId)) {
-            throw new AccessDeniedException("채널을 생성할 권한이 없습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
 
         User creator = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         Channel channel = Channel.builder()
                 .server(server)
@@ -50,17 +53,17 @@ public class ChannelService {
     public void deleteChannel(UUID serverId, UUID channelId) {
         UUID hostId = SecurityUtil.getCurrentUserId();
         Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new EntityNotFoundException("서버를 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
         if (!server.getHost().getId().equals(hostId)) {
-            throw new AccessDeniedException("채널 삭제 권한이 없습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
 
         Channel channel = channelRepository.findById(channelId)
-                .orElseThrow(() -> new EntityNotFoundException("채널을 찾을 수 없습니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_CHANNEL));
 
         if (!channel.getServer().getId().equals(serverId)) {
-            throw new IllegalArgumentException("해당 서버에 속한 채널이 아닙니다.");
+            throw new ForbiddenException403(ErrorDefineCode.CHANNEL_NOT_IN_SERVER);
         }
 
         channelRepository.delete(channel);
