@@ -28,7 +28,7 @@ public class ServerController {
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<List<ServerResponse>> getServerList2() {
+    public CommonResponse<List<ServerResponse>> getServerList() {
         UUID currentUserId = SecurityUtil.getCurrentUserId();
         List<ServerResponse> servers = serverService.findServers(currentUserId);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
@@ -43,7 +43,7 @@ public class ServerController {
         return new CommonResponse<>(true, HttpStatus.OK, "서버가 생성되었습니다.", serverId);
     }
 
-    @PatchMapping("/server/{serverId}")
+    @PatchMapping("/{serverId}")
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<String> updateServerName(@PathVariable UUID serverId,
                                                  @RequestBody ServerNameUpdateRequest request) {
@@ -53,7 +53,7 @@ public class ServerController {
     }
 
 
-    @PatchMapping("/server/{serverId}/image")
+    @PatchMapping("/{serverId}/image")
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<Void> updateServerImage(@PathVariable UUID serverId,
                                                   @RequestBody ServerImageUpdateRequest request) {
@@ -62,7 +62,7 @@ public class ServerController {
     }
 
 
-    @PostMapping("/server/{serverId}/invite")
+    @PostMapping("/{serverId}/invite")
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<Void> inviteUserToServer(@PathVariable UUID serverId,
                                                    @RequestBody ServerInviteRequest request) {

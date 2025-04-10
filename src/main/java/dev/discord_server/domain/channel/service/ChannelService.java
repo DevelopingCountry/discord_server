@@ -1,5 +1,6 @@
 package dev.discord_server.domain.channel.service;
 
+import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.domain.channel.dto.ChannelCreateRequest;
 import dev.discord_server.domain.channel.dto.ChannelDeleteRequest;
 import dev.discord_server.domain.channel.entity.Channel;
@@ -27,11 +28,13 @@ public class ChannelService {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new EntityNotFoundException("서버를 찾을 수 없습니다."));
 
-        if (!server.getHost().getId().equals(request.getHostId())) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+
+        if (!server.getHost().getId().equals(currentUserId)) {
             throw new AccessDeniedException("채널을 생성할 권한이 없습니다.");
         }
 
-        User creator = userRepository.findById(request.getHostId())
+        User creator = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new EntityNotFoundException("유저를 찾을 수 없습니다."));
 
         Channel channel = Channel.builder()
@@ -44,7 +47,8 @@ public class ChannelService {
         channelRepository.save(channel);
     }
 
-    public void deleteChannel(UUID serverId, UUID hostId, UUID channelId) {
+    public void deleteChannel(UUID serverId, UUID channelId) {
+        UUID hostId = SecurityUtil.getCurrentUserId();
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new EntityNotFoundException("서버를 찾을 수 없습니다."));
 

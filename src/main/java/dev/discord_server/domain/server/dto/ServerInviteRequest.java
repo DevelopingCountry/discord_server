@@ -6,6 +6,5 @@ import java.util.UUID;
 
 @Getter
 public class ServerInviteRequest {
-    private UUID hostId;
     private UUID guestId;
 }

@@ -1,5 +1,6 @@
 package dev.discord_server.domain.server.service;
 
+import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.domain.server.dto.ServerImageUpdateRequest;
@@ -74,7 +75,7 @@ public class ServerService {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 서버가 존재하지 않습니다."));
 
-        if (!server.getHost().equals(userId)) {
+        if (!server.getHost().getId().equals(userId)) {
             throw new AccessDeniedException("해당 서버를 수정할 권한이 없습니다.");
         }
         server.setName(newName);
@@ -82,13 +83,16 @@ public class ServerService {
     }
 
     public void updateServerImage(UUID serverId, ServerImageUpdateRequest request) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new EntityNotFoundException("해당 서버가 존재하지 않습니다."));
 
-        if (!server.getHost().getId().equals(request.getUserId())) {
+        if (!server.getHost().getId().equals(currentUserId)) {
             throw new AccessDeniedException("해당 서버를 수정할 권한이 없습니다.");
         }
 
+        server.setName(request.getServerName());
         server.setImage(request.getImage());
         serverRepository.save(server);
     }
@@ -98,7 +102,9 @@ public class ServerService {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new EntityNotFoundException("서버를 찾을 수 없습니다."));
 
-        if (!server.getHost().getId().equals(request.getHostId())) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+
+        if (!server.getHost().getId().equals(currentUserId)) {
             throw new AccessDeniedException("해당 서버에 초대할 권한이 없습니다.");
         }
 
