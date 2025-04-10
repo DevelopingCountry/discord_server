@@ -3,6 +3,7 @@ package dev.discord_server.domain.friend.controller;
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.friend.dto.*;
+import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -31,8 +32,9 @@ public class FriendController {
             @RequestBody FriendAddRequest request) {
 
         UUID uuid = SecurityUtil.getCurrentUserId();
-        friendService.sendFriendRequest(uuid,request.getUserId());
-        return new CommonResponse<>(true,HttpStatus.OK,"친구 추가 성공했습니다.",null);
+        Friend friend = friendService.sendFriendRequest(uuid,request.getUserId());
+        FriendAddResponse response = new FriendAddResponse(friend.getId());
+        return new CommonResponse<>(true,HttpStatus.OK,"친구 추가 성공했습니다.",response);
     }
 
     /**
@@ -42,7 +44,7 @@ public class FriendController {
      */
     @DeleteMapping
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<FriendDeleteResponse> deleteFriend(@RequestBody FriendDeleteRequest request) {
+    public CommonResponse<Void> deleteFriend(@RequestBody FriendDeleteRequest request) {
         UUID uuid = SecurityUtil.getCurrentUserId();
         friendService.deleteFriendRequest(uuid,request.getUserId());
         return new CommonResponse<>(true,HttpStatus.OK,"친구 삭제 성공했습니다.",null);

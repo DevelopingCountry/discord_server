@@ -32,7 +32,7 @@ public class FriendService {
                 .toList();
     }
 
-    public void sendFriendRequest(UUID currentUserId, UUID toUserId) {
+    public Friend sendFriendRequest(UUID currentUserId, UUID toUserId) {
         User fromUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
         User toUser = userRepository.findById(toUserId)
@@ -54,7 +54,7 @@ public class FriendService {
                 .status(FriendStatus.PENDING)
                 .build();
 
-        friendRepository.save(friend);
+        return friendRepository.save(friend);
     }
 
 
@@ -68,6 +68,9 @@ public class FriendService {
                 .findByFromUserAndToUserOrToUserAndFromUser(fromUser, toUser, toUser, fromUser)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_FRIEND));
 
+        if (friend.getStatus() != FriendStatus.ACCEPTED) {
+            throw new ForbiddenException403(ErrorDefineCode.NOT_DELETABLE_FRIEND_STATUS);
+        }
         friendRepository.delete(friend);
     }
 

@@ -5,6 +5,7 @@ import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.user.dto.UserNickNameResponse;
 import dev.discord_server.domain.user.dto.UserNicknameRequest;
 import dev.discord_server.domain.user.service.UserService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,6 +24,7 @@ public class UserController {
 
     @PatchMapping
     @PreAuthorize("hasRole('USER')")
+    @Tag(name = "유저 닉네임 변경 API", description = "[USER] 유저 닉네임 변경 API 입니다.")
     public CommonResponse<UserNickNameResponse> changeNickname(@RequestBody UserNicknameRequest request) {
         UUID uuid = SecurityUtil.getCurrentUserId();
         UserNickNameResponse response = userService.changeNickname(uuid, request.getNickname());
