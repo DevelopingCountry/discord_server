@@ -2,6 +2,7 @@ package dev.discord_server.domain.server.controller;
 
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.server.dto.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -64,6 +65,31 @@ public class ServerController {
         serverService.inviteUser(serverId, request);
         return new CommonResponse<>(true, HttpStatus.OK, "참여자 초대가 완료되었습니다.", null);
     }
+
+
+    @PatchMapping("/{serverId}/alarm")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<ServerAlarmUpdateResponse> updateAlarm(@PathVariable UUID serverId,
+                                                                 @RequestBody @Valid ServerAlarmUpdateRequest request) {
+        ServerAlarmUpdateResponse response = serverService.updateAlarm(serverId, request);
+        return new CommonResponse<>(true, HttpStatus.OK, "알림이 변경되었습니다.", response);
+    }
+
+    @DeleteMapping("/{serverId}/leave")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<Void> exitServer(@PathVariable UUID serverId) {
+        serverService.exitServer(serverId);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버에서 나갔습니다.", null);
+    }
+
+    @DeleteMapping("/{serverId}")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<Void> deleteServer(@PathVariable UUID serverId) {
+        serverService.deleteServer(serverId);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버를 삭제했습니다.", null);
+    }
+
+
 
 
 

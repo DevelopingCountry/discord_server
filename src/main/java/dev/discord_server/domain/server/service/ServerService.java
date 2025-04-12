@@ -4,6 +4,7 @@ import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
+import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
 import dev.discord_server.domain.server.dto.*;
 import dev.discord_server.domain.server.entity.Server;
 import dev.discord_server.domain.server.repository.ServerRepository;
@@ -68,7 +69,14 @@ public class ServerService {
                 user
                 );
 
+        ServerUser createUser = ServerUser.builder()
+                .server(server)
+                .user(user)
+                .alarm(true)
+                .build();
+
         serverRepository.save(server);
+        serverUserRepository.save(createUser);
 
         return new ServerCreateOrUpdateResponse(
                 server.getId(),
@@ -138,6 +146,66 @@ public class ServerService {
 
         serverUserRepository.save(invited);
     }
+
+
+
+    @Transactional
+    public ServerAlarmUpdateResponse updateAlarm(UUID serverId, ServerAlarmUpdateRequest request) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
+
+        System.out.println(currentUserId);
+
+        ServerUser serverUser = server.getServerUsers().stream()
+                .filter(su -> su.getUser().getId().equals(currentUserId))
+                .findFirst()
+                .orElseThrow(() -> new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL));
+
+        serverUser.setAlarm(request.isAlarm());
+
+        return new ServerAlarmUpdateResponse(serverId, request.isAlarm());
+    }
+
+
+
+    public void exitServer(UUID serverId) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
+
+        if(server.getHost().getId().equals(currentUserId)) {
+            throw new PreconditionFailException412(ErrorDefineCode.CANT_EXIT_HOST_SERVER);
+        }
+
+
+        ServerUser serverUser = serverUserRepository.findByServerIdAndUserId(serverId, currentUserId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.NOT_JOINED_SERVER));
+
+        serverUserRepository.delete(serverUser);
+    }
+
+
+
+    @Transactional
+    public void deleteServer(UUID serverId) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
+
+        if (!server.getHost().getId().equals(currentUserId)) {
+            throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
+        }
+
+        // 관련 엔티티들(예: ServerUser, Channel 등) cascade를 통해 같이 삭제
+        serverRepository.delete(server);
+    }
+
+
+
 
 
 
