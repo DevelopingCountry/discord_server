@@ -50,10 +50,10 @@ public class ServerController {
 
     @PatchMapping("/{serverId}/image")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<Void> updateServerImage(@PathVariable UUID serverId,
-                                                  @RequestBody ServerImageUpdateRequest request) {
-        serverService.updateServerImage(serverId, request);
-        return new CommonResponse<>(true, HttpStatus.OK, "서버 이미지가 변경되었습니다.",null);
+    public CommonResponse<ServerCreateOrUpdateResponse> updateServerImage(@PathVariable UUID serverId,
+                                                                          @RequestBody ServerImageUpdateRequest request) {
+        ServerCreateOrUpdateResponse serverResponse = serverService.updateServerImage(serverId, request);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버 이미지가 변경되었습니다.",serverResponse);
     }
 
 

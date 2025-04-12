@@ -97,7 +97,7 @@ public class ServerService {
     }
 
     @Transactional
-    public void updateServerImage(UUID serverId, ServerImageUpdateRequest request) {
+    public ServerCreateOrUpdateResponse updateServerImage(UUID serverId, ServerImageUpdateRequest request) {
         UUID currentUserId = SecurityUtil.getCurrentUserId();
 
         Server server = serverRepository.findById(serverId)
@@ -107,9 +107,13 @@ public class ServerService {
             throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
 
-        server.setServerName(request.getServerName());
-        server.setImage(request.getImage());
-        serverRepository.save(server);
+        server.setImage(request.getImageUrl());
+
+        return new ServerCreateOrUpdateResponse(
+                serverId,
+                server.getImage(),
+                server.getServerName()
+        );
     }
 
 

@@ -7,6 +7,5 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ServerImageUpdateRequest {
-    private String serverName;
-    private String image;
+    private String imageUrl;
 }
