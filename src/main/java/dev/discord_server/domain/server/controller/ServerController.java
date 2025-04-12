@@ -1,10 +1,8 @@
 package dev.discord_server.domain.server.controller;
 
-import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.server.dto.*;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -29,27 +27,24 @@ public class ServerController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<ServerResponse>> getServerList() {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
-        List<ServerResponse> servers = serverService.findServers(currentUserId);
+        List<ServerResponse> servers = serverService.findServers();
         return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
     }
 
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<UUID> addServer(@RequestBody ServerRequest serverRequest) {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
-        UUID serverId = serverService.addServer(currentUserId, serverRequest);
-        return new CommonResponse<>(true, HttpStatus.OK, "서버가 생성되었습니다.", serverId);
+    public CommonResponse<ServerCreateOrUpdateResponse> addServer(@RequestBody ServerCreateRequest serverCreateRequest) {
+        ServerCreateOrUpdateResponse serverResponse = serverService.addServer(serverCreateRequest);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버가 생성되었습니다.", serverResponse);
     }
 
     @PatchMapping("/{serverId}")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<String> updateServerName(@PathVariable UUID serverId,
+    public CommonResponse<ServerCreateOrUpdateResponse> updateServerName(@PathVariable UUID serverId,
                                                  @RequestBody ServerNameUpdateRequest request) {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
-        serverService.updateServerName(currentUserId, serverId, request.getName());
-        return new CommonResponse<>(true, HttpStatus.OK, "서버 이름이 변경되었습니다.", null);
+        ServerCreateOrUpdateResponse serverResponse = serverService.updateServerName(serverId, request);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버 이름이 변경되었습니다.", serverResponse);
     }
 
 

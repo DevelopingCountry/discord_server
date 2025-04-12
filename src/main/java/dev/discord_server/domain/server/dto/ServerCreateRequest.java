@@ -1,12 +1,9 @@
 package dev.discord_server.domain.server.dto;
 
-import lombok.Builder;
 import lombok.Getter;
 
-import java.util.UUID;
-
 @Getter
-public class ServerRequest {
+public class ServerCreateRequest {
+    private String imageUrl;
     private String serverName;
-    private String image;
 }

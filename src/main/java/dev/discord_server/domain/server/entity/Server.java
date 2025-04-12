@@ -26,7 +26,7 @@ public class Server extends BaseEntity {
     private UUID id;
 
     @Column(name = "name", nullable = false, length = 20)
-    private String name;
+    private String serverName;
 
     @Column(name = "image_url", nullable = false, length = 50)
     private String image;
@@ -52,7 +52,7 @@ public class Server extends BaseEntity {
     //TODO: host_id로 안해도되는지
     public static Server createServer(String name, String image, User host) {
         return Server.builder()
-                .name(name)
+                .serverName(name)
                 .image(image)
                 .host(host)
                 .build();

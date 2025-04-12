@@ -4,22 +4,17 @@ import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
-import dev.discord_server.domain.server.dto.ServerImageUpdateRequest;
-import dev.discord_server.domain.server.dto.ServerInviteRequest;
-import dev.discord_server.domain.server.dto.ServerRequest;
-import dev.discord_server.domain.server.dto.ServerResponse;
+import dev.discord_server.domain.server.dto.*;
 import dev.discord_server.domain.server.entity.Server;
 import dev.discord_server.domain.server.repository.ServerRepository;
 import dev.discord_server.domain.serverUser.entity.ServerUser;
 import dev.discord_server.domain.serverUser.entity.ServerUserRepository;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.entity.UserRepository;
-import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
-import java.awt.*;
 import java.util.List;
 import java.util.UUID;
 
@@ -32,13 +27,16 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ServerService {
 
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
     private final ServerUserRepository serverUserRepository;
 
-    public List<ServerResponse> findServers(UUID userId) {
+    public List<ServerResponse> findServers() {
+
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
         List<Server> all = serverRepository.findAll();
         if (all.isEmpty()) {
             throw new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER);
@@ -47,7 +45,7 @@ public class ServerService {
         return all.stream()
                 .map(server -> {
                     boolean alarm = server.getServerUsers().stream()
-                            .filter(su -> su.getUser().getId().equals(userId))
+                            .filter(su -> su.getUser().getId().equals(currentUserId))
                             .findFirst()
                             .map(ServerUser::isAlarm) // 또는 getAlarm()
                             .orElse(false);
@@ -58,32 +56,47 @@ public class ServerService {
     }
 
 
-    public UUID addServer(UUID userId, ServerRequest serverRequest) {
+    public ServerCreateOrUpdateResponse addServer(ServerCreateRequest serverCreateRequest) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         Server server = Server.createServer(
-                serverRequest.getServerName(),
-                serverRequest.getImage(),
+                serverCreateRequest.getServerName(),
+                serverCreateRequest.getImageUrl(),
                 user
                 );
 
         serverRepository.save(server);
-        return server.getId();
+
+        return new ServerCreateOrUpdateResponse(
+                server.getId(),
+                server.getImage(),
+                server.getServerName()
+        );
     }
 
-    public void updateServerName(UUID userId, UUID serverId, String newName) {
+    @Transactional
+    public ServerCreateOrUpdateResponse updateServerName(UUID serverId, ServerNameUpdateRequest serverNameUpdateRequest) {
+        UUID currentUserId = SecurityUtil.getCurrentUserId();
+
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
-        if (!server.getHost().getId().equals(userId)) {
+        if (!server.getHost().getId().equals(currentUserId)) {
             throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
-        server.setName(newName);
-        serverRepository.save(server);
+        server.setServerName(serverNameUpdateRequest.getServerName());
+
+        return new ServerCreateOrUpdateResponse(
+                serverId,
+                server.getImage(),
+                server.getServerName()
+        );
     }
 
+    @Transactional
     public void updateServerImage(UUID serverId, ServerImageUpdateRequest request) {
         UUID currentUserId = SecurityUtil.getCurrentUserId();
 
@@ -94,7 +107,7 @@ public class ServerService {
             throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
 
-        server.setName(request.getServerName());
+        server.setServerName(request.getServerName());
         server.setImage(request.getImage());
         serverRepository.save(server);
     }
