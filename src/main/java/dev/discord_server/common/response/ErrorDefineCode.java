@@ -23,6 +23,7 @@ public enum ErrorDefineCode {
     EMPTY_CHANNEL("CHA_01", "채널이 존재하지 않습니다."),
     CHANNEL_NOT_IN_SERVER("CHA_02", "해당 서버에 속한 채널이 아닙니다.")
 
+
             ;
 
     private final String code;
