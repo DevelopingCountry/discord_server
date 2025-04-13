@@ -12,9 +12,9 @@ import dev.discord_server.domain.serverUser.entity.ServerUser;
 import dev.discord_server.domain.serverUser.entity.ServerUserRepository;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.entity.UserRepository;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +28,7 @@ import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
-@Transactional
+@Transactional(readOnly = true)
 public class ServerService {
 
     private final ServerRepository serverRepository;
@@ -57,6 +57,7 @@ public class ServerService {
     }
 
 
+    @Transactional
     public ServerCreateOrUpdateResponse addServer(ServerCreateRequest serverCreateRequest) {
         UUID currentUserId = SecurityUtil.getCurrentUserId();
 
@@ -125,6 +126,7 @@ public class ServerService {
     }
 
 
+    @Transactional
     public void inviteUser(UUID serverId, ServerInviteRequest request) {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
@@ -170,6 +172,7 @@ public class ServerService {
 
 
 
+    @Transactional
     public void exitServer(UUID serverId) {
         UUID currentUserId = SecurityUtil.getCurrentUserId();
 

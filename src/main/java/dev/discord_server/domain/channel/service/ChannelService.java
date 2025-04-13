@@ -17,18 +17,22 @@ import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.entity.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
+@Transactional(readOnly = true)
 public class ChannelService {
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
 
+
+    @Transactional
     public ChannelCreateResponse createChannel(UUID serverId, ChannelCreateRequest request) {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
@@ -59,6 +63,7 @@ public class ChannelService {
     }
 
 
+    @Transactional
     public void deleteChannel(UUID serverId, ChannelDeleteRequest request) {
         UUID hostId = SecurityUtil.getCurrentUserId();
 
