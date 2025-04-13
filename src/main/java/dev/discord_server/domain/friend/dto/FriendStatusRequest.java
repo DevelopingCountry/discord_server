@@ -12,5 +12,5 @@ import java.util.UUID;
 @NoArgsConstructor
 public class FriendStatusRequest {
     private UUID friendId;
-    private FriendStatus status;
+    private FriendStatus isFriend;
 }

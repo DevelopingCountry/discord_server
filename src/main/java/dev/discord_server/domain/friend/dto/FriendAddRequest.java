@@ -12,5 +12,6 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 public class FriendAddRequest {
-    private UUID userId;
+    private UUID targetId;
+
 }

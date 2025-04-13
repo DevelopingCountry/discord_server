@@ -17,5 +17,4 @@ public interface FriendRepository extends JpaRepository<Friend, UUID> {
             UUID fromId1, UUID toId1, UUID fromId2, UUID toId2
     );
 
-
 }
