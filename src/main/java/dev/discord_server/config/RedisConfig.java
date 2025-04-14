@@ -25,6 +25,7 @@ public class RedisConfig {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration();
         config.setHostName(redisHost);
         config.setPort(redisPort);
+        config.setDatabase(0);
         return new LettuceConnectionFactory(config);
     }
 
@@ -37,4 +38,5 @@ public class RedisConfig {
         template.setValueSerializer(new StringRedisSerializer());
         return template;
     }
+
 }

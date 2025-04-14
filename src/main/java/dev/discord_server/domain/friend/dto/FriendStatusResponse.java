@@ -1,17 +1,16 @@
 package dev.discord_server.domain.friend.dto;
 
+import dev.discord_server.domain.friend.Enum.FriendStatus;
 import lombok.AllArgsConstructor;
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
-public class FriendAddRequest {
-    private UUID targetId;
-
+@NoArgsConstructor
+public class FriendStatusResponse {
+    private UUID friendId;
+    private FriendStatus ifFriend;
 }

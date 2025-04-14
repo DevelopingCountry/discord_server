@@ -55,7 +55,7 @@
                              server_id Binary(16) NOT NULL,
                              creator_id Binary(16) NOT NULL,
                              name VARCHAR(20) NOT NULL,
-                             type ENUM('CHAT', 'VOICE', 'DM') NOT NULL DEFAULT 'DM',
+                             type ENUM('CHAT', 'VOICE') NOT NULL DEFAULT 'CHAT',
                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                              FOREIGN KEY (server_id) REFERENCES Server(id),
@@ -74,6 +74,26 @@
                              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                              FOREIGN KEY (channel_id) REFERENCES channel(id) ON DELETE CASCADE,
                              FOREIGN KEY (user_id) REFERENCES user(id)
+    );
+
+    CREATE TABLE dm (
+                        id BINARY(16) PRIMARY KEY,
+                        user1_id BINARY(16) NOT NULL,
+                        user2_id BINARY(16) NOT NULL,
+                        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                        FOREIGN KEY (user1_id) REFERENCES user(id),
+                        FOREIGN KEY (user2_id) REFERENCES user(id)
+    );
+
+    CREATE TABLE dm_message (
+                                id BINARY(16) PRIMARY KEY,
+                                content VARCHAR(50),
+                                dm_id BINARY(16) NOT NULL,
+                                user_id BINARY(16) NOT NULL,
+                                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                                FOREIGN KEY (dm_id) REFERENCES dm(id),
+                                FOREIGN KEY (user_id) REFERENCES user(id)
     );
 
 
