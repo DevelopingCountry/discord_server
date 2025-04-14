@@ -11,7 +11,7 @@ import dev.discord_server.domain.server.repository.ServerRepository;
 import dev.discord_server.domain.serverUser.entity.ServerUser;
 import dev.discord_server.domain.serverUser.entity.ServerUserRepository;
 import dev.discord_server.domain.user.entity.User;
-import dev.discord_server.domain.user.entity.UserRepository;
+import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
