@@ -36,25 +36,26 @@ public class ServerService {
     private final ServerUserRepository serverUserRepository;
 
     public List<ServerResponse> findServers() {
-
         UUID currentUserId = SecurityUtil.getCurrentUserId();
-        List<Server> all = serverRepository.findAll();
-        if (all.isEmpty()) {
+        List<Server> servers = serverRepository.findByServerUsers_User_Id(currentUserId);
+
+        if (servers.isEmpty()) {
             throw new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER);
         }
 
-        return all.stream()
+        return servers.stream()
                 .map(server -> {
                     boolean alarm = server.getServerUsers().stream()
                             .filter(su -> su.getUser().getId().equals(currentUserId))
                             .findFirst()
-                            .map(ServerUser::isAlarm) // 또는 getAlarm()
+                            .map(ServerUser::isAlarm)
                             .orElse(false);
 
                     return ServerResponse.toResponseDto(server, alarm);
                 })
                 .toList();
     }
+
 
 
     @Transactional
@@ -87,7 +88,7 @@ public class ServerService {
     }
 
     @Transactional
-    public ServerCreateOrUpdateResponse updateServerName(UUID serverId, ServerNameUpdateRequest serverNameUpdateRequest) {
+    public ServerCreateOrUpdateResponse updateServerInfo(UUID serverId, ServerInfoUpdateRequest serverInfoUpdateRequest) {
         UUID currentUserId = SecurityUtil.getCurrentUserId();
 
         Server server = serverRepository.findById(serverId)
@@ -96,7 +97,8 @@ public class ServerService {
         if (!server.getHost().getId().equals(currentUserId)) {
             throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
-        server.setServerName(serverNameUpdateRequest.getServerName());
+        server.setServerName(serverInfoUpdateRequest.getServerName());
+        server.setImage(serverInfoUpdateRequest.getImageUrl());
 
         return new ServerCreateOrUpdateResponse(
                 serverId,
@@ -105,25 +107,6 @@ public class ServerService {
         );
     }
 
-    @Transactional
-    public ServerCreateOrUpdateResponse updateServerImage(UUID serverId, ServerImageUpdateRequest request) {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
-
-        Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
-
-        if (!server.getHost().getId().equals(currentUserId)) {
-            throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
-        }
-
-        server.setImage(request.getImageUrl());
-
-        return new ServerCreateOrUpdateResponse(
-                serverId,
-                server.getImage(),
-                server.getServerName()
-        );
-    }
 
 
     @Transactional

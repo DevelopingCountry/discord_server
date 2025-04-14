@@ -42,20 +42,12 @@ public class ServerController {
 
     @PatchMapping("/{serverId}")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<ServerCreateOrUpdateResponse> updateServerName(@PathVariable UUID serverId,
-                                                 @RequestBody ServerNameUpdateRequest request) {
-        ServerCreateOrUpdateResponse serverResponse = serverService.updateServerName(serverId, request);
+    public CommonResponse<ServerCreateOrUpdateResponse> updateServerInfo(@PathVariable UUID serverId,
+                                                 @RequestBody ServerInfoUpdateRequest request) {
+        ServerCreateOrUpdateResponse serverResponse = serverService.updateServerInfo(serverId, request);
         return new CommonResponse<>(true, HttpStatus.OK, "서버 이름이 변경되었습니다.", serverResponse);
     }
 
-
-    @PatchMapping("/{serverId}/image")
-    @PreAuthorize("hasRole('USER')")
-    public CommonResponse<ServerCreateOrUpdateResponse> updateServerImage(@PathVariable UUID serverId,
-                                                                          @RequestBody ServerImageUpdateRequest request) {
-        ServerCreateOrUpdateResponse serverResponse = serverService.updateServerImage(serverId, request);
-        return new CommonResponse<>(true, HttpStatus.OK, "서버 이미지가 변경되었습니다.",serverResponse);
-    }
 
 
     @PostMapping("/{serverId}/invite")
