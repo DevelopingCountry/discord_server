@@ -50,7 +50,6 @@ public class Server extends BaseEntity {
     private Set<ServerUser> serverUsers = new LinkedHashSet<>();
 
 
-    //TODO: host_id로 안해도되는지
     public static Server createServer(String name, String image, User host) {
         return Server.builder()
                 .serverName(name)
