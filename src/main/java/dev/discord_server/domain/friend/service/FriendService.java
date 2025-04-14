@@ -4,6 +4,7 @@ import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.exception.custom.exception.AlreadyExistElementException409;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
+import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
 import dev.discord_server.domain.friend.dto.FriendAddResponse;
 import dev.discord_server.domain.friend.dto.FriendDeleteResponse;
 import dev.discord_server.domain.friend.dto.FriendResponse;
@@ -118,7 +119,7 @@ public class FriendService {
         switch (status) {
             case ACCEPTED -> friend.setStatus(FriendStatus.ACCEPTED);
             case REJECTED -> friend.setStatus(FriendStatus.REJECTED);
-            default -> throw new NoSuchElementFoundException404(ErrorDefineCode.NOT_VALID_FRIEND_STATUS);
+            default -> throw new PreconditionFailException412(ErrorDefineCode.NOT_VALID_FRIEND_STATUS);
         }
 
         friendRepository.save(friend);
