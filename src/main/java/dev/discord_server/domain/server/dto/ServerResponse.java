@@ -14,19 +14,19 @@ import java.util.UUID;
 @Getter
 @Builder
 public class ServerResponse {
-    private UUID id;
+    private UUID serverId;
     private String name;
-    private String image;
-    private LocalDateTime createdAt;
+    private String imageUrl;
     private boolean alarm;
+    private UUID hostId;
 
     public static ServerResponse toResponseDto(Server server, boolean alarm) {
         return ServerResponse.builder()
-                .id(server.getId())
-                .name(server.getName())
-                .image(server.getImage())
-                .createdAt(server.getCreatedAt())
+                .serverId(server.getId())
+                .name(server.getServerName())
+                .imageUrl(server.getImage())
                 .alarm(alarm)
+                .hostId(server.getHost().getId())
                 .build();
     }
 }

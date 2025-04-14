@@ -1,15 +1,12 @@
 package dev.discord_server.domain.server.controller;
 
-import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
-import dev.discord_server.domain.server.dto.ServerResponse;
+import dev.discord_server.domain.server.dto.*;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import dev.discord_server.domain.server.service.ServerService;
 
 import java.util.List;
@@ -30,9 +27,64 @@ public class ServerController {
 
     @GetMapping
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<List<ServerResponse>> getServerList2() {
-        UUID userId = SecurityUtil.getCurrentUserId();
-        List<ServerResponse> servers = serverService.findServers(userId);
+    public CommonResponse<List<ServerResponse>> getServerList() {
+        List<ServerResponse> servers = serverService.findServers();
         return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
     }
+
+
+    @PostMapping
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<ServerCreateOrUpdateResponse> addServer(@RequestBody ServerCreateRequest serverCreateRequest) {
+        ServerCreateOrUpdateResponse serverResponse = serverService.addServer(serverCreateRequest);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버가 생성되었습니다.", serverResponse);
+    }
+
+    @PatchMapping("/{serverId}")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<ServerCreateOrUpdateResponse> updateServerInfo(@PathVariable UUID serverId,
+                                                 @RequestBody ServerInfoUpdateRequest request) {
+        ServerCreateOrUpdateResponse serverResponse = serverService.updateServerInfo(serverId, request);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버 이름이 변경되었습니다.", serverResponse);
+    }
+
+
+
+    @PostMapping("/{serverId}/invite")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<Void> inviteUserToServer(@PathVariable UUID serverId,
+                                                   @RequestBody ServerInviteRequest request) {
+        serverService.inviteUser(serverId, request);
+        return new CommonResponse<>(true, HttpStatus.OK, "참여자 초대가 완료되었습니다.", null);
+    }
+
+
+    @PatchMapping("/{serverId}/alarm")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<ServerAlarmUpdateResponse> updateAlarm(@PathVariable UUID serverId,
+                                                                 @RequestBody @Valid ServerAlarmUpdateRequest request) {
+        ServerAlarmUpdateResponse response = serverService.updateAlarm(serverId, request);
+        return new CommonResponse<>(true, HttpStatus.OK, "알림이 변경되었습니다.", response);
+    }
+
+    @DeleteMapping("/{serverId}/leave")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<Void> exitServer(@PathVariable UUID serverId) {
+        serverService.exitServer(serverId);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버에서 나갔습니다.", null);
+    }
+
+    @DeleteMapping("/{serverId}")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<Void> deleteServer(@PathVariable UUID serverId) {
+        serverService.deleteServer(serverId);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버를 삭제했습니다.", null);
+    }
+
+
+
+
+
+
+
 }
