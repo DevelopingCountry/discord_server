@@ -1,7 +1,10 @@
 package dev.discord_server.domain.friend.dto;
 
+import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.user.entity.User;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -9,10 +12,12 @@ import java.util.UUID;
 
 @Getter
 @Builder
+@AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class FriendResponse {
     private UUID friendId;
     private String name;
     private String imageUrl;
+    private FriendStatus status;
 
     public static FriendResponse toFriendResponse(Friend friend, UUID currentUserId) {
         User targetUser = friend.getFromUser().getId().equals(currentUserId)
@@ -23,6 +28,7 @@ public class FriendResponse {
                 .friendId(friend.getId())
                 .name(targetUser.getNickname())
                 .imageUrl(targetUser.getImageUrl())
+                .status(friend.getStatus())
                 .build();
     }
 }

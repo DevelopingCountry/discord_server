@@ -8,7 +8,7 @@ import dev.discord_server.auth.util.JwtUtil;
 import dev.discord_server.auth.util.KakaoUtil;
 import dev.discord_server.domain.user.Enum.Role;
 import dev.discord_server.domain.user.entity.User;
-import dev.discord_server.domain.user.entity.UserRepository;
+import dev.discord_server.domain.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

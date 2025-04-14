@@ -4,13 +4,9 @@ import dev.discord_server.auth.dto.RefreshRequestDTO;
 import dev.discord_server.auth.dto.TokenResponse;
 import dev.discord_server.auth.service.AuthService;
 import dev.discord_server.common.response.CommonResponse;
-import dev.discord_server.domain.user.dto.UserResponse;
-import dev.discord_server.domain.user.entity.User;
-import dev.discord_server.domain.user.entity.UserRepository;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController

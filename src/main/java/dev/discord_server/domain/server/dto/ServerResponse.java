@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 /**
  * DTO 이름은 domain이름 + request OR response로 정한다.
@@ -13,7 +14,7 @@ import java.time.LocalDateTime;
 @Getter
 @Builder
 public class ServerResponse {
-    private Long id;
+    private UUID id;
     private String name;
     private String image;
     private LocalDateTime createdAt;

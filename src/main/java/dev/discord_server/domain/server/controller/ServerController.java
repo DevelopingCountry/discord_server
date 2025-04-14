@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 import dev.discord_server.domain.server.service.ServerService;
 
 import java.util.List;
+import java.util.UUID;
 
 
 /**
@@ -30,7 +31,7 @@ public class ServerController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<ServerResponse>> getServerList2() {
-        Long userId = SecurityUtil.getCurrentUserId();
+        UUID userId = SecurityUtil.getCurrentUserId();
         List<ServerResponse> servers = serverService.findServers(userId);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 서버가 반환되었습니다.",servers);
     }

@@ -10,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.UUID;
 
 /**
  * 예외처리 사용 방법
@@ -24,7 +25,7 @@ public class ServerService {
 
     private final ServerRepository serverRepository;
 
-    public List<ServerResponse> findServers(Long userId) {
+    public List<ServerResponse> findServers(UUID userId) {
         List<Server> all = serverRepository.findAll();
         if (all.isEmpty()) {
             throw new NoSuchElementFoundException404(ErrorDefineCode.EXAMPLE_OCCURE_ERROR);
