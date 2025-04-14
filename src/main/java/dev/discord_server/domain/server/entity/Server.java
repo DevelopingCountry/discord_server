@@ -3,7 +3,6 @@ package dev.discord_server.domain.server.entity;
 import dev.discord_server.domain.channel.entity.Channel;
 import dev.discord_server.config.BaseEntity;
 import dev.discord_server.domain.serverUser.entity.ServerUser;
-import dev.discord_server.domain.user.Enum.Role;
 import dev.discord_server.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
