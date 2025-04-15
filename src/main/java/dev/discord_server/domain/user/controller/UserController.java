@@ -26,7 +26,7 @@ public class UserController {
     @PreAuthorize("hasRole('USER')")
     @Tag(name = "유저 닉네임 변경 API", description = "[USER] 유저 닉네임 변경 API 입니다.")
     public CommonResponse<UserNickNameResponse> changeNickname(@RequestBody UserNicknameRequest request) {
-        UUID uuid = SecurityUtil.getCurrentUserId();
+        Long uuid = SecurityUtil.getCurrentUserId();
         UserNickNameResponse response = userService.changeNickname(uuid, request.getNickname());
 
         return new CommonResponse<>(true, HttpStatus.OK, "닉네임 변경에 성공하였습니다.", response);

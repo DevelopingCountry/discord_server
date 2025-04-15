@@ -6,6 +6,7 @@ import dev.discord_server.auth.dto.TokenResponse;
 import dev.discord_server.auth.repository.RefreshTokenRepository;
 import dev.discord_server.auth.util.JwtUtil;
 import dev.discord_server.auth.util.KakaoUtil;
+import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.domain.user.Enum.Role;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
@@ -26,6 +27,7 @@ public class AuthService {
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
+    private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     public TokenResponse oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
@@ -60,16 +62,7 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid JWT");
         }
 
-        System.out.println(email);
-
         String storedToken = refreshTokenRepository.getRefreshToken(email);
-
-        System.out.println(storedToken);
-
-        // ✅ 여기 로그 추가!
-        System.out.println("📩 요청된 refreshToken: " + refreshToken);
-        System.out.println("📦 Redis에 저장된 refreshToken: " + storedToken);
-        System.out.println("⛔ equals 비교 결과: " + refreshToken.equals(storedToken));
 
         if (storedToken != null && storedToken.equals(refreshToken)) {
             User user = userRepository.findByEmail(email)
@@ -84,6 +77,7 @@ public class AuthService {
 
     private User createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
         User newUser = AuthConverter.toUser(
+                snowflakeIdGenerator.generateId(),
                 kakaoProfile.getKakao_account().getEmail(),
                 kakaoProfile.getKakao_account().getProfile().getNickname(),
                 Role.USER

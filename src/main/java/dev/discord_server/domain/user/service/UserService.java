@@ -17,7 +17,7 @@ public class UserService {
     private final UserRepository userRepository;
 
 
-    public UserNickNameResponse changeNickname(UUID uuid, String nickname) {
+    public UserNickNameResponse changeNickname(Long uuid, String nickname) {
         User user = userRepository.findById(uuid)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 

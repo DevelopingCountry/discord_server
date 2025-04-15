@@ -2,6 +2,7 @@ package dev.discord_server.domain.server.service;
 
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.ErrorDefineCode;
+import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
@@ -17,7 +18,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 /**
  * 예외처리 사용 방법
@@ -34,9 +34,10 @@ public class ServerService {
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
     private final ServerUserRepository serverUserRepository;
+    private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     public List<ServerResponse> findServers() {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
+        Long currentUserId = SecurityUtil.getCurrentUserId();
         List<Server> servers = serverRepository.findByServerUsers_User_Id(currentUserId);
 
         if (servers.isEmpty()) {
@@ -60,24 +61,30 @@ public class ServerService {
 
     @Transactional
     public ServerCreateOrUpdateResponse addServer(ServerCreateRequest serverCreateRequest) {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
+        Long currentUserId = SecurityUtil.getCurrentUserId();
 
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
+
         Server server = Server.createServer(
+                snowflakeIdGenerator.generateId(),
                 serverCreateRequest.getServerName(),
                 serverCreateRequest.getImageUrl(),
                 user
                 );
 
+
+        serverRepository.save(server);
+        serverRepository.flush();
+
         ServerUser createUser = ServerUser.builder()
+                .id(snowflakeIdGenerator.generateId())
                 .server(server)
                 .user(user)
                 .alarm(true)
                 .build();
 
-        serverRepository.save(server);
         serverUserRepository.save(createUser);
 
         return new ServerCreateOrUpdateResponse(
@@ -88,8 +95,8 @@ public class ServerService {
     }
 
     @Transactional
-    public ServerCreateOrUpdateResponse updateServerInfo(UUID serverId, ServerInfoUpdateRequest serverInfoUpdateRequest) {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
+    public ServerCreateOrUpdateResponse updateServerInfo(Long serverId, ServerInfoUpdateRequest serverInfoUpdateRequest) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
 
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
@@ -110,11 +117,11 @@ public class ServerService {
 
 
     @Transactional
-    public void inviteUser(UUID serverId, ServerInviteRequest request) {
+    public void inviteUser(Long serverId, ServerInviteRequest request) {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
+        Long currentUserId = SecurityUtil.getCurrentUserId();
 
         if (!server.getHost().getId().equals(currentUserId)) {
             throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
@@ -123,7 +130,9 @@ public class ServerService {
         User guest = userRepository.findById(request.getGuestId())
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
+
         ServerUser invited = ServerUser.builder()
+                .id(snowflakeIdGenerator.generateId())
                 .server(server)
                 .user(guest)
                 .alarm(true)
@@ -135,8 +144,8 @@ public class ServerService {
 
 
     @Transactional
-    public ServerAlarmUpdateResponse updateAlarm(UUID serverId, ServerAlarmUpdateRequest request) {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
+    public ServerAlarmUpdateResponse updateAlarm(Long serverId, ServerAlarmUpdateRequest request) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
 
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
@@ -156,8 +165,8 @@ public class ServerService {
 
 
     @Transactional
-    public void exitServer(UUID serverId) {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
+    public void exitServer(Long serverId) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
 
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
@@ -176,8 +185,8 @@ public class ServerService {
 
 
     @Transactional
-    public void deleteServer(UUID serverId) {
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
+    public void deleteServer(Long serverId) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
 
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));

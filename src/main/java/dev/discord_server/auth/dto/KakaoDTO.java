@@ -3,7 +3,6 @@ package dev.discord_server.auth.dto;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 
-import java.util.UUID;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class KakaoDTO {

@@ -8,6 +8,6 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class ServerAlarmUpdateResponse {
-    private UUID serverId;
+    private Long serverId;
     private boolean alarm;
 }

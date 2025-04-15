@@ -19,10 +19,10 @@ import java.util.*;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User extends BaseEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
-    private UUID id;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "nickname", nullable = false, length = 10)
     private String nickname;
@@ -67,8 +67,9 @@ public class User extends BaseEntity {
 
 
 
-    public static User createUser(String email, String nickname, Role role) {
+    public static User createUser(Long id, String email, String nickname, Role role) {
         return User.builder()
+                .id(id)
                 .email(email)
                 .nickname(nickname)
                 .role(role)
