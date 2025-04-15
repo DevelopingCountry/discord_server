@@ -20,10 +20,10 @@ import java.util.*;
 @AllArgsConstructor
 @Table(name = "channel")
 public class Channel extends BaseEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
-    private UUID id;
+    @Column(name = "id")
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @OnDelete(action = OnDeleteAction.CASCADE)

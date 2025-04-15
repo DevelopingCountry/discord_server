@@ -4,8 +4,6 @@ import dev.discord_server.domain.friend.Enum.FriendStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.UUID;
-
 @Getter
 @AllArgsConstructor
 public class FriendAddResponse {

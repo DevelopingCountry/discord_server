@@ -13,7 +13,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
@@ -32,7 +31,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.replace("Bearer ", "");
             try {
-                UUID userId = jwtUtil.getUserIdFromToken(token);
+                Long userId = jwtUtil.getUserIdFromToken(token);
                 Role role = Role.valueOf(jwtUtil.getRoleFromToken(token)); // role 파싱
 
                 UsernamePasswordAuthenticationToken authentication =

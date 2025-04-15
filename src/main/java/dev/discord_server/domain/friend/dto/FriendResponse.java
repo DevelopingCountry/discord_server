@@ -8,18 +8,16 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.UUID;
-
 @Getter
 @Builder
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class FriendResponse {
-    private UUID friendId;
+    private Long friendId;
     private String name;
     private String imageUrl;
     private FriendStatus status;
 
-    public static FriendResponse toFriendResponse(Friend friend, UUID currentUserId) {
+    public static FriendResponse toFriendResponse(Friend friend, Long currentUserId) {
         User targetUser = friend.getFromUser().getId().equals(currentUserId)
                 ? friend.getToUser()
                 : friend.getFromUser();

@@ -10,7 +10,7 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class ChannelCreateResponse {
-    private UUID channelId;
+    private Long channelId;
     private String channelName;
     private ChannelType channelType;
 }

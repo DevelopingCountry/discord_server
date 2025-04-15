@@ -2,6 +2,7 @@ package dev.discord_server.domain.channel.service;
 
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.ErrorDefineCode;
+import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
@@ -29,15 +30,16 @@ public class ChannelService {
     private final ServerRepository serverRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final SnowflakeIdGenerator snowflakeIdGenerator;
 
 
 
     @Transactional
-    public ChannelCreateResponse createChannel(UUID serverId, ChannelCreateRequest request) {
+    public ChannelCreateResponse createChannel(Long serverId, ChannelCreateRequest request) {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
-        UUID currentUserId = SecurityUtil.getCurrentUserId();
+        Long currentUserId = SecurityUtil.getCurrentUserId();
 
         if (!server.getHost().getId().equals(currentUserId)) {
             throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
@@ -46,7 +48,9 @@ public class ChannelService {
         User creator = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
+
         Channel channel = Channel.builder()
+                .id(snowflakeIdGenerator.generateId())
                 .server(server)
                 .creator(creator)
                 .name(request.getChannelName())
@@ -64,8 +68,8 @@ public class ChannelService {
 
 
     @Transactional
-    public void deleteChannel(UUID serverId, ChannelDeleteRequest request) {
-        UUID hostId = SecurityUtil.getCurrentUserId();
+    public void deleteChannel(Long serverId, ChannelDeleteRequest request) {
+        Long hostId = SecurityUtil.getCurrentUserId();
 
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
@@ -85,7 +89,7 @@ public class ChannelService {
         channelRepository.delete(channel);
     }
 
-    public List<ChannelResponse> findChannels(UUID serverId) {
+    public List<ChannelResponse> findChannels(Long serverId) {
 
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));

@@ -5,13 +5,12 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.UUID;
 
 @Data
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
 public class FriendAddRequest {
-    private UUID targetId;
+    private Long targetId;
 
 }

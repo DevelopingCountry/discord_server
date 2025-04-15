@@ -5,5 +5,5 @@ import java.util.UUID;
 
 @Getter
 public class ChannelDeleteRequest {
-    private UUID channelId;
+    private Long channelId;
 }

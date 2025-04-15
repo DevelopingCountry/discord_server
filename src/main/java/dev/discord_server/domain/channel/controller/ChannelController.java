@@ -22,7 +22,7 @@ public class ChannelController {
 
     @GetMapping("/{serverId}/channel")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<List<ChannelResponse>> getListChannel(@PathVariable UUID serverId) {
+    public CommonResponse<List<ChannelResponse>> getListChannel(@PathVariable Long serverId) {
         List<ChannelResponse> channels = channelService.findChannels(serverId);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 채널이 반환되었습니다.",channels);
     }
@@ -30,7 +30,7 @@ public class ChannelController {
 
     @PostMapping("/{serverId}/channel")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<ChannelCreateResponse> createChannel(@PathVariable UUID serverId,
+    public CommonResponse<ChannelCreateResponse> createChannel(@PathVariable Long serverId,
                                                                @RequestBody ChannelCreateRequest request) {
         ChannelCreateResponse channel = channelService.createChannel(serverId, request);
         return new CommonResponse<>(true, HttpStatus.OK, "채널이 생성되었습니다.",channel);
@@ -38,7 +38,7 @@ public class ChannelController {
 
     @DeleteMapping("/{serverId}/channel")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<Void> deleteChannel(@PathVariable UUID serverId,
+    public CommonResponse<Void> deleteChannel(@PathVariable Long serverId,
                                               @RequestBody ChannelDeleteRequest request) {
 
         channelService.deleteChannel(serverId, request);

@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @RestController
@@ -28,7 +27,7 @@ public class FriendController {
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<FriendResponse>> getFriendList() {
-        UUID uuid = SecurityUtil.getCurrentUserId();
+        Long uuid = SecurityUtil.getCurrentUserId();
         List<FriendResponse> friends = friendService.findFriends(uuid);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 친구가 반환되었습니다.", friends);
     }
@@ -44,7 +43,7 @@ public class FriendController {
     public CommonResponse<FriendAddResponse> postFriend(
             @RequestBody FriendAddRequest request) {
 
-        UUID uuid = SecurityUtil.getCurrentUserId();
+        Long uuid = SecurityUtil.getCurrentUserId();
         FriendAddResponse friendAddResponse = friendService.sendFriendRequest(uuid, request.getTargetId());
 
         return new CommonResponse<>(true, HttpStatus.OK, "친구 추가 성공했습니다.", friendAddResponse);
@@ -59,7 +58,7 @@ public class FriendController {
     @DeleteMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendDeleteResponse> deleteFriend(@RequestBody FriendDeleteRequest request) {
-        UUID uuid = SecurityUtil.getCurrentUserId();
+        Long uuid = SecurityUtil.getCurrentUserId();
         friendService.deleteFriendRequest(uuid, request.getUserId());
         return new CommonResponse<>(true, HttpStatus.OK, "친구 삭제 성공했습니다.", null);
     }
@@ -73,7 +72,7 @@ public class FriendController {
     @PatchMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendStatusResponse> changeFriendStatus(@RequestBody FriendStatusRequest request) {
-        UUID uuid = SecurityUtil.getCurrentUserId();
+        Long uuid = SecurityUtil.getCurrentUserId();
         FriendStatusResponse friendStatusResponse = friendService.changeFriendRequest(uuid, request.getFriendId(), request.getIsFriend());
         return new CommonResponse<>(true, HttpStatus.OK, "친구 상태 변경에 성공했습니다.", friendStatusResponse);
 
@@ -82,7 +81,7 @@ public class FriendController {
     @GetMapping("/search")
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<Optional<FriendResponse>> getFriendByNickname(@RequestBody FriendSearchRequest request) {
-        UUID uuid = SecurityUtil.getCurrentUserId();
+        Long uuid = SecurityUtil.getCurrentUserId();
         Optional<FriendResponse> Friend = friendService.findFriendByNickname(uuid, request.getNickName());
         return new CommonResponse<>(true,HttpStatus.OK,"닉네임으로 유저 조회 성공했습니다.",Friend);
     }

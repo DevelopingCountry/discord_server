@@ -4,7 +4,7 @@
 
     -- User 테이블 생성
     CREATE TABLE User (
-                          id Binary(16) PRIMARY KEY ,
+                          id BIGINT PRIMARY KEY ,
                           nickname VARCHAR(10) NOT NULL UNIQUE,
                           password VARCHAR(20),
                           email VARCHAR(20) NOT NULL UNIQUE,
@@ -16,9 +16,9 @@
 
     -- Friend 테이블 생성
     CREATE TABLE Friend (
-                            id Binary(16) PRIMARY KEY ,
-                            from_user_id Binary(16) NOT NULL,
-                            to_user_id Binary(16) NOT NULL,
+                            id BIGINT PRIMARY KEY ,
+                            from_user_id BIGINT NOT NULL,
+                            to_user_id BIGINT NOT NULL,
                             status ENUM('PENDING', 'ACCEPTED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -28,10 +28,10 @@
 
     -- Server 테이블 생성
     CREATE TABLE Server (
-                            id Binary(16) PRIMARY KEY ,
+                            id BIGINT PRIMARY KEY ,
                             name VARCHAR(20) NOT NULL,
                             image_url VARCHAR(50),
-                            host_id Binary(16) NOT NULL,
+                            host_id BIGINT NOT NULL,
                             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                             FOREIGN KEY (host_id) REFERENCES User(id)
@@ -39,9 +39,9 @@
 
     -- Server_User 테이블 생성 (서버 내 사용자 관계)
     CREATE TABLE Server_User (
-                                 id Binary(16) PRIMARY KEY ,
-                                 server_id Binary(16) NOT NULL,
-                                 user_id Binary(16) NOT NULL,
+                                 id BIGINT PRIMARY KEY ,
+                                 server_id BIGINT NOT NULL,
+                                 user_id BIGINT NOT NULL,
                                  alarm boolean NOT NULL,
                                  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -51,9 +51,9 @@
 
     -- Channel 테이블 생성
     CREATE TABLE Channel (
-                             id Binary(16) PRIMARY KEY,
-                             server_id Binary(16) NOT NULL,
-                             creator_id Binary(16) NOT NULL,
+                             id BIGINT PRIMARY KEY,
+                             server_id BIGINT NOT NULL,
+                             creator_id BIGINT NOT NULL,
                              name VARCHAR(20) NOT NULL,
                              type ENUM('CHAT', 'VOICE') NOT NULL DEFAULT 'CHAT',
                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -68,8 +68,8 @@
     CREATE TABLE message (
                              id Binary(16) PRIMARY KEY ,
                              content VARCHAR(50),
-                             channel_id Binary(16) NOT NULL,
-                             user_id Binary(16) NOT NULL,
+                             channel_id BIGINT NOT NULL,
+                             user_id BIGINT NOT NULL,
                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                              FOREIGN KEY (channel_id) REFERENCES channel(id) ON DELETE CASCADE,
@@ -78,8 +78,8 @@
 
     CREATE TABLE dm (
                         id BINARY(16) PRIMARY KEY,
-                        user1_id BINARY(16) NOT NULL,
-                        user2_id BINARY(16) NOT NULL,
+                        user1_id BIGINT NOT NULL,
+                        user2_id BIGINT NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         FOREIGN KEY (user1_id) REFERENCES user(id),
                         FOREIGN KEY (user2_id) REFERENCES user(id)
@@ -89,7 +89,7 @@
                                 id BINARY(16) PRIMARY KEY,
                                 content VARCHAR(50),
                                 dm_id BINARY(16) NOT NULL,
-                                user_id BINARY(16) NOT NULL,
+                                user_id BIGINT NOT NULL,
                                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                                 FOREIGN KEY (dm_id) REFERENCES dm(id),

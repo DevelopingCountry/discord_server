@@ -9,7 +9,6 @@ import lombok.*;
 
 import java.util.LinkedHashSet;
 import java.util.Set;
-import java.util.UUID;
 
 @Getter
 @Setter
@@ -19,10 +18,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @Table(name = "server")
 public class Server extends BaseEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
-    private UUID id;
+    @Column(name = "id")
+    private Long id;
 
     @Column(name = "name", nullable = false, length = 20)
     private String serverName;
@@ -49,8 +48,9 @@ public class Server extends BaseEntity {
     private Set<ServerUser> serverUsers = new LinkedHashSet<>();
 
 
-    public static Server createServer(String name, String image, User host) {
+    public static Server createServer(Long id, String name, String image, User host) {
         return Server.builder()
+                .id(id)
                 .serverName(name)
                 .image(image)
                 .host(host)

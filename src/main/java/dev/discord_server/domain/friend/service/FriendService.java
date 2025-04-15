@@ -1,12 +1,12 @@
 package dev.discord_server.domain.friend.service;
 
 import dev.discord_server.common.response.ErrorDefineCode;
+import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.config.exception.custom.exception.AlreadyExistElementException409;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
 import dev.discord_server.domain.friend.dto.FriendAddResponse;
-import dev.discord_server.domain.friend.dto.FriendDeleteResponse;
 import dev.discord_server.domain.friend.dto.FriendResponse;
 import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.friend.dto.FriendStatusResponse;
@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,8 +27,9 @@ import java.util.UUID;
 public class FriendService {
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
+    private final SnowflakeIdGenerator snowflakeIdGenerator;
 
-    public List<FriendResponse> findFriends(UUID currentUserId) {
+    public List<FriendResponse> findFriends(Long currentUserId) {
         List<Friend> friends = friendRepository.findByFromUserIdOrToUserId(currentUserId, currentUserId);
 
         return friends.stream()
@@ -43,7 +43,7 @@ public class FriendService {
      * @param toUserId
      * @return
      */
-    public FriendAddResponse sendFriendRequest(UUID currentUserId, UUID toUserId) {
+    public FriendAddResponse sendFriendRequest(Long currentUserId, Long toUserId) {
         User fromUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
         User toUser = userRepository.findById(toUserId)
@@ -65,7 +65,9 @@ public class FriendService {
                 }
             }
         } else {
+
             Friend friend = Friend.builder()
+                    .id(snowflakeIdGenerator.generateId())
                     .fromUser(fromUser)
                     .toUser(toUser)
                     .status(FriendStatus.PENDING)
@@ -77,7 +79,7 @@ public class FriendService {
     }
 
 
-    public void deleteFriendRequest(UUID currentUserId, UUID toUserId) {
+    public void deleteFriendRequest(Long currentUserId, Long toUserId) {
         User fromUser = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
         User toUser = userRepository.findById(toUserId)
@@ -101,7 +103,7 @@ public class FriendService {
      * @param status
      * @return
      */
-    public FriendStatusResponse changeFriendRequest(UUID uuid, UUID friendId, FriendStatus status) {
+    public FriendStatusResponse changeFriendRequest(Long uuid, Long friendId, FriendStatus status) {
         Friend friend = friendRepository
                 .findByFromUserIdAndToUserIdOrFromUserIdAndToUserId(
                         uuid, friendId,
@@ -125,7 +127,7 @@ public class FriendService {
         friendRepository.save(friend);
 
         // 상대방 id
-        UUID targetId = friend.getFromUser().getId().equals(uuid)
+        Long targetId = friend.getFromUser().getId().equals(uuid)
                 ? friend.getToUser().getId()
                 : friend.getFromUser().getId();
 
@@ -138,7 +140,7 @@ public class FriendService {
      * @param nickname
      * @return
      */
-    public Optional<FriendResponse> findFriendByNickname(UUID currentId,String nickname){
+    public Optional<FriendResponse> findFriendByNickname(Long currentId,String nickname){
         Optional<User> targetOpt = userRepository.findByNickname(nickname);
         if (targetOpt.isEmpty() || targetOpt.get().getId().equals(currentId)) {
             return Optional.empty();
