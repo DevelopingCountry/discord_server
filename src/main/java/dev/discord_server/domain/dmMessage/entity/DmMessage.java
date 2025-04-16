@@ -6,7 +6,6 @@ import dev.discord_server.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.UUID;
 
 @Getter
 @Setter

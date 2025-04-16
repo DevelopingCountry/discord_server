@@ -3,16 +3,13 @@ package dev.discord_server.domain.dmMessage.controller;
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.dmMessage.dto.DmMessageResponse;
-import dev.discord_server.domain.dmMessage.dto.DmMsgRequest;
-import dev.discord_server.domain.dmMessage.dto.SendMessage;
 import dev.discord_server.domain.dmMessage.dto.UpdateMessageRequest;
 import dev.discord_server.domain.dmMessage.service.DmMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/dm")

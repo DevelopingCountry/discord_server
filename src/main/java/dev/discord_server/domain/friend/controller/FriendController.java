@@ -3,7 +3,6 @@ package dev.discord_server.domain.friend.controller;
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.friend.dto.*;
-import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
