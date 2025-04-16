@@ -9,8 +9,8 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class ChannelResponse {
-    private String channelId;
-    private String channelName;
+    private String id;
+    private String name;
     private String type;
     private String creatorId;
 

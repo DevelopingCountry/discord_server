@@ -26,7 +26,7 @@ public class Server extends BaseEntity {
     @Column(name = "name", nullable = false, length = 20)
     private String serverName;
 
-    @Column(name = "image_url", nullable = false, length = 50)
+    @Column(name = "image_url", length = 50)
     private String image;
 
 

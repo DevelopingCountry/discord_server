@@ -2,7 +2,6 @@ package dev.discord_server.domain.channel.controller;
 
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.channel.dto.ChannelCreateRequest;
-import dev.discord_server.domain.channel.dto.ChannelCreateResponse;
 import dev.discord_server.domain.channel.dto.ChannelDeleteRequest;
 import dev.discord_server.domain.channel.dto.ChannelResponse;
 import dev.discord_server.domain.channel.service.ChannelService;
@@ -12,7 +11,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/server")
@@ -31,10 +29,10 @@ public class ChannelController {
 
     @PostMapping("/{serverId}/channel")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<ChannelCreateResponse> createChannel(@PathVariable String serverId,
+    public CommonResponse<ChannelResponse> createChannel(@PathVariable String serverId,
                                                                @RequestBody ChannelCreateRequest request) {
         Long Id = Long.parseLong(serverId);
-        ChannelCreateResponse channel = channelService.createChannel(Id, request);
+        ChannelResponse channel = channelService.createChannel(Id, request);
         return new CommonResponse<>(true, HttpStatus.OK, "채널이 생성되었습니다.",channel);
     }
 
