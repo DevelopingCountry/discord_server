@@ -9,6 +9,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FriendStatusRequest {
-    private Long friendId;
+    private String friendId;
     private FriendStatus isFriend;
 }

@@ -33,7 +33,7 @@ public class FriendService {
         List<Friend> friends = friendRepository.findByFromUserIdOrToUserId(currentUserId, currentUserId);
 
         return friends.stream()
-                .map(friend -> FriendResponse.toFriendResponse(friend, currentUserId))
+                .map(friend -> FriendResponse.toFriendResponse(friend, currentUserId.toString()))
                 .toList();
     }
 
@@ -131,7 +131,7 @@ public class FriendService {
                 ? friend.getToUser().getId()
                 : friend.getFromUser().getId();
 
-        return new FriendStatusResponse(targetId,friend.getStatus());
+        return new FriendStatusResponse(targetId.toString(),friend.getStatus());
     }
 
     /**
@@ -155,7 +155,7 @@ public class FriendService {
         FriendStatus status = relationOpt.map(Friend::getStatus).orElse(null);
 
         FriendResponse response = new FriendResponse(
-                targetUser.getId(),
+                targetUser.getId().toString(),
                 targetUser.getNickname(),
                 targetUser.getImageUrl(),
                 status
