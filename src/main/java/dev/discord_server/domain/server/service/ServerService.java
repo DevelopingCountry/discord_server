@@ -60,7 +60,7 @@ public class ServerService {
 
 
     @Transactional
-    public ServerCreateOrUpdateResponse addServer(ServerCreateRequest serverCreateRequest) {
+    public ServerResponse addServer(ServerCreateRequest serverCreateRequest) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
 
         User user = userRepository.findById(currentUserId)
@@ -87,15 +87,17 @@ public class ServerService {
 
         serverUserRepository.save(createUser);
 
-        return new ServerCreateOrUpdateResponse(
+        return new ServerResponse(
                 server.getId(),
+                server.getServerName(),
                 server.getImage(),
-                server.getServerName()
+                createUser.isAlarm(),
+                server.getHost().getId()
         );
     }
 
     @Transactional
-    public ServerCreateOrUpdateResponse updateServerInfo(Long serverId, ServerInfoUpdateRequest serverInfoUpdateRequest) {
+    public ServerUpdateResponse updateServerInfo(Long serverId, ServerInfoUpdateRequest serverInfoUpdateRequest) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
 
         Server server = serverRepository.findById(serverId)
@@ -107,7 +109,7 @@ public class ServerService {
         server.setServerName(serverInfoUpdateRequest.getServerName());
         server.setImage(serverInfoUpdateRequest.getImageUrl());
 
-        return new ServerCreateOrUpdateResponse(
+        return new ServerUpdateResponse(
                 serverId,
                 server.getImage(),
                 server.getServerName()

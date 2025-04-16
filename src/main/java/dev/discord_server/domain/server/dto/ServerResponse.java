@@ -1,6 +1,7 @@
 package dev.discord_server.domain.server.dto;
 
 import dev.discord_server.domain.server.entity.Server;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -11,8 +12,9 @@ import lombok.Getter;
  */
 @Getter
 @Builder
+@AllArgsConstructor
 public class ServerResponse {
-    private Long serverId;
+    private Long id;
     private String name;
     private String imageUrl;
     private boolean alarm;
@@ -20,7 +22,7 @@ public class ServerResponse {
 
     public static ServerResponse toResponseDto(Server server, boolean alarm) {
         return ServerResponse.builder()
-                .serverId(server.getId())
+                .id(server.getId())
                 .name(server.getServerName())
                 .imageUrl(server.getImage())
                 .alarm(alarm)
