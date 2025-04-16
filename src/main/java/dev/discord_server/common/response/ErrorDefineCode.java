@@ -27,7 +27,13 @@ public enum ErrorDefineCode {
     NOT_JOINED_SERVER("SER_02","해당 서버에 참여 중인 유저가 아닙니다."),
     CANT_EXIT_HOST_SERVER("SER_03","서버 호스트는 서버를 나갈 수 없습니다."),
     EMPTY_CHANNEL("CHA_01", "채널이 존재하지 않습니다."),
-    CHANNEL_NOT_IN_SERVER("CHA_02", "해당 서버에 속한 채널이 아닙니다.")
+    CHANNEL_NOT_IN_SERVER("CHA_02", "해당 서버에 속한 채널이 아닙니다."),
+    NOT_FOUND_DM("dm_01","해당되는 dm이 없습니다."),
+    NOT_PARTICIPANT_DM("dm_02","해당 DM에 참여 중인 유저가 아닙니다."),
+    DM_MESSAGE_MISMATCH("dm_03","메시지와 DM ID가 일치하지 않습니다."),
+    SELF_DM_NOT_ALLOWED("dm_04","자기 자신에게는 DM을 시작할 수 없습니다."),
+    UNAUTHORIZED_MESSAGE_ACCESS("MSG_01", "본인의 메시지만 수정할 수 있습니다."),
+
     ;
 
     private final String code;

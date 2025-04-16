@@ -1,0 +1,62 @@
+package dev.discord_server.domain.dm.service;
+
+import dev.discord_server.common.response.ErrorDefineCode;
+import dev.discord_server.config.SnowflakeIdGenerator;
+import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
+import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
+import dev.discord_server.domain.dm.dto.DmAddResponse;
+import dev.discord_server.domain.dm.dto.DmUserResponse;
+import dev.discord_server.domain.dm.entity.Dm;
+import dev.discord_server.domain.dm.repository.DmRepository;
+import dev.discord_server.domain.user.entity.User;
+import dev.discord_server.domain.user.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class DmService {
+    private final DmRepository dmRepository;
+    private final UserRepository userRepository;
+    private final SnowflakeIdGenerator snowflakeIdGenerator;
+
+    public List<DmUserResponse> findDmUsers(Long currentId) {
+        List<Dm> rooms = dmRepository.findByUser1IdOrUser2Id(currentId,currentId);
+
+        return rooms.stream()
+                .map(room -> {
+                    User target = room.getUser1().getId().equals(currentId)
+                            ? room.getUser2()
+                            : room.getUser1();
+                    return new DmUserResponse(room.getId().toString(),target.getId().toString(),  target.getImageUrl(),target.getNickname());
+                })
+                .toList();
+    }
+
+    public DmAddResponse findOrCreateDm(Long userId, Long targetUserId) {
+        if (userId.equals(targetUserId)) {
+            throw new ForbiddenException403(ErrorDefineCode.SELF_DM_NOT_ALLOWED);
+        }
+
+        User user1 = userRepository.findById(userId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+        User user2 = userRepository.findById(targetUserId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+
+        Optional<Dm> existing = dmRepository.findByUser1IdAndUser2IdOrUser2IdAndUser1Id(
+                userId, targetUserId, userId, targetUserId
+        );
+
+        Long dmId = existing.map(Dm::getId)
+                .orElseGet(() -> dmRepository.save(Dm.builder()
+                        .id(snowflakeIdGenerator.generateId())
+                        .user1(user1)
+                        .user2(user2)
+                        .build()).getId());
+
+        return new DmAddResponse(dmId.toString());
+    }
+}

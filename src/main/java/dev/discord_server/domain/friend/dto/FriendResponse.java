@@ -12,18 +12,18 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor(access = AccessLevel.PUBLIC)
 public class FriendResponse {
-    private Long friendId;
+    private String friendId;
     private String name;
     private String imageUrl;
     private FriendStatus status;
 
-    public static FriendResponse toFriendResponse(Friend friend, Long currentUserId) {
-        User targetUser = friend.getFromUser().getId().equals(currentUserId)
+    public static FriendResponse toFriendResponse(Friend friend, String currentUserId) {
+        User targetUser = friend.getFromUser().getId().toString().equals(currentUserId)
                 ? friend.getToUser()
                 : friend.getFromUser();
 
         return FriendResponse.builder()
-                .friendId(friend.getId())
+                .friendId(friend.getId().toString())
                 .name(targetUser.getNickname())
                 .imageUrl(targetUser.getImageUrl())
                 .status(friend.getStatus())

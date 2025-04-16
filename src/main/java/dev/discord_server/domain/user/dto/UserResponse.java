@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 public class UserResponse {
-    private Long id;
+    private String id;
     private String email;
     private String nickname;
     private String imageUrl;
@@ -16,7 +16,7 @@ public class UserResponse {
 
     @Builder
     public UserResponse(User user) {
-        this.id = user.getId();
+        this.id = user.getId().toString();
         this.nickname = user.getNickname();
         this.email = user.getEmail();
         this.imageUrl = user.getImageUrl();

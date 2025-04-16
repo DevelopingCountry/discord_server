@@ -16,11 +16,10 @@ import java.util.UUID;
 @Table(name = "message")
 public class Message extends BaseEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    @Column(name = "id", columnDefinition = "BINARY(16)")
+    @Column(name = "id")
     private UUID id;
 
-    @Column(name = "content", length = 50)
+    @Column(name = "content", length = 250)
     private String content;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)

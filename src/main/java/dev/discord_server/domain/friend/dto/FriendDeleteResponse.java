@@ -6,6 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class FriendDeleteResponse {
-    private Long friendId;
+    private String friendId;
 
 }

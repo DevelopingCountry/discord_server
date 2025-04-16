@@ -3,7 +3,6 @@ package dev.discord_server.domain.friend.controller;
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.friend.dto.*;
-import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -44,7 +43,7 @@ public class FriendController {
             @RequestBody FriendAddRequest request) {
 
         Long uuid = SecurityUtil.getCurrentUserId();
-        FriendAddResponse friendAddResponse = friendService.sendFriendRequest(uuid, request.getTargetId());
+        FriendAddResponse friendAddResponse = friendService.sendFriendRequest(uuid, Long.valueOf(request.getTargetId()));
 
         return new CommonResponse<>(true, HttpStatus.OK, "친구 추가 성공했습니다.", friendAddResponse);
     }
@@ -59,7 +58,7 @@ public class FriendController {
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendDeleteResponse> deleteFriend(@RequestBody FriendDeleteRequest request) {
         Long uuid = SecurityUtil.getCurrentUserId();
-        friendService.deleteFriendRequest(uuid, request.getUserId());
+        friendService.deleteFriendRequest(uuid, Long.valueOf(request.getUserId()));
         return new CommonResponse<>(true, HttpStatus.OK, "친구 삭제 성공했습니다.", null);
     }
 
@@ -73,7 +72,7 @@ public class FriendController {
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendStatusResponse> changeFriendStatus(@RequestBody FriendStatusRequest request) {
         Long uuid = SecurityUtil.getCurrentUserId();
-        FriendStatusResponse friendStatusResponse = friendService.changeFriendRequest(uuid, request.getFriendId(), request.getIsFriend());
+        FriendStatusResponse friendStatusResponse = friendService.changeFriendRequest(uuid, Long.valueOf(request.getFriendId()), request.getIsFriend());
         return new CommonResponse<>(true, HttpStatus.OK, "친구 상태 변경에 성공했습니다.", friendStatusResponse);
 
     }
