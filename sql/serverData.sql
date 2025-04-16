@@ -1,19 +1,14 @@
 use discord_server;
 
-# INSERT INTO User (id,nickname, password, email, role)
-# VALUES
-#     (UUID_TO_BIN(UUID()),'admin', 'adminpass', 'admin@example.com','USER');
-#
-
-
-INSERT INTO server (id,name, image_url, host_id)
+-- 서버 2개 추가 (해당 유저가 host로 소유)
+INSERT INTO Server (id, name, image_url, host_id, created_at, updated_at)
 VALUES
+    (1001, 'Server A', NULL, 567342956374134784, NOW(), NOW()),
+    (1002, 'Server B', NULL, 567342956374134784, NOW(), NOW());
 
-    ( UUID_TO_BIN(UUID()),'server1', 'server1_image_url',UUID_TO_BIN('2616f85c-287e-4810-9cc6-c201217ed94d'))
-;
-# server의 host_id는 테스트하려면 User먼저 만들고 그 user의 uuid 복사해서 UUID_TO_BIN()에 넣어서 만들어보세요
-
-INSERT INTO channel(id,server_id,creator_id,name,type)
-    values (UUID_TO_BIN(UUID()),UUID_TO_BIN('57d7f838-18ef-11f0-a6da-3544b8cddce4'),UUID_TO_BIN('2616f85c-287e-4810-9cc6-c201217ed94d'),'천우희방','DM');
-
+-- 서버-유저 관계도 추가 (해당 유저가 두 서버에 포함되어 있도록)
+INSERT INTO Server_User (id, server_id, user_id, alarm, created_at, updated_at)
+VALUES
+    (2001, 1001, 567342956374134784, TRUE, NOW(), NOW()),
+    (2002, 1002, 567342956374134784, TRUE, NOW(), NOW());
 
