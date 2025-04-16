@@ -29,7 +29,7 @@ public class DmController {
     @PostMapping
     public CommonResponse<DmAddResponse> startDm(@RequestBody DmStartRequest request) {
         Long currentUserId = SecurityUtil.getCurrentUserId();
-        DmAddResponse dmAddResponse = dmService.findOrCreateDm(currentUserId, request.getTargetId());
+        DmAddResponse dmAddResponse = dmService.findOrCreateDm(currentUserId, Long.valueOf(request.getTargetId()));
 
         return new CommonResponse<>(true, HttpStatus.OK, "DM 생성 성공", dmAddResponse);
     }

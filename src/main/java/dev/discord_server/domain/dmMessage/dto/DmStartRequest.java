@@ -8,5 +8,5 @@ import java.util.UUID;
 @Data
 @Getter
 public class DmStartRequest {
-    private Long targetId;
+    private String targetId;
 }

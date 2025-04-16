@@ -31,7 +31,7 @@ public class DmService {
                     User target = room.getUser1().getId().equals(currentId)
                             ? room.getUser2()
                             : room.getUser1();
-                    return new DmUserResponse(room.getId(),target.getId(),  target.getImageUrl(),target.getNickname());
+                    return new DmUserResponse(room.getId().toString(),target.getId().toString(),  target.getImageUrl(),target.getNickname());
                 })
                 .toList();
     }
@@ -57,6 +57,6 @@ public class DmService {
                         .user2(user2)
                         .build()).getId());
 
-        return new DmAddResponse(dmId);
+        return new DmAddResponse(dmId.toString());
     }
 }

@@ -27,7 +27,14 @@ public class DmMessage extends BaseEntity {
     @JoinColumn(name = "dm_id", nullable = false)
     private Dm dm;
 
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
+

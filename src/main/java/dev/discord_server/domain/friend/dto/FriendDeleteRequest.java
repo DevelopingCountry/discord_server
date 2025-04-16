@@ -9,5 +9,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FriendDeleteRequest {
-    private Long userId;  //상대 아이디
+    private String userId;  //상대 아이디
 }

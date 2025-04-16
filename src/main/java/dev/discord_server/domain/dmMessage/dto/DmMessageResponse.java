@@ -9,7 +9,8 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class DmMessageResponse {
-    private Long dmId;
+    private String dmId;
+    private String messageId;
     private String nickName;
     private String imageUrl;
     private String content;

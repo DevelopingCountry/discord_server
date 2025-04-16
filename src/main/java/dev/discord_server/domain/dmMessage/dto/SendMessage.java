@@ -6,13 +6,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 @Getter
-@Setter
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class SendMessage {
-    private Long dmId;
-    private Long messageId;
+    private String dmId;
+    private String messageId;
     private String nickName;
     private String imageUrl;
     private String content;

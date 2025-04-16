@@ -8,5 +8,5 @@ import java.util.UUID;
 @Getter
 @AllArgsConstructor
 public class DmAddResponse {
-    private Long dmId;
+    private String dmId;
 }
