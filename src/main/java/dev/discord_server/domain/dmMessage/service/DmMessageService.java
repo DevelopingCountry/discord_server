@@ -42,6 +42,7 @@ public class DmMessageService {
                 .map(msg -> new DmMessageResponse(
                         dmId.toString(),
                         msg.getId().toString(),
+                        msg.getUser().getId().toString(),
                         msg.getUser().getNickname(),
                         msg.getUser().getImageUrl(),
                         msg.getContent(),
@@ -59,7 +60,7 @@ public class DmMessageService {
         }
 
         User sender = userRepository.findById(senderId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         DmMessage saved = dmMessageRepository.save(DmMessage.builder()
                 .id(snowflakeIdGenerator.generateId())

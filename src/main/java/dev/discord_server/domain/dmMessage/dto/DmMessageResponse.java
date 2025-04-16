@@ -11,6 +11,7 @@ import java.util.UUID;
 public class DmMessageResponse {
     private String dmId;
     private String messageId;
+    private String userId;
     private String nickName;
     private String imageUrl;
     private String content;
