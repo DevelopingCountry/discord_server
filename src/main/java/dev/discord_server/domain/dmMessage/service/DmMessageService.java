@@ -3,6 +3,7 @@ package dev.discord_server.domain.dmMessage.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.SnowflakeIdGenerator;
+import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.redis.RedisPublisher;
 import dev.discord_server.domain.dm.entity.Dm;
@@ -53,10 +54,10 @@ public class DmMessageService {
 
     public void sendMessage(Long dmId, Long senderId, String content) {
         Dm dm = dmRepository.findById(dmId)
-                .orElseThrow(() -> new RuntimeException("존재하지 않는 DM입니다."));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.NOT_FOUND_DM));
 
         if (!isParticipant(dm, senderId)) {
-            throw new RuntimeException("DM 참여자가 아닙니다.");
+            throw new NoSuchElementFoundException404(ErrorDefineCode.NOT_PARTICIPANT_DM);
         }
 
         User sender = userRepository.findById(senderId)
@@ -88,11 +89,11 @@ public class DmMessageService {
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         if (!message.getDm().getId().equals(dmId)) {
-            throw new IllegalArgumentException("DM ID가 일치하지 않습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.DM_MESSAGE_MISMATCH);
         }
 
         if (!message.getUser().getId().equals(userId)) {
-            throw new SecurityException("본인의 메시지만 수정할 수 있습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.UNAUTHORIZED_MESSAGE_ACCESS);
         }
 
         message.updateContent(content);
@@ -111,14 +112,14 @@ public class DmMessageService {
 
     public void deleteMessage(Long dmId, Long messageId, Long userId) {
         DmMessage message = dmMessageRepository.findById(messageId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.NOT_FOUND_DM));
 
         if (!message.getDm().getId().equals(dmId)) {
-            throw new IllegalArgumentException("DM ID가 일치하지 않습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.DM_MESSAGE_MISMATCH);
         }
 
         if (!message.getUser().getId().equals(userId)) {
-            throw new SecurityException("본인의 메시지만 삭제할 수 있습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.UNAUTHORIZED_MESSAGE_ACCESS);
         }
 
         dmMessageRepository.delete(message);

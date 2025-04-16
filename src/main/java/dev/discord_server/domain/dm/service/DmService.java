@@ -2,6 +2,7 @@ package dev.discord_server.domain.dm.service;
 
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.SnowflakeIdGenerator;
+import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.domain.dm.dto.DmAddResponse;
 import dev.discord_server.domain.dm.dto.DmUserResponse;
@@ -38,7 +39,7 @@ public class DmService {
 
     public DmAddResponse findOrCreateDm(Long userId, Long targetUserId) {
         if (userId.equals(targetUserId)) {
-            throw new IllegalArgumentException("자기 자신에게는 DM을 시작할 수 없습니다.");
+            throw new ForbiddenException403(ErrorDefineCode.SELF_DM_NOT_ALLOWED);
         }
 
         User user1 = userRepository.findById(userId)
