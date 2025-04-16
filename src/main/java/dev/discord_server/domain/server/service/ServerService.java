@@ -40,10 +40,6 @@ public class ServerService {
         Long currentUserId = SecurityUtil.getCurrentUserId();
         List<Server> servers = serverRepository.findByServerUsers_User_Id(currentUserId);
 
-        if (servers.isEmpty()) {
-            throw new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER);
-        }
-
         return servers.stream()
                 .map(server -> {
                     boolean alarm = server.getServerUsers().stream()
@@ -88,11 +84,11 @@ public class ServerService {
         serverUserRepository.save(createUser);
 
         return new ServerResponse(
-                server.getId(),
+                String.valueOf(server.getId()),
                 server.getServerName(),
                 server.getImage(),
                 createUser.isAlarm(),
-                server.getHost().getId()
+                String.valueOf(server.getHost().getId())
         );
     }
 
@@ -110,7 +106,7 @@ public class ServerService {
         server.setImage(serverInfoUpdateRequest.getImageUrl());
 
         return new ServerUpdateResponse(
-                serverId,
+                String.valueOf(serverId),
                 server.getImage(),
                 server.getServerName()
         );
@@ -129,7 +125,7 @@ public class ServerService {
             throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
 
-        User guest = userRepository.findById(request.getGuestId())
+        User guest = userRepository.findById(Long.valueOf(request.getGuestId()))
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
 
@@ -161,7 +157,7 @@ public class ServerService {
 
         serverUser.setAlarm(request.isAlarm());
 
-        return new ServerAlarmUpdateResponse(serverId, request.isAlarm());
+        return new ServerAlarmUpdateResponse(String.valueOf(serverId), request.isAlarm());
     }
 
 

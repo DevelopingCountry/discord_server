@@ -14,19 +14,19 @@ import lombok.Getter;
 @Builder
 @AllArgsConstructor
 public class ServerResponse {
-    private Long id;
+    private String id;
     private String name;
     private String imageUrl;
     private boolean alarm;
-    private Long hostId;
+    private String hostId;
 
     public static ServerResponse toResponseDto(Server server, boolean alarm) {
         return ServerResponse.builder()
-                .id(server.getId())
+                .id(String.valueOf(server.getId()))
                 .name(server.getServerName())
                 .imageUrl(server.getImage())
                 .alarm(alarm)
-                .hostId(server.getHost().getId())
+                .hostId(String.valueOf(server.getHost().getId()))
                 .build();
     }
 }

@@ -41,9 +41,10 @@ public class ServerController {
 
     @PatchMapping("/{serverId}")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<ServerUpdateResponse> updateServerInfo(@PathVariable Long serverId,
+    public CommonResponse<ServerUpdateResponse> updateServerInfo(@PathVariable String serverId,
                                                  @RequestBody ServerInfoUpdateRequest request) {
-        ServerUpdateResponse serverResponse = serverService.updateServerInfo(serverId, request);
+        Long Id = Long.parseLong(serverId);
+        ServerUpdateResponse serverResponse = serverService.updateServerInfo(Id, request);
         return new CommonResponse<>(true, HttpStatus.OK, "서버 이름이 변경되었습니다.", serverResponse);
     }
 
@@ -51,32 +52,37 @@ public class ServerController {
 
     @PostMapping("/{serverId}/invite")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<Void> inviteUserToServer(@PathVariable Long serverId,
+    public CommonResponse<Void> inviteUserToServer(@PathVariable String serverId,
                                                    @RequestBody ServerInviteRequest request) {
-        serverService.inviteUser(serverId, request);
+        Long Id = Long.parseLong(serverId);
+        serverService.inviteUser(Id, request);
         return new CommonResponse<>(true, HttpStatus.OK, "참여자 초대가 완료되었습니다.", null);
     }
 
 
     @PatchMapping("/{serverId}/alarm")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<ServerAlarmUpdateResponse> updateAlarm(@PathVariable Long serverId,
+    public CommonResponse<ServerAlarmUpdateResponse> updateAlarm(@PathVariable String serverId,
                                                                  @RequestBody @Valid ServerAlarmUpdateRequest request) {
-        ServerAlarmUpdateResponse response = serverService.updateAlarm(serverId, request);
+
+        Long Id = Long.parseLong(serverId);
+        ServerAlarmUpdateResponse response = serverService.updateAlarm(Id, request);
         return new CommonResponse<>(true, HttpStatus.OK, "알림이 변경되었습니다.", response);
     }
 
     @DeleteMapping("/{serverId}/leave")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<Void> exitServer(@PathVariable Long serverId) {
-        serverService.exitServer(serverId);
+    public CommonResponse<Void> exitServer(@PathVariable String serverId) {
+        Long Id = Long.parseLong(serverId);
+        serverService.exitServer(Id);
         return new CommonResponse<>(true, HttpStatus.OK, "서버에서 나갔습니다.", null);
     }
 
     @DeleteMapping("/{serverId}")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<Void> deleteServer(@PathVariable Long serverId) {
-        serverService.deleteServer(serverId);
+    public CommonResponse<Void> deleteServer(@PathVariable String serverId) {
+        Long Id = Long.parseLong(serverId);
+        serverService.deleteServer(Id);
         return new CommonResponse<>(true, HttpStatus.OK, "서버를 삭제했습니다.", null);
     }
 
