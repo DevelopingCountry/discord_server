@@ -60,7 +60,7 @@ public class ChannelService {
         channelRepository.save(channel);
 
         return new ChannelCreateResponse(
-                channel.getId(),
+                String.valueOf(channel.getId()),
                 channel.getName(),
                 channel.getType()
         );
@@ -75,7 +75,7 @@ public class ChannelService {
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
 
-        Channel channel = channelRepository.findById(request.getChannelId())
+        Channel channel = channelRepository.findById(Long.valueOf(request.getChannelId()))
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_CHANNEL));
 
         if(!channel.getServer().getId().equals(server.getId())) {
@@ -90,13 +90,13 @@ public class ChannelService {
     }
 
     public List<ChannelResponse> findChannels(Long serverId) {
+        List<Channel> channels = channelRepository.findAllByServerId((serverId));
 
         Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
+            .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
-        return server.getChannels().stream()
+        return channels.stream()
                 .map(ChannelResponse::from)
                 .toList();
-
     }
 }

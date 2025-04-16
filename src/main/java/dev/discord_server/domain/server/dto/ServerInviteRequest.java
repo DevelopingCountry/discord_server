@@ -4,5 +4,5 @@ import lombok.Getter;
 
 @Getter
 public class ServerInviteRequest {
-    private Long guestId;
+    private String guestId;
 }

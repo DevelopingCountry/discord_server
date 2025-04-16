@@ -22,26 +22,29 @@ public class ChannelController {
 
     @GetMapping("/{serverId}/channel")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<List<ChannelResponse>> getListChannel(@PathVariable Long serverId) {
-        List<ChannelResponse> channels = channelService.findChannels(serverId);
+    public CommonResponse<List<ChannelResponse>> getListChannel(@PathVariable String serverId) {
+        Long Id = Long.parseLong(serverId);
+        List<ChannelResponse> channels = channelService.findChannels(Id);
         return new CommonResponse<>(true, HttpStatus.OK, "모든 채널이 반환되었습니다.",channels);
     }
 
 
     @PostMapping("/{serverId}/channel")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<ChannelCreateResponse> createChannel(@PathVariable Long serverId,
+    public CommonResponse<ChannelCreateResponse> createChannel(@PathVariable String serverId,
                                                                @RequestBody ChannelCreateRequest request) {
-        ChannelCreateResponse channel = channelService.createChannel(serverId, request);
+        Long Id = Long.parseLong(serverId);
+        ChannelCreateResponse channel = channelService.createChannel(Id, request);
         return new CommonResponse<>(true, HttpStatus.OK, "채널이 생성되었습니다.",channel);
     }
 
     @DeleteMapping("/{serverId}/channel")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<Void> deleteChannel(@PathVariable Long serverId,
+    public CommonResponse<Void> deleteChannel(@PathVariable String serverId,
                                               @RequestBody ChannelDeleteRequest request) {
 
-        channelService.deleteChannel(serverId, request);
+        Long Id = Long.parseLong(serverId);
+        channelService.deleteChannel(Id, request);
         return new CommonResponse<>(true, HttpStatus.OK, "채널이 삭제되었습니다.", null);
     }
 
