@@ -7,7 +7,6 @@ import dev.discord_server.config.exception.custom.exception.ForbiddenException40
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
 import dev.discord_server.domain.channel.dto.ChannelCreateRequest;
-import dev.discord_server.domain.channel.dto.ChannelCreateResponse;
 import dev.discord_server.domain.channel.dto.ChannelDeleteRequest;
 import dev.discord_server.domain.channel.dto.ChannelResponse;
 import dev.discord_server.domain.channel.entity.Channel;
@@ -21,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @RequiredArgsConstructor
 @Service
@@ -35,7 +33,7 @@ public class ChannelService {
 
 
     @Transactional
-    public ChannelCreateResponse createChannel(Long serverId, ChannelCreateRequest request) {
+    public ChannelResponse createChannel(Long serverId, ChannelCreateRequest request) {
         Server server = serverRepository.findById(serverId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
@@ -59,11 +57,7 @@ public class ChannelService {
 
         channelRepository.save(channel);
 
-        return new ChannelCreateResponse(
-                channel.getId(),
-                channel.getName(),
-                channel.getType()
-        );
+        return ChannelResponse.from(channel);
     }
 
 
@@ -75,7 +69,7 @@ public class ChannelService {
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
 
-        Channel channel = channelRepository.findById(request.getChannelId())
+        Channel channel = channelRepository.findById(Long.valueOf(request.getChannelId()))
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_CHANNEL));
 
         if(!channel.getServer().getId().equals(server.getId())) {
@@ -90,13 +84,13 @@ public class ChannelService {
     }
 
     public List<ChannelResponse> findChannels(Long serverId) {
+        List<Channel> channels = channelRepository.findAllByServerId((serverId));
 
         Server server = serverRepository.findById(serverId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
+            .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
 
-        return server.getChannels().stream()
+        return channels.stream()
                 .map(ChannelResponse::from)
                 .toList();
-
     }
 }
