@@ -34,16 +34,16 @@ public class ServerController {
 
     @PostMapping
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<ServerCreateOrUpdateResponse> addServer(@RequestBody ServerCreateRequest serverCreateRequest) {
-        ServerCreateOrUpdateResponse serverResponse = serverService.addServer(serverCreateRequest);
+    public CommonResponse<ServerResponse> addServer(@RequestBody ServerCreateRequest serverCreateRequest) {
+        ServerResponse serverResponse = serverService.addServer(serverCreateRequest);
         return new CommonResponse<>(true, HttpStatus.OK, "서버가 생성되었습니다.", serverResponse);
     }
 
     @PatchMapping("/{serverId}")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<ServerCreateOrUpdateResponse> updateServerInfo(@PathVariable Long serverId,
+    public CommonResponse<ServerUpdateResponse> updateServerInfo(@PathVariable Long serverId,
                                                  @RequestBody ServerInfoUpdateRequest request) {
-        ServerCreateOrUpdateResponse serverResponse = serverService.updateServerInfo(serverId, request);
+        ServerUpdateResponse serverResponse = serverService.updateServerInfo(serverId, request);
         return new CommonResponse<>(true, HttpStatus.OK, "서버 이름이 변경되었습니다.", serverResponse);
     }
 

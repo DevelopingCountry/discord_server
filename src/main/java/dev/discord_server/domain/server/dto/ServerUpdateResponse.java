@@ -5,9 +5,8 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class ServerCreateOrUpdateResponse {
-
-    private Long serverId;
+public class ServerUpdateResponse {
+    private Long id;
     private String imageUrl;
     private String serverName;
 }
