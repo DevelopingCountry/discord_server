@@ -1,5 +1,3 @@
-DROP DATABASE IF EXISTS discord_server;
-CREATE DATABASE IF NOT EXISTS discord_server;
 USE discord_server;
 
 CREATE TABLE nicknames (

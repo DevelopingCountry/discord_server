@@ -1,5 +1,7 @@
 package dev.discord_server.domain.nickname.service;
 
+import dev.discord_server.common.response.ErrorDefineCode;
+import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
 import dev.discord_server.domain.nickname.entity.Nickname;
 import dev.discord_server.domain.nickname.repository.NicknameRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +16,7 @@ public class NicknameService {
     @Transactional
     public String assignRandomNickname() {
         Nickname nickname = nicknameRepository.getRandomUnusedNickname()
-                .orElseThrow(() -> new IllegalStateException("No available nicknames left"));
-
+                .orElseThrow(() -> new PreconditionFailException412(ErrorDefineCode.EMPTY_NICKNAME));
         nickname.setIsUsed(true);
         nicknameRepository.save(nickname);
 

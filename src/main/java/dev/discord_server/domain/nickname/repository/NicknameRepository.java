@@ -9,4 +9,6 @@ import java.util.Optional;
 public interface NicknameRepository extends JpaRepository<Nickname,Long> {
     @Query(value = "SELECT * FROM nicknames WHERE is_used = FALSE ORDER BY RAND() LIMIT 1", nativeQuery = true)
     Optional<Nickname> getRandomUnusedNickname();
+
+    Optional<Nickname> findByNickname(String nickname);
 }
