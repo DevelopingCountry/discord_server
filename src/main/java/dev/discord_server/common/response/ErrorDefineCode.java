@@ -23,6 +23,7 @@ public enum ErrorDefineCode {
     AUTH_NOT_CHANGE_FRIEND_STATUS("FRI_06","수락/거절할 수 있는 친구 요청이 존재하지 않습니다."),
     NOT_DELETABLE_FRIEND_STATUS("FRI_07","수락된 친구 관계가 아닙니다."),
     EMPTY_USER("user_01","존재하지 않는 유저입니다."),
+    EMPTY_NICKNAME("NICK_01", "사용 가능한 닉네임이 더 이상 존재하지 않습니다."),
     EMPTY_SERVER("SER_01","서버가 존재하지 않습니다."),
     NOT_JOINED_SERVER("SER_02","해당 서버에 참여 중인 유저가 아닙니다."),
     CANT_EXIT_HOST_SERVER("SER_03","서버 호스트는 서버를 나갈 수 없습니다."),

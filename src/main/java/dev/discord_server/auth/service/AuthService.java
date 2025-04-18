@@ -7,6 +7,7 @@ import dev.discord_server.auth.repository.RefreshTokenRepository;
 import dev.discord_server.auth.util.JwtUtil;
 import dev.discord_server.auth.util.KakaoUtil;
 import dev.discord_server.config.SnowflakeIdGenerator;
+import dev.discord_server.domain.nickname.service.NicknameService;
 import dev.discord_server.domain.user.Enum.Role;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
@@ -28,6 +29,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final RefreshTokenRepository refreshTokenRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
+    private final NicknameService nicknameService;
 
     public TokenResponse oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
@@ -79,7 +81,7 @@ public class AuthService {
         User newUser = AuthConverter.toUser(
                 snowflakeIdGenerator.generateId(),
                 kakaoProfile.getKakao_account().getEmail(),
-                kakaoProfile.getKakao_account().getProfile().getNickname(),
+                nicknameService.assignRandomNickname(),
                 Role.USER
 
         );
