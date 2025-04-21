@@ -12,6 +12,6 @@ public class RedisPublisher {
     private final ChannelTopic dmTopic;
 
     public void publish(String message) {
-        redisTemplate.convertAndSend(dmTopic.getTopic(), message); // 채널명 chat 고정
+        redisTemplate.convertAndSend(dmTopic.getTopic(), message);
     }
 }

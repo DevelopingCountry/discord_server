@@ -16,7 +16,7 @@ public class RedisPubSubConfig {
     @Qualifier("pubSubConnectionFactory")
     public RedisConnectionFactory pubSubConnectionFactory() {
         // 기본 Redis와 분리된 Pub/Sub용 설정
-        return new LettuceConnectionFactory("localhost", 6379); // 환경에 따라 수정
+        return new LettuceConnectionFactory("localhost", 6379);
     }
 
     @Bean
