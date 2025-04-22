@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>WebSocket 채널 테스트</title>
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h1>🔔 실시간 채널 생성 테스트</h1>
+<ul id="channel-list"></ul>
+
+<script>
+  const serverId = "567587959969157120";
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NjcyMjk0Mjk5NjU2NTYwNjQiLCJlbWFpbCI6Imx3YjkwMzZAa2FrYW8uY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDUzMzM5MzcsImV4cCI6MTc0NTM0NDczN30.9egRga8tSbzVZcLNEytF-CAF6hQWPVoPHxdVy3yzrmE"; // JWT
+
+  // 1. 기존 채널 목록 불러오기
+  fetch(`http://localhost:8080/server/${serverId}/channel`, {
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  })
+          .then(res => res.json())
+          .then(data => {
+            data.response.forEach(channel => {
+              const li = document.createElement("li");
+              li.innerText = `기존 채널: ${channel.name} (${channel.id})`;
+              document.getElementById("channel-list").appendChild(li);
+            });
+
+          });
+
+  // 2. WebSocket 연결 및 실시간 구독
+  const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token}`);
+  const stomp = Stomp.over(socket);
+
+  stomp.connect({}, () => {
+    stomp.subscribe(`/topic/server/${serverId}/channels`, (msg) => {
+      const data = JSON.parse(msg.body);
+      console.log("📩 받은 메시지:", data); // 🔍 확인용 로그 추가
+      const li = document.createElement("li");
+      li.innerText = `🔄 생성됨: ${data.channelName} (${data.channelId})`;
+      document.getElementById("channel-list").appendChild(li);
+    });
+
+  });
+</script>
+</body>
+</html>
