@@ -6,7 +6,9 @@ import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
+import dev.discord_server.config.redis.ChannelRedisPublisher;
 import dev.discord_server.domain.channel.dto.ChannelCreateRequest;
+import dev.discord_server.domain.channel.dto.ChannelCreatedMessageResponse;
 import dev.discord_server.domain.channel.dto.ChannelDeleteRequest;
 import dev.discord_server.domain.channel.dto.ChannelResponse;
 import dev.discord_server.domain.channel.entity.Channel;
@@ -29,6 +31,7 @@ public class ChannelService {
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
+    private final ChannelRedisPublisher channelRedisPublisher;
 
 
 
@@ -56,6 +59,13 @@ public class ChannelService {
                 .build();
 
         channelRepository.save(channel);
+
+        // ✅ WebSocket 알림 전파 (채널 생성 후)
+        channelRedisPublisher.publish(new ChannelCreatedMessageResponse(
+                serverId.toString(),
+                channel.getId().toString(),
+                channel.getName()
+        ));
 
         return ChannelResponse.from(channel);
     }

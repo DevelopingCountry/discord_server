@@ -36,7 +36,8 @@ public class SecurityConfig {
             "/auth/login/kakao",
             "/auth/refresh",
             "/ws-chat/**",
-            "/ws-chat"
+            "/ws-chat",
+            "/index.html"
     };
 
     @Bean
