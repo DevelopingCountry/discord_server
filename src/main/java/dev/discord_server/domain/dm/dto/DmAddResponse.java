@@ -9,4 +9,7 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DmAddResponse {
     private String dmId;
+    private String targetId;
+    private String targetImageUrl;
+    private String targetNickname;
 }

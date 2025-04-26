@@ -57,6 +57,6 @@ public class DmService {
                         .user2(user2)
                         .build()).getId());
 
-        return new DmAddResponse(dmId.toString());
+        return new DmAddResponse(dmId.toString(),user2.getId().toString(),user2.getImageUrl(),user2.getNickname());
     }
 }
