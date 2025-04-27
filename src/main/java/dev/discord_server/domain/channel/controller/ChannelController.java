@@ -19,7 +19,7 @@ public class ChannelController {
     private ChannelService channelService;
 
     @GetMapping("/{serverId}/channel")
-//    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<ChannelResponse>> getListChannel(@PathVariable String serverId) {
         Long Id = Long.parseLong(serverId);
         List<ChannelResponse> channels = channelService.findChannels(Id);

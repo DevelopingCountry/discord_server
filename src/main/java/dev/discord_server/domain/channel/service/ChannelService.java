@@ -42,10 +42,6 @@ public class ChannelService {
 
         Long currentUserId = SecurityUtil.getCurrentUserId();
 
-        if (!server.getHost().getId().equals(currentUserId)) {
-            throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
-        }
-
         User creator = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
@@ -60,7 +56,7 @@ public class ChannelService {
 
         channelRepository.save(channel);
 
-        // ✅ WebSocket 알림 전파 (채널 생성 후)
+        // WebSocket 알림 전파
         channelRedisPublisher.publish(new ChannelCreatedMessageResponse(
                 serverId.toString(),
                 channel.getId().toString(),
