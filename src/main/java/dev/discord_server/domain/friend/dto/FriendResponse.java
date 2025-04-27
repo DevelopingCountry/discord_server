@@ -23,7 +23,7 @@ public class FriendResponse {
                 : friend.getFromUser();
 
         return FriendResponse.builder()
-                .friendId(friend.getId().toString())
+                .friendId(targetUser.getId().toString())
                 .name(targetUser.getNickname())
                 .imageUrl(targetUser.getImageUrl())
                 .status(friend.getStatus())
