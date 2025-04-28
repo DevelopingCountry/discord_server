@@ -3,6 +3,7 @@ package dev.discord_server.config.redis;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -14,14 +15,25 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 @Configuration
 public class RedisPubSubConfig {
 
-    @Bean
-    @Qualifier("pubSubConnectionFactory")
-    public RedisConnectionFactory pubSubConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
-        config.setDatabase(1); // ✅ DM용 DB 1번
 
+    @Bean
+    @Profile("dev")
+    @Qualifier("pubSubConnectionFactory")
+    public RedisConnectionFactory devPubSubConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
+        config.setDatabase(1);
         return new LettuceConnectionFactory(config);
     }
+
+    @Bean
+    @Profile("prod")
+    @Qualifier("pubSubConnectionFactory")
+    public RedisConnectionFactory prodPubSubConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("discord-redis", 6379);
+        config.setDatabase(1);
+        return new LettuceConnectionFactory(config);
+    }
+
 
     @Bean
     public StringRedisTemplate pubSubRedisTemplate(@Qualifier("pubSubConnectionFactory") RedisConnectionFactory factory) {
