@@ -1,11 +1,10 @@
-package dev.discord_server.domain.channel.dto;
+package dev.discord_server.domain.message.dto;
 
 public record ChannelChatPayload(
         String channelId,
         String messageId,
-        String senderNickname,
-        String senderImageUrl,
+        String nickName,
+        String imageUrl,
         String content,
         String createdAt
-) {
-}
+) {}

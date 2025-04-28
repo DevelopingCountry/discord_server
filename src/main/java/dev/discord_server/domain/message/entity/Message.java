@@ -4,8 +4,7 @@ import dev.discord_server.domain.channel.entity.Channel;
 import dev.discord_server.config.BaseEntity;
 import dev.discord_server.domain.user.entity.User;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 import java.util.UUID;
@@ -13,11 +12,14 @@ import java.util.UUID;
 @Getter
 @Setter
 @Entity
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @Table(name = "message")
 public class Message extends BaseEntity {
     @Id
     @Column(name = "id")
-    private UUID id;
+    private Long id;
 
     @Column(name = "content", length = 250)
     private String content;
@@ -30,4 +32,8 @@ public class Message extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    public void updateContent(String content) {
+        this.content = content;
+    }
 }
