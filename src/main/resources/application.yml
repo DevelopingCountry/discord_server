@@ -24,6 +24,9 @@ spring:
       host: localhost
       port: 6379
 
+  profiles:
+    active: dev
+
 
 jwt:
   accessSecret: UGxlYXNlIGRvIG5vdCBkZWNyeXB0IHRoaIEl0J3MgY29uZmlkZW50aG91ciBzZWNyZXQuIGl0IGlzIGNjQgYnl0ZXMuIHNvIHNhZC4gaG93IGFyZSB5b3UgaSdtIG5vdCBmaW5lIHRoYW5rIHlvdSBhbmQgeW91PyBpIHdhbnQgZ28gaG9tZSBmZg==
