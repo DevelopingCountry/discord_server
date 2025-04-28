@@ -7,10 +7,7 @@ import dev.discord_server.config.exception.custom.exception.ForbiddenException40
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
 import dev.discord_server.config.redis.ChannelRedisPublisher;
-import dev.discord_server.domain.channel.dto.ChannelCreateRequest;
-import dev.discord_server.domain.channel.dto.ChannelCreatedMessageResponse;
-import dev.discord_server.domain.channel.dto.ChannelDeleteRequest;
-import dev.discord_server.domain.channel.dto.ChannelResponse;
+import dev.discord_server.domain.channel.dto.*;
 import dev.discord_server.domain.channel.entity.Channel;
 import dev.discord_server.domain.channel.entity.ChannelRepository;
 import dev.discord_server.domain.server.entity.Server;
@@ -98,5 +95,24 @@ public class ChannelService {
         return channels.stream()
                 .map(ChannelResponse::from)
                 .toList();
+    }
+
+    @Transactional
+    public ChannelResponse updateChannel(Long serverId, ChannelUpdateRequest request) {
+
+        Server server = serverRepository.findById(serverId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
+
+        Channel channel = channelRepository.findById(request.getChannelId())
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_CHANNEL));
+
+        if (!channel.getServer().getId().equals(serverId)) {
+            throw new PreconditionFailException412(ErrorDefineCode.CHANNEL_NOT_IN_SERVER);
+        }
+
+        channel.setName(request.getChannelName());
+        channelRepository.save(channel);
+
+        return ChannelResponse.from(channel);
     }
 }
