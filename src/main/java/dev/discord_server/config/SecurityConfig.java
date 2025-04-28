@@ -40,6 +40,7 @@ public class SecurityConfig {
             "/index.html",
             "/ws/voice",
             "/ws/voice/**",
+            "/channel/**",
             "/channel/*/messages",
             "/channel/*/message/*",
             "/app/channel/*"
