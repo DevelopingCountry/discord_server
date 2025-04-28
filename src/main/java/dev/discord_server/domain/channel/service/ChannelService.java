@@ -114,7 +114,5 @@ public class ChannelService {
         channelRepository.save(channel);
 
         return ChannelResponse.from(channel);
-
-
     }
 }
