@@ -52,32 +52,45 @@ public class FriendService {
         if (currentUserId.equals(toUserId)) {
             throw new AlreadyExistElementException409(ErrorDefineCode.SELF_FRIEND_REQUEST);
         }
+
         Optional<Friend> existingFriendOpt = friendRepository.findByFromUserAndToUserOrToUserAndFromUser(
                 fromUser, toUser, toUser, fromUser);
 
         if (existingFriendOpt.isPresent()) {
             Friend friend = existingFriendOpt.get();
             switch (friend.getStatus()) {
-                case PENDING, ACCEPTED -> throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_FRIEND);
+                case ACCEPTED -> throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_FRIEND);
+                case PENDING -> {
+                    if (friend.getToUser().getId().equals(currentUserId)) {
+                        friend.setStatus(FriendStatus.ACCEPTED);
+                        friendRepository.save(friend);
+                        return new FriendAddResponse(toUser.getId().toString(), toUser.getNickname(),
+                                toUser.getImageUrl(), FriendStatus.ACCEPTED);
+                    } else {
+                        throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_FRIEND);
+                    }
+                }
                 case REJECTED -> {
                     friend.setStatus(FriendStatus.PENDING);
                     friendRepository.save(friend);
+                    // 거절된 요청을 다시 요청할 때, 업데이트된 상태로 응답 반환
+                    return new FriendAddResponse(toUser.getId().toString(), toUser.getNickname(),
+                            toUser.getImageUrl(), FriendStatus.PENDING);
                 }
             }
-        } else {
-
-            Friend friend = Friend.builder()
-                    .id(snowflakeIdGenerator.generateId())
-                    .fromUser(fromUser)
-                    .toUser(toUser)
-                    .status(FriendStatus.PENDING)
-                    .build();
-            friendRepository.save(friend);
         }
 
-        return new FriendAddResponse(toUser.getId().toString(),toUser.getNickname(), toUser.getImageUrl(), FriendStatus.PENDING);
-    }
+        Friend friend = Friend.builder()
+                .id(snowflakeIdGenerator.generateId())
+                .fromUser(fromUser)
+                .toUser(toUser)
+                .status(FriendStatus.PENDING)
+                .build();
+        friendRepository.save(friend);
 
+        return new FriendAddResponse(toUser.getId().toString(), toUser.getNickname(),
+                toUser.getImageUrl(), FriendStatus.PENDING);
+    }
 
     public void deleteFriendRequest(Long currentUserId, Long toUserId) {
         User fromUser = userRepository.findById(currentUserId)
@@ -89,7 +102,13 @@ public class FriendService {
                 .findByFromUserAndToUserOrToUserAndFromUser(fromUser, toUser, toUser, fromUser)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_FRIEND));
 
-        if (friend.getStatus() != FriendStatus.ACCEPTED) {
+        // 수락된 친구 관계는 누구나 삭제 가능
+        // PENDING 상태는 친구 요청을 보낸 사람만 취소 가능
+        if (friend.getStatus() == FriendStatus.PENDING && !friend.getFromUser().getId().equals(currentUserId)) {
+            throw new ForbiddenException403(ErrorDefineCode.NOT_DELETABLE_FRIEND_STATUS);
+        }
+        // REJECTED 상태는 삭제 불가
+        if (friend.getStatus() == FriendStatus.REJECTED) {
             throw new ForbiddenException403(ErrorDefineCode.NOT_DELETABLE_FRIEND_STATUS);
         }
 
@@ -111,9 +130,7 @@ public class FriendService {
                 )
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.NOT_VALID_FRIEND));
 
-
         // 친구 신청을 받은 사람만 상태값을 변경할 수 있도록 함
-
         if (!friend.getToUser().getId().equals(uuid)) {
             throw new ForbiddenException403(ErrorDefineCode.AUTH_NOT_CHANGE_FRIEND_STATUS);
         }
@@ -126,12 +143,10 @@ public class FriendService {
 
         friendRepository.save(friend);
 
-        // 상대방 id
-        Long targetId = friend.getFromUser().getId().equals(uuid)
-                ? friend.getToUser().getId()
-                : friend.getFromUser().getId();
+        // 항상 친구 요청을 보낸 사람의 ID를 반환 (수정된 부분)
+        Long targetId = friend.getFromUser().getId();
 
-        return new FriendStatusResponse(targetId.toString(),friend.getStatus());
+        return new FriendStatusResponse(targetId.toString(), friend.getStatus());
     }
 
     /**
