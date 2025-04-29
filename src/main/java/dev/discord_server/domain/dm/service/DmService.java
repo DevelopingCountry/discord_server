@@ -44,9 +44,9 @@ public class DmService {
             throw new ForbiddenException403(ErrorDefineCode.SELF_DM_NOT_ALLOWED);
         }
 
-        User user1 = userRepository.findById(userId)
+        User currentUser = userRepository.findById(userId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
-        User user2 = userRepository.findById(targetUserId)
+        User targetUser = userRepository.findById(targetUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         Optional<Dm> existing = dmRepository.findByUser1IdAndUser2IdOrUser2IdAndUser1Id(
@@ -56,12 +56,12 @@ public class DmService {
         Long dmId = existing.map(Dm::getId)
                 .orElseGet(() -> dmRepository.save(Dm.builder()
                         .id(snowflakeIdGenerator.generateId())
-                        .user1(user1)
-                        .user2(user2)
                         .isVisible(true)
+                        .user1(currentUser)
+                        .user2(targetUser)
                         .build()).getId());
 
-        return new DmAddResponse(dmId.toString());
+        return new DmAddResponse(dmId.toString(),targetUser.getId().toString(),targetUser.getImageUrl(),targetUser.getNickname());
     }
 
 

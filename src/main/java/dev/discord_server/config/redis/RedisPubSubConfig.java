@@ -15,13 +15,14 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 @Configuration
 public class RedisPubSubConfig {
 
+    // 기본 빈을 제거하고 프로필별 빈만 유지합니다
 
     @Bean
     @Profile("dev")
     @Qualifier("pubSubConnectionFactory")
-    public RedisConnectionFactory devPubSubConnectionFactory() {
+    public RedisConnectionFactory pubSubConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
-        config.setDatabase(1);
+        config.setDatabase(1); // DM용 DB 1번
         return new LettuceConnectionFactory(config);
     }
 
@@ -34,6 +35,15 @@ public class RedisPubSubConfig {
         return new LettuceConnectionFactory(config);
     }
 
+    // 기본 프로필을 위한 빈 추가 (dev나 prod가 아닐 경우)
+    @Bean
+    @Profile("!dev & !prod")
+    @Qualifier("pubSubConnectionFactory")
+    public RedisConnectionFactory defaultPubSubConnectionFactory() {
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
+        config.setDatabase(1);
+        return new LettuceConnectionFactory(config);
+    }
 
     @Bean
     public StringRedisTemplate pubSubRedisTemplate(@Qualifier("pubSubConnectionFactory") RedisConnectionFactory factory) {
@@ -45,25 +55,26 @@ public class RedisPubSubConfig {
         return new ChannelTopic("chat.dm");
     }
 
-
     @Bean(name = "channelCreatedTopic")
     public ChannelTopic channelCreatedTopic() {
         return new ChannelTopic("channel.created");
     }
 
+    @Bean(name="msgTopic")
+    public ChannelTopic msgTopic() {return new ChannelTopic("channel.msg");}
+
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
             @Qualifier("pubSubConnectionFactory") RedisConnectionFactory factory,
             DmRedisSubscriber dmSubscriber,
-            ChannelCreatedSubscriber channelSubscriber
+            ChannelCreatedSubscriber channelSubscriber,
+            MessageRedisSubscriber messageRedisSubscriber
     ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(factory);
         container.addMessageListener(dmSubscriber, new ChannelTopic("chat.dm"));
         container.addMessageListener(channelSubscriber, new PatternTopic("channel.created.*"));
+        container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg.*"));
         return container;
     }
-
-
-
 }

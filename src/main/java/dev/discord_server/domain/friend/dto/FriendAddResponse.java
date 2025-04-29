@@ -7,7 +7,8 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class FriendAddResponse {
-    private String friendName;
+    private String friendId;
+    private String name;
     private String imageUrl;
-    private FriendStatus isFriend;
+    private FriendStatus status;
 }

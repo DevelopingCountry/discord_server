@@ -7,4 +7,5 @@ import java.util.UUID;
 
 public interface ServerUserRepository extends JpaRepository<ServerUser, Long> {
     Optional<ServerUser> findByServerIdAndUserId(Long serverId, Long currentUserId);
+    boolean existsByServerIdAndUserId(Long serverId, Long userId);
 }

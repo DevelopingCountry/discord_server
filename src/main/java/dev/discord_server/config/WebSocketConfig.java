@@ -1,8 +1,6 @@
-package dev.discord_server.config.redis;
+package dev.discord_server.config;
 
 import dev.discord_server.auth.util.JwtUtil;
-import dev.discord_server.config.JwtHandshakeInterceptor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.*;
@@ -29,4 +27,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.setApplicationDestinationPrefixes("/app");
         registry.enableSimpleBroker("/topic");
     }
+
+
+
 }
