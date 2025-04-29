@@ -3,7 +3,7 @@ package dev.discord_server.domain.dmMessage.controller;
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.dmMessage.dto.DmMessageResponse;
-import dev.discord_server.domain.dmMessage.dto.UpdateMessageRequest;
+import dev.discord_server.domain.dmMessage.dto.UpdateDMMessageRequest;
 import dev.discord_server.domain.dmMessage.service.DmMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -26,7 +26,7 @@ public class DmMessageController {
     @PatchMapping("/{dmId}/message/{messageId}")
     public CommonResponse<Void> updateMessage(@PathVariable Long dmId,
                                               @PathVariable Long messageId,
-                                              @RequestBody UpdateMessageRequest request) {
+                                              @RequestBody UpdateDMMessageRequest request) {
         Long userId = SecurityUtil.getCurrentUserId();
         dmMessageService.updateMessage(dmId, messageId, userId, request.getContent());
 

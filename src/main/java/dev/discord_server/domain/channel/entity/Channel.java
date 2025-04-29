@@ -48,4 +48,5 @@ public class Channel extends BaseEntity {
     @OneToMany(mappedBy = "channel")
     private List<Message> messages = new ArrayList<>();
 
+
 }
