@@ -75,7 +75,7 @@ public class FriendService {
             friendRepository.save(friend);
         }
 
-        return new FriendAddResponse(toUser.getNickname(), toUser.getImageUrl(), FriendStatus.PENDING);
+        return new FriendAddResponse(toUser.getId().toString(),toUser.getNickname(), toUser.getImageUrl(), FriendStatus.PENDING);
     }
 
 
