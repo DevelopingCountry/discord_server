@@ -138,7 +138,7 @@ public class DmMessageService {
         try {
             log.info("📤 Redis 전송 [{}] - messageId: {}, content: {}", type, message.messageId(), message.content());
             String payload = objectMapper.writeValueAsString(new WebSocketMessage(type, message));
-            redisPublisher.publish(payload);
+            redisPublisher.publishDm(payload);
         } catch (Exception e) {
             log.error("❌ Redis 메시지 전송 실패", e);
         }
