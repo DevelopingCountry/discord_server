@@ -6,12 +6,15 @@ import dev.discord_server.config.exception.custom.exception.ForbiddenException40
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.domain.dm.dto.DmAddResponse;
 import dev.discord_server.domain.dm.dto.DmUserResponse;
+import dev.discord_server.domain.dm.dto.DmVisibleRequest;
+import dev.discord_server.domain.dm.dto.DmVisibleResponse;
 import dev.discord_server.domain.dm.entity.Dm;
 import dev.discord_server.domain.dm.repository.DmRepository;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -24,7 +27,7 @@ public class DmService {
     private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     public List<DmUserResponse> findDmUsers(Long currentId) {
-        List<Dm> rooms = dmRepository.findByUser1IdOrUser2Id(currentId,currentId);
+        List<Dm> rooms = dmRepository.findByIsVisibleTrueAndUser1IdOrUser2Id(currentId,currentId);
 
         return rooms.stream()
                 .map(room -> {
@@ -55,8 +58,24 @@ public class DmService {
                         .id(snowflakeIdGenerator.generateId())
                         .user1(user1)
                         .user2(user2)
+                        .isVisible(true)
                         .build()).getId());
 
         return new DmAddResponse(dmId.toString());
     }
+
+
+    @Transactional
+    public DmVisibleResponse nonVisibleDm(DmVisibleRequest request) {
+        Dm dm = dmRepository.findById(Long.valueOf(request.getDmId()))
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.NOT_FOUND_DM));
+
+        dm.setVisible(false); // 👈 isVisible을 false로 변경
+
+        return DmVisibleResponse.builder()
+                .id(dm.getId())
+                .isVisible(dm.isVisible())
+                .build();
+    }
+
 }
