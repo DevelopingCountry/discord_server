@@ -21,7 +21,7 @@ public class RedisPubSubConfig {
     public RedisConnectionFactory pubSubConnectionFactory() {
         RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("localhost", 6379);
         config.setDatabase(1); // ✅ DM용 DB 1번
-
+        return new LettuceConnectionFactory(config);
     }
     @Bean
     @Profile("dev")
