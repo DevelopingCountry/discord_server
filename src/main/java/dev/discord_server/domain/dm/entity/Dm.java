@@ -18,6 +18,9 @@ public class Dm extends BaseEntity {
     @Column(name = "id")
     private Long id;
 
+    @Column(name = "isVisible")
+    private boolean isVisible;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user1_id", nullable = false)
     private User user1;

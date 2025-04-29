@@ -54,11 +54,7 @@ public class ChannelService {
         channelRepository.save(channel);
 
         // WebSocket 알림 전파
-        channelRedisPublisher.publish(new ChannelCreatedMessageResponse(
-                serverId.toString(),
-                channel.getId().toString(),
-                channel.getName()
-        ));
+        channelRedisPublisher.publish(ChannelCreatedMessageResponse.from(channel, serverId));
 
         return ChannelResponse.from(channel);
     }

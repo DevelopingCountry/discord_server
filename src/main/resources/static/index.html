@@ -12,7 +12,7 @@
 
 <script>
   const serverId = "567587959969157120";
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI1NjcyMjk0Mjk5NjU2NTYwNjQiLCJlbWFpbCI6Imx3YjkwMzZAa2FrYW8uY29tIiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDUzMzM5MzcsImV4cCI6MTc0NTM0NDczN30.9egRga8tSbzVZcLNEytF-CAF6hQWPVoPHxdVy3yzrmE"; // JWT
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDU5Mzk0OTAsImV4cCI6MTc0NTk1MDI5MH0.s3dnuuy7u3fw2PQdWobMpScU-lEytitaE70NhV4Weys"; // JWT
 
   // 1. 기존 채널 목록 불러오기
   fetch(`http://localhost:8080/server/${serverId}/channel`, {
@@ -39,11 +39,11 @@
       const data = JSON.parse(msg.body);
       console.log("📩 받은 메시지:", data); // 🔍 확인용 로그 추가
       const li = document.createElement("li");
-      li.innerText = `🔄 생성됨: ${data.channelName} (${data.channelId})`;
+      li.innerText = `🔄 생성됨: ${data.name} (${data.id})`; // ✅ 수정
       document.getElementById("channel-list").appendChild(li);
     });
-
   });
+
 </script>
 </body>
 </html>
