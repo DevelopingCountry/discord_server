@@ -74,10 +74,9 @@ public class FriendController {
         Long uuid = SecurityUtil.getCurrentUserId();
         FriendStatusResponse friendStatusResponse = friendService.changeFriendRequest(uuid, Long.valueOf(request.getFriendId()), request.getIsFriend());
         return new CommonResponse<>(true, HttpStatus.OK, "친구 상태 변경에 성공했습니다.", friendStatusResponse);
-
     }
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<Optional<FriendResponse>> getFriendByNickname(@RequestBody FriendSearchRequest request) {
         Long uuid = SecurityUtil.getCurrentUserId();

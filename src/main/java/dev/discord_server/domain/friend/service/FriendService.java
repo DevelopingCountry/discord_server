@@ -30,7 +30,7 @@ public class FriendService {
     private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     public List<FriendResponse> findFriends(Long currentUserId) {
-        List<Friend> friends = friendRepository.findByFromUserIdOrToUserId(currentUserId, currentUserId);
+        List<Friend> friends = friendRepository.findDistinctFriendsByUserId(currentUserId);
 
         return friends.stream()
                 .map(friend -> FriendResponse.toFriendResponse(friend, currentUserId.toString()))
