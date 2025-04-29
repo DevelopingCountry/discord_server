@@ -14,7 +14,7 @@ public class RedisPublisher {
 
     public RedisPublisher(StringRedisTemplate redisTemplate,
                           @Qualifier("dmTopic") ChannelTopic dmTopic,
-                          @Qualifier("channelCreatedTopic") ChannelTopic messageTopic) {
+                          @Qualifier("msgTopic") ChannelTopic messageTopic) {
         this.redisTemplate = redisTemplate;
         this.dmTopic = dmTopic;
         this.messageTopic = messageTopic;

@@ -38,6 +38,9 @@ public class RedisPubSubConfig {
         return new ChannelTopic("channel.created");
     }
 
+    @Bean(name="msgTopic")
+    public ChannelTopic msgTopic() {return new ChannelTopic("channel.msg");}
+
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
             @Qualifier("pubSubConnectionFactory") RedisConnectionFactory factory,
@@ -49,11 +52,8 @@ public class RedisPubSubConfig {
         container.setConnectionFactory(factory);
         container.addMessageListener(dmSubscriber, new ChannelTopic("chat.dm"));
         container.addMessageListener(channelSubscriber, new PatternTopic("channel.created.*"));
-        container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.message.*"));
+        container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg.*"));
         return container;
     }
-
-
-
 
 }
