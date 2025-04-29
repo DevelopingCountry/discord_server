@@ -18,7 +18,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -32,7 +34,28 @@ public class FriendService {
     public List<FriendResponse> findFriends(Long currentUserId) {
         List<Friend> friends = friendRepository.findDistinctFriendsByUserId(currentUserId);
 
-        return friends.stream()
+        Map<Long, Friend> uniqueFriends = new HashMap<>();
+
+        for (Friend friend : friends) {
+            // 상대방 유저 ID 결정
+            Long targetUserId = friend.getFromUser().getId().equals(currentUserId)
+                    ? friend.getToUser().getId()
+                    : friend.getFromUser().getId();
+
+            // 이미 해당 유저 관계가 있으면, ACCEPTED 상태를 우선시
+            if (uniqueFriends.containsKey(targetUserId)) {
+                Friend existingFriend = uniqueFriends.get(targetUserId);
+                // ACCEPTED 상태가 있으면 그것을 유지
+                if (existingFriend.getStatus() != FriendStatus.ACCEPTED &&
+                        friend.getStatus() == FriendStatus.ACCEPTED) {
+                    uniqueFriends.put(targetUserId, friend);
+                }
+            } else {
+                uniqueFriends.put(targetUserId, friend);
+            }
+        }
+
+        return uniqueFriends.values().stream()
                 .map(friend -> FriendResponse.toFriendResponse(friend, currentUserId.toString()))
                 .toList();
     }
