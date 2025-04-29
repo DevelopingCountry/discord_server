@@ -2,6 +2,7 @@ package dev.discord_server.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.discord_server.domain.channel.dto.ChannelCreatedMessageResponse;
+import dev.discord_server.domain.channel.dto.ChannelResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.connection.Message;
@@ -20,7 +21,7 @@ public class ChannelCreatedSubscriber implements MessageListener {
     public void onMessage(Message message, byte[] pattern) {
         try {
             ChannelCreatedMessageResponse parsed = objectMapper.readValue(message.getBody(), ChannelCreatedMessageResponse.class);
-            String serverId = parsed.getServerId();
+            Long serverId = parsed.getServerId();
             template.convertAndSend("/topic/server/" + serverId + "/channels", parsed);
         } catch (Exception e) {
             log.error("❌ 채널 생성 메시지 파싱 실패", e);
