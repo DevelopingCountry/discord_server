@@ -18,6 +18,7 @@ public class RedisPublisher {
         this.redisTemplate = redisTemplate;
         this.dmTopic = dmTopic;
         this.messageTopic = messageTopic;
+
     }
 
     public void publishDm(String message) {
