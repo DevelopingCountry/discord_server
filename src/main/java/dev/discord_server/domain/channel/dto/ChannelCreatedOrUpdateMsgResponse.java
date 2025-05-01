@@ -14,14 +14,16 @@ public class ChannelCreatedOrUpdateMsgResponse {
     private String type;
     private String creatorId;
     private Long serverId;
+    private String action;
 
-    public static ChannelCreatedOrUpdateMsgResponse from(Channel channel, Long serverId) {
+    public static ChannelCreatedOrUpdateMsgResponse from(Channel channel, Long serverId, String action) {
         return new ChannelCreatedOrUpdateMsgResponse(
                 String.valueOf(channel.getId()),
                 channel.getName(),
                 channel.getType().name(), // enum -> string
                 String.valueOf(channel.getCreator().getId()),
-                serverId
+                serverId,
+                action
         );
     }
 }

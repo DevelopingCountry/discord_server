@@ -29,18 +29,25 @@
             });
 
           });
-
   // 2. WebSocket 연결 및 실시간 구독
+
   const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token}`);
   const stomp = Stomp.over(socket);
 
   stomp.connect({}, () => {
     stomp.subscribe(`/topic/server/${serverId}/channels`, (msg) => {
       const data = JSON.parse(msg.body);
-      console.log("📩 받은 메시지:", data); // 🔍 확인용 로그 추가
-      const li = document.createElement("li");
-      li.innerText = `🔄 생성됨: ${data.name} (${data.id})`; // ✅ 수정
-      document.getElementById("channel-list").appendChild(li);
+
+      if(data.action==="create"){
+        console.log("📩 받은 메시지:", data); // 🔍 확인용 로그 추가
+        const li = document.createElement("li");
+        li.innerText = `🔄 생성됨: ${data.name} (${data.id})`; // ✅ 수정
+        document.getElementById("channel-list").appendChild(li);
+      }else if(data.action==="update"){
+        console.log("수정되었을때 로직!")
+      }
+
+
     });
   });
 
