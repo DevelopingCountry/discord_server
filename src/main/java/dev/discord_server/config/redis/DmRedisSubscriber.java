@@ -1,7 +1,6 @@
 package dev.discord_server.config.redis;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import dev.discord_server.domain.channel.dto.ChannelCreatedMessageResponse;
 import dev.discord_server.domain.dmMessage.dto.WebSocketMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
