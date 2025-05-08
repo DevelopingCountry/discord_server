@@ -8,7 +8,10 @@ import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundEx
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
 import dev.discord_server.domain.server.dto.*;
 import dev.discord_server.domain.server.entity.Server;
+import dev.discord_server.domain.server.entity.ServerInvite;
+import dev.discord_server.domain.server.repository.ServerInviteRepository;
 import dev.discord_server.domain.server.repository.ServerRepository;
+import dev.discord_server.domain.server.entity.Enum.InviteStatus;
 import dev.discord_server.domain.serverUser.entity.ServerUser;
 import dev.discord_server.domain.serverUser.entity.ServerUserRepository;
 import dev.discord_server.domain.user.entity.User;
@@ -17,7 +20,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * 예외처리 사용 방법
@@ -35,6 +40,7 @@ public class ServerService {
     private final UserRepository userRepository;
     private final ServerUserRepository serverUserRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
+    private final ServerInviteRepository serverInviteRepository;
 
     public List<ServerResponse> findServers() {
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -125,18 +131,42 @@ public class ServerService {
             throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
 
+        User user = userRepository.findById(currentUserId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+
         User guest = userRepository.findById(Long.valueOf(request.getGuestId()))
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
 
-        ServerUser invited = ServerUser.builder()
+        ServerInvite invite = ServerInvite.builder()
                 .id(snowflakeIdGenerator.generateId())
                 .server(server)
-                .user(guest)
+                .fromUser(user)
+                .toUser(guest)
+                .status(InviteStatus.PENDING)
+                .build();
+
+        serverInviteRepository.save(invite);
+    }
+
+
+    @Transactional
+    public void acceptInvite(Long inviteId) {
+        ServerInvite invite = serverInviteRepository.findById(inviteId)
+                .orElseThrow(()-> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER)); //수정해야함 초대가 없는걸로
+
+        if (invite.getStatus() != InviteStatus.PENDING)
+            throw new IllegalStateException("이미 처리된 초대입니다."); // Accept면 이미 받은거 Declare면 거부된 요청
+
+        ServerUser serverUser = ServerUser.builder()
+                .id(snowflakeIdGenerator.generateId())
+                .server(invite.getServer())
+                .user(invite.getToUser())
                 .alarm(true)
                 .build();
 
-        serverUserRepository.save(invited);
+        serverUserRepository.save(serverUser);
+        invite.setStatus(InviteStatus.ACCEPTED);
     }
 
 
