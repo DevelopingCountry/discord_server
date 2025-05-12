@@ -1,6 +1,6 @@
-package dev.discord_server.domain.dmMessage.repository;
+package dev.discord_server.domain.dm_message.repository;
 
-import dev.discord_server.domain.dmMessage.entity.DmMessage;
+import dev.discord_server.domain.dm_message.entity.DmMessage;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
