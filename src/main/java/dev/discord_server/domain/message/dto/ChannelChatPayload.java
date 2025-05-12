@@ -6,5 +6,6 @@ public record ChannelChatPayload(
         String nickName,
         String imageUrl,
         String content,
-        String createdAt
+        String createdAt,
+        String userId
 ) {}
