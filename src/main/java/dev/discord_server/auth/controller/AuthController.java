@@ -4,7 +4,6 @@ import dev.discord_server.auth.dto.RefreshRequestDTO;
 import dev.discord_server.auth.dto.TokenResponse;
 import dev.discord_server.auth.service.AuthService;
 import dev.discord_server.common.response.CommonResponse;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,8 +16,8 @@ public class AuthController {
     private final AuthService authService;
 
     @GetMapping("/login/kakao")
-    public CommonResponse<TokenResponse> kakaoLogin(@RequestParam("code") String accessCode, HttpServletResponse httpServletResponse) {
-        TokenResponse tokenResponse = authService.oAuthLogin(accessCode, httpServletResponse);
+    public CommonResponse<TokenResponse> kakaoLogin(@RequestParam("code") String accessCode) {
+        TokenResponse tokenResponse = authService.oAuthLogin(accessCode);
         return new CommonResponse<>(true, HttpStatus.OK, "로그인 완료되었습니다.", tokenResponse);
     }
 

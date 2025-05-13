@@ -74,7 +74,7 @@ public class RedisPubSubConfig {
         container.setConnectionFactory(factory);
         container.addMessageListener(dmSubscriber, new ChannelTopic("chat.dm"));
         container.addMessageListener(channelSubscriber, new PatternTopic("channel.createdOrUpdate.*"));
-        container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg.*"));
+        container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg"));
         return container;
     }
 }

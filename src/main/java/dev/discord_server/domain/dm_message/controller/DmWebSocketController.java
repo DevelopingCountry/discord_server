@@ -1,8 +1,8 @@
-package dev.discord_server.domain.dmMessage.controller;
+package dev.discord_server.domain.dm_message.controller;
 
 import dev.discord_server.auth.util.SecurityUtil;
-import dev.discord_server.domain.dmMessage.dto.DmMsgRequest;
-import dev.discord_server.domain.dmMessage.service.DmMessageService;
+import dev.discord_server.domain.dm_message.dto.DmMsgRequest;
+import dev.discord_server.domain.dm_message.service.DmMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
