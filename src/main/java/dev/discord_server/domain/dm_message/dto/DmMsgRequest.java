@@ -1,4 +1,4 @@
-package dev.discord_server.domain.dmMessage.dto;
+package dev.discord_server.domain.dm_message.dto;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

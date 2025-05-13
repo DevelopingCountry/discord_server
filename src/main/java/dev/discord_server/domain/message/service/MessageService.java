@@ -6,16 +6,14 @@ import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.redis.RedisPublisher;
-import dev.discord_server.domain.message.dto.ChannelChatPayload;
 import dev.discord_server.domain.channel.dto.ChannelWebSocketMessage;
 import dev.discord_server.domain.channel.entity.Channel;
 import dev.discord_server.domain.channel.entity.ChannelRepository;
+import dev.discord_server.domain.message.dto.ChannelChatPayload;
 import dev.discord_server.domain.message.dto.MessageResponse;
 import dev.discord_server.domain.message.entity.Message;
 import dev.discord_server.domain.message.repository.MessageRepository;
-import dev.discord_server.domain.server.entity.Server;
 import dev.discord_server.domain.server.repository.ServerRepository;
-import dev.discord_server.domain.serverUser.entity.ServerUser;
 import dev.discord_server.domain.serverUser.entity.ServerUserRepository;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
@@ -56,10 +54,6 @@ public class MessageService {
         Channel channel = channelRepository.findById(channelId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_CHANNEL));
 
-        Server server = channel.getServer();
-        ServerUser serverUser = serverUserRepository.findByServerIdAndUserId(server.getId(), senderId)
-                .orElseThrow(() -> new ForbiddenException403(ErrorDefineCode.NOT_JOINED_SERVER));
-
         User sender = userRepository.findById(senderId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
@@ -76,7 +70,8 @@ public class MessageService {
                 sender.getNickname(),
                 sender.getImageUrl(),
                 saved.getContent(),
-                saved.getCreatedAt().toString()
+                saved.getCreatedAt().toString(),
+                sender.getId().toString()
         );
 
         publish(socketPayload, "SEND");
@@ -102,7 +97,8 @@ public class MessageService {
                 message.getUser().getNickname(),
                 message.getUser().getImageUrl(),
                 message.getContent(),
-                message.getCreatedAt().toString()
+                message.getCreatedAt().toString(),
+                message.getUser().getId().toString()
         );
 
         publish(socketPayload, "UPDATE");
@@ -126,7 +122,8 @@ public class MessageService {
                 message.getChannel().getId().toString(),
                 message.getId().toString(),
                 null, null, null,
-                message.getCreatedAt().toString()
+                message.getCreatedAt().toString(),
+                message.getUser().getId().toString()
         );
 
         publish(socketPayload, "DELETE");

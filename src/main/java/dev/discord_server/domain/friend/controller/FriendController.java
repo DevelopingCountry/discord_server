@@ -77,12 +77,12 @@ public class FriendController {
 
     }
 
-    @GetMapping("/search")
+    @PostMapping("/search")
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<Optional<FriendResponse>> getFriendByNickname(@RequestBody FriendSearchRequest request) {
         Long uuid = SecurityUtil.getCurrentUserId();
-        Optional<FriendResponse> Friend = friendService.findFriendByNickname(uuid, request.getNickName());
-        return new CommonResponse<>(true,HttpStatus.OK,"닉네임으로 유저 조회 성공했습니다.",Friend);
+        Optional<FriendResponse> friend = friendService.findFriendByNickname(uuid, request.getNickName());
+        return new CommonResponse<>(true,HttpStatus.OK,"닉네임으로 유저 조회 성공했습니다.",friend);
     }
 
 

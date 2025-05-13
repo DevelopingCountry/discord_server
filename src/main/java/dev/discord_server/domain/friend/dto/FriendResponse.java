@@ -17,8 +17,8 @@ public class FriendResponse {
     private String imageUrl;
     private FriendStatus status;
 
-    public static FriendResponse toFriendResponse(Friend friend, String currentUserId) {
-        User targetUser = friend.getFromUser().getId().toString().equals(currentUserId)
+    public static FriendResponse toFriendResponse(Friend friend, Long currentUserId) {
+        User targetUser = friend.getFromUser().getId().equals(currentUserId)
                 ? friend.getToUser()
                 : friend.getFromUser();
 

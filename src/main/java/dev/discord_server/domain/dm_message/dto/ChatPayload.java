@@ -1,4 +1,4 @@
-package dev.discord_server.domain.dmMessage.dto;
+package dev.discord_server.domain.dm_message.dto;
 
 public record ChatPayload(
         String dmId,
@@ -6,6 +6,7 @@ public record ChatPayload(
         String nickName,
         String imageUrl,
         String content,
-        String createdAt
+        String createdAt,
+        String userId
 ) {}
 

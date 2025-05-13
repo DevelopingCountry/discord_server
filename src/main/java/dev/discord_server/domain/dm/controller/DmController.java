@@ -7,7 +7,7 @@ import dev.discord_server.domain.dm.dto.DmUserResponse;
 import dev.discord_server.domain.dm.dto.DmVisibleRequest;
 import dev.discord_server.domain.dm.dto.DmVisibleResponse;
 import dev.discord_server.domain.dm.service.DmService;
-import dev.discord_server.domain.dmMessage.dto.DmStartRequest;
+import dev.discord_server.domain.dm_message.dto.DmStartRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

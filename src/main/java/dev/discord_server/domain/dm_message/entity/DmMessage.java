@@ -1,4 +1,4 @@
-package dev.discord_server.domain.dmMessage.entity;
+package dev.discord_server.domain.dm_message.entity;
 
 import dev.discord_server.config.BaseEntity;
 import dev.discord_server.domain.dm.entity.Dm;
