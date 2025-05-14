@@ -41,6 +41,7 @@ public class ServerService {
     private final ServerUserRepository serverUserRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
     private final ServerInviteRepository serverInviteRepository;
+    private final NotificationService notificationService;
 
     public List<ServerResponse> findServers() {
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -147,6 +148,14 @@ public class ServerService {
                 .build();
 
         serverInviteRepository.save(invite);
+
+
+        notificationService.sendInviteNotification(
+                guest.getId(),
+                server.getServerName(),
+                user.getNickname(),
+                invite.getId()
+        );
     }
 
 

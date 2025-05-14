@@ -38,6 +38,7 @@ public class SecurityConfig {
             "/ws-chat/**",
             "/ws-chat",
             "/index.html",
+            "/notification.html",
             "/ws/voice",
             "/ws/voice/**",
             "/channel/**",
