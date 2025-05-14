@@ -13,6 +13,7 @@ import dev.discord_server.domain.dmMessage.dto.DmMessageResponse;
 import dev.discord_server.domain.dmMessage.dto.WebSocketMessage;
 import dev.discord_server.domain.dmMessage.entity.DmMessage;
 import dev.discord_server.domain.dmMessage.repository.DmMessageRepository;
+import dev.discord_server.domain.server.service.NotificationService;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,8 @@ public class DmMessageService {
     private final SnowflakeIdGenerator snowflakeIdGenerator;
     private final RedisPublisher redisPublisher;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final NotificationService notificationService;
+
 
     private boolean isParticipant(Dm dm, Long userId) {
         return dm.getUser1().getId().equals(userId) || dm.getUser2().getId().equals(userId);
@@ -82,6 +85,18 @@ public class DmMessageService {
         );
 
         publish(socketPayload, "SEND");
+
+        Long receiverId = dm.getUser1().getId().equals(senderId)
+                ? dm.getUser2().getId()
+                : dm.getUser1().getId();
+
+        notificationService.sendDmNotification(
+                receiverId,
+                sender.getNickname(),
+                sender.getImageUrl(),
+                saved.getContent()
+        );
+
     }
 
     public void updateMessage(Long dmId, Long messageId, Long userId, String content) {

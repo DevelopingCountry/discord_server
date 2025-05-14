@@ -11,8 +11,8 @@
 <ul id="notification-list"></ul>
 
 <script>
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDcyMjUxNDksImV4cCI6MTc0NzIzNTk0OX0.cj8_2l5uMFz_V91B9CGMFojsevn2cxaljyW9bK3jsoQ"; // 예: localStorage.getItem("accessToken")
-
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDcyMjcxNTMsImV4cCI6MTc0NzIzNzk1M30.t6cvUTLUbVV4_gkvtdrLQ2DuT49CGu1EiVy0_D70Yhk"; // 예: localStorage.getItem("accessToken")
+    const dmId = "12345678";
     const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token}`);
     const stomp = Stomp.over(socket);
 
@@ -52,6 +52,11 @@
 
             document.getElementById("notification-list").appendChild(li);
         });
+
+        // 2. DM 메시지 전송
+        stomp.send(`/app/dm/${dmId}`, {}, JSON.stringify({
+            content: "이건 테스트 DM입니다!"
+        }));
     });
 </script>
 </body>
