@@ -11,7 +11,7 @@
 <ul id="notification-list"></ul>
 
 <script>
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDcxNTA2NjcsImV4cCI6MTc0NzE2MTQ2N30.GeLYMhIoXBszg8VgmxR7-MO-zdxiiKkrxKb6odcaJlM"; // 예: localStorage.getItem("accessToken")
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDcyMjUxNDksImV4cCI6MTc0NzIzNTk0OX0.cj8_2l5uMFz_V91B9CGMFojsevn2cxaljyW9bK3jsoQ"; // 예: localStorage.getItem("accessToken")
 
     const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token}`);
     const stomp = Stomp.over(socket);

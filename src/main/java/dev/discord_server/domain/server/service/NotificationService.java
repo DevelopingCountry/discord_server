@@ -2,6 +2,7 @@ package dev.discord_server.domain.server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.discord_server.config.redis.RedisPublisher;
+import dev.discord_server.domain.friend.dto.FriendRequestPayload;
 import dev.discord_server.domain.server.dto.InviteNotificationPayload;
 import dev.discord_server.domain.server.dto.WebSocketNotification;
 import lombok.RequiredArgsConstructor;
@@ -29,5 +30,23 @@ public class NotificationService {
             throw new RuntimeException("❌ 알림 직렬화 실패", e);
         }
     }
+
+    public void sendFriendRequestNotification(Long toUserId, String fromNickname, String fromImageUrl) {
+        FriendRequestPayload payload = new FriendRequestPayload(fromNickname, fromImageUrl);
+
+        WebSocketNotification notification = new WebSocketNotification(
+                "FRIEND_REQUEST",
+                payload,
+                toUserId
+        );
+
+        try {
+            String json = objectMapper.writeValueAsString(notification);
+            redisPublisher.publishNotification(json);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 친구 요청 알림 직렬화 실패", e);
+        }
+    }
+
 }
 
