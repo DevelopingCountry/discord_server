@@ -54,7 +54,7 @@ public class ChannelService {
         channelRepository.save(channel);
 
         // WebSocket 알림 전파
-        channelRedisPublisher.publish(ChannelCreatedOrUpdateMsgResponse.from(channel, serverId,"create"));
+        channelRedisPublisher.publish(ChannelActionMessage.from(channel, serverId,"create"));
 
         return ChannelResponse.from(channel);
     }
@@ -80,6 +80,11 @@ public class ChannelService {
         }
 
         channelRepository.delete(channel);
+
+        channelRedisPublisher.publish(
+                ChannelActionMessage.from(channel, serverId, "delete")
+        );
+
     }
 
     public List<ChannelResponse> findChannels(Long serverId) {
@@ -109,7 +114,7 @@ public class ChannelService {
         channel.setName(request.getChannelName());
         channel = channelRepository.save(channel);
 
-        channelRedisPublisher.publish(ChannelCreatedOrUpdateMsgResponse.from(channel, serverId,"update"));
+        channelRedisPublisher.publish(ChannelActionMessage.from(channel, serverId,"update"));
 
         return ChannelResponse.from(channel);
     }

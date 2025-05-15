@@ -60,9 +60,9 @@ public class RedisPubSubConfig {
         return new ChannelTopic("chat.dm");
     }
 
-    @Bean(name = "channelCreatedOrUpdateTopic")
-    public ChannelTopic channelCreatedOrUpdateTopic() {
-        return new ChannelTopic("channel.createdOrUpdate");
+    @Bean(name = "channelEventTopic")
+    public ChannelTopic channelEventTopic() {
+        return new ChannelTopic("channel.event");
     }
 
     @Bean(name="msgTopic")
@@ -72,14 +72,14 @@ public class RedisPubSubConfig {
     public RedisMessageListenerContainer redisMessageListenerContainer(
             @Qualifier("pubSubConnectionFactory") RedisConnectionFactory factory,
             DmRedisSubscriber dmSubscriber,
-            ChannelCreatedSubscriber channelSubscriber,
+            ChannelSubscriber channelSubscriber,
             MessageRedisSubscriber messageRedisSubscriber,
             NotificationSubscriber notificationSubscriber // ✅ 추가
     ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(factory);
         container.addMessageListener(dmSubscriber, new ChannelTopic("chat.dm"));
-        container.addMessageListener(channelSubscriber, new PatternTopic("channel.createdOrUpdate.*"));
+        container.addMessageListener(channelSubscriber, new PatternTopic("channel.event.*"));
         container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg.*"));
         container.addMessageListener(notificationSubscriber, notificationTopic()); // ✅ 수정
         return container;

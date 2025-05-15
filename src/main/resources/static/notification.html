@@ -11,9 +11,10 @@
 <ul id="notification-list"></ul>
 
 <script>
-    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDcyMjcxNTMsImV4cCI6MTc0NzIzNzk1M30.t6cvUTLUbVV4_gkvtdrLQ2DuT49CGu1EiVy0_D70Yhk"; // 예: localStorage.getItem("accessToken")
+    const token1 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDczMTQ5OTEsImV4cCI6MTc0NzMyNTc5MX0.R9MiszVZ_DlroLbu1uahNxbJ3UZISwzEXtDx3_qaKfQ"; // 예: localStorage.getItem("accessToken")
+    const token2 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDczMTQzODIsImV4cCI6MTc0NzMyNTE4Mn0.6_a0JAi3YxiDVUMqfYJL5yL4370m9fdzCBBGFcq6Cw0";
     const dmId = "12345678";
-    const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token}`);
+    const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token1}`);
     const stomp = Stomp.over(socket);
 
     stomp.connect({}, () => {
@@ -22,8 +23,11 @@
         // 통합 알림 구독
         stomp.subscribe("/user/queue/notifications", (msg) => {
             const data = JSON.parse(msg.body);
-            const type = data.type;
+            const type = data.action;
             const payload = data.payload;
+
+            console.log("📩 DM 알림 구조 확인:", payload.senderName, payload.message);
+
 
             console.log("📩 알림 수신:", type, payload);
 
@@ -52,11 +56,6 @@
 
             document.getElementById("notification-list").appendChild(li);
         });
-
-        // 2. DM 메시지 전송
-        stomp.send(`/app/dm/${dmId}`, {}, JSON.stringify({
-            content: "이건 테스트 DM입니다!"
-        }));
     });
 </script>
 </body>

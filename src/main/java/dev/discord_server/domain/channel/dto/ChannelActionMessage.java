@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-public class ChannelCreatedOrUpdateMsgResponse {
+public class ChannelActionMessage {
     private String id;
     private String name;
     private String type;
@@ -16,8 +16,8 @@ public class ChannelCreatedOrUpdateMsgResponse {
     private Long serverId;
     private String action;
 
-    public static ChannelCreatedOrUpdateMsgResponse from(Channel channel, Long serverId, String action) {
-        return new ChannelCreatedOrUpdateMsgResponse(
+    public static ChannelActionMessage from(Channel channel, Long serverId, String action) {
+        return new ChannelActionMessage(
                 String.valueOf(channel.getId()),
                 channel.getName(),
                 channel.getType().name(), // enum -> string

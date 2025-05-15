@@ -21,6 +21,16 @@ public class NotificationSubscriber implements MessageListener {
             String json = new String(message.getBody());
             WebSocketNotification notification = objectMapper.readValue(json, WebSocketNotification.class);
 
+            System.out.println("🔴 전송되는 알림 JSON: " + json);
+
+            //recipientId.toString()은 내부적으로 Principal.getName()과 매칭
+            //principal은 userId로 설정이 되어있기때문에
+            //다음과같이 해석
+            /*
+            convertAndSendToUser("123", "/queue/notifications", ...)
+            → "/user/123/queue/notifications" 로 내부 처리
+            → 유저 123이 구독한 "/user/queue/notifications" 에게 도달
+             */
             messagingTemplate.convertAndSendToUser(
                     notification.recipientId().toString(),
                     "/queue/notifications",
