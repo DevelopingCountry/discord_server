@@ -15,11 +15,12 @@ public class NotificationService {
     private final ObjectMapper objectMapper;
     private final RedisPublisher redisPublisher;
 
-    public void sendInviteNotification(Long toUserId, String serverName, String inviterName, Long inviteId) {
+    public void sendInviteNotification(Long toUserId, String serverName, String fromNickname, String fromImageUrl,Long serverId) {
         InviteNotificationPayload payload = new InviteNotificationPayload(
                 serverName,
-                inviterName,
-                "https://yourapp.com/invite/" + inviteId
+                fromNickname,
+                fromImageUrl,
+                "http://localhost:3000/channels/" + serverId
         );
 
         WebSocketNotification message = new WebSocketNotification("INVITE", payload, toUserId);
@@ -32,7 +33,7 @@ public class NotificationService {
         }
     }
 
-    public void sendFriendRequestNotification(Long toUserId, String fromNickname, String fromImageUrl) {
+    public void sendFriendRequestNotification(Long toUserId, String fromNickname,String fromImageUrl) {
         FriendRequestPayload payload = new FriendRequestPayload(fromNickname, fromImageUrl);
 
         WebSocketNotification notification = new WebSocketNotification(
@@ -50,8 +51,8 @@ public class NotificationService {
     }
 
 
-    public void sendDmNotification(Long toUserId, String senderName, String senderImageUrl, String content) {
-        DmNotificationPayload payload = new DmNotificationPayload(senderName, senderImageUrl, content);
+    public void sendDmNotification(Long toUserId, String fromNickname, String fromImageUrl, String content) {
+        DmNotificationPayload payload = new DmNotificationPayload(fromNickname, fromImageUrl, content);
 
         WebSocketNotification notification = new WebSocketNotification("DM", payload, toUserId);
 

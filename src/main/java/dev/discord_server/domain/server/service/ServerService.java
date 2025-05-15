@@ -154,7 +154,8 @@ public class ServerService {
                 guest.getId(),
                 server.getServerName(),
                 user.getNickname(),
-                invite.getId()
+                user.getImageUrl(),
+                serverId
         );
     }
 
