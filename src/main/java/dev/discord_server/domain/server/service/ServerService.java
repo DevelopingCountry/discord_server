@@ -3,6 +3,7 @@ package dev.discord_server.domain.server.service;
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.SnowflakeIdGenerator;
+import dev.discord_server.config.exception.custom.exception.AlreadyExistElementException409;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
@@ -137,6 +138,13 @@ public class ServerService {
 
         User guest = userRepository.findById(Long.valueOf(request.getGuestId()))
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+
+        boolean isDuplicate = serverInviteRepository.existsByServerIdAndToUserIdAndStatus(
+                serverId, guest.getId(), InviteStatus.PENDING);
+
+        if (isDuplicate) {
+            throw new AlreadyExistElementException409(ErrorDefineCode.EXIST_SERVER_INVITE);
+        }
 
 
         ServerInvite invite = ServerInvite.builder()
