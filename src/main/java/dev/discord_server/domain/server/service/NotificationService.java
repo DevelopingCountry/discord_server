@@ -2,7 +2,7 @@ package dev.discord_server.domain.server.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.discord_server.config.redis.RedisPublisher;
-import dev.discord_server.domain.dmMessage.dto.DmNotificationPayload;
+import dev.discord_server.domain.dm_message.dto.DmNotificationPayload;
 import dev.discord_server.domain.friend.dto.FriendRequestPayload;
 import dev.discord_server.domain.server.dto.
         InviteNotificationPayload;
