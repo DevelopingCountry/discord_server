@@ -7,8 +7,9 @@ import dev.discord_server.config.exception.custom.exception.ForbiddenException40
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
 import dev.discord_server.domain.friend.dto.FriendAddResponse;
-import dev.discord_server.domain.friend.dto.FriendResponse;
+
 import dev.discord_server.domain.friend.Enum.FriendStatus;
+import dev.discord_server.domain.friend.dto.FriendResponse;
 import dev.discord_server.domain.friend.dto.FriendStatusResponse;
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.repository.FriendRepository;
@@ -35,7 +36,7 @@ public class FriendService {
         List<Friend> friends = friendRepository.findByFromUserIdOrToUserId(currentUserId, currentUserId);
 
         return friends.stream()
-                .map(friend -> FriendResponse.toFriendResponse(friend, currentUserId.toString()))
+                .map(friend -> FriendResponse.toFriendResponse(friend, currentUserId))
                 .toList();
     }
 
@@ -57,6 +58,7 @@ public class FriendService {
         Optional<Friend> existingFriendOpt = friendRepository.findByFromUserAndToUserOrToUserAndFromUser(
                 fromUser, toUser, toUser, fromUser);
 
+
         if (existingFriendOpt.isPresent()) {
             Friend friend = existingFriendOpt.get();
             switch (friend.getStatus()) {
@@ -64,25 +66,41 @@ public class FriendService {
                 case REJECTED -> {
                     friend.setStatus(FriendStatus.PENDING);
                     friendRepository.save(friend);
+
+                    User targetUser = friend.getToUser();
+                    if (friend.getToUser().getId().equals(currentUserId)) {
+                        targetUser = friend.getFromUser();
+                    }
+                    return new FriendAddResponse(targetUser.getId().toString(),
+                            targetUser.getNickname(),
+                            targetUser.getImageUrl(),
+                            FriendStatus.PENDING);
                 }
             }
-        } else {
+        }
 
-            Friend friend = Friend.builder()
+        Friend friend;
+        if (currentUserId < toUserId) {
+            friend = Friend.builder()
                     .id(snowflakeIdGenerator.generateId())
                     .fromUser(fromUser)
                     .toUser(toUser)
                     .status(FriendStatus.PENDING)
                     .build();
-            friendRepository.save(friend);
+        } else {
+            friend = Friend.builder()
+                    .id(snowflakeIdGenerator.generateId())
+                    .fromUser(toUser)
+                    .toUser(fromUser)
+                    .status(FriendStatus.PENDING)
+                    .build();
         }
-
+        friendRepository.save(friend);
 
         notificationService.sendFriendRequestNotification(toUserId, fromUser.getNickname(), fromUser.getImageUrl());
 
         return new FriendAddResponse(toUser.getId().toString(),toUser.getNickname(), toUser.getImageUrl(), FriendStatus.PENDING);
     }
-
 
     public void deleteFriendRequest(Long currentUserId, Long toUserId) {
         User fromUser = userRepository.findById(currentUserId)

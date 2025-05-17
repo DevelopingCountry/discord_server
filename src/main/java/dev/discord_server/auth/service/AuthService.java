@@ -11,7 +11,6 @@ import dev.discord_server.domain.nickname.service.NicknameService;
 import dev.discord_server.domain.user.Enum.Role;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -31,7 +30,7 @@ public class AuthService {
     private final SnowflakeIdGenerator snowflakeIdGenerator;
     private final NicknameService nicknameService;
 
-    public TokenResponse oAuthLogin(String accessCode, HttpServletResponse httpServletResponse) {
+    public TokenResponse oAuthLogin(String accessCode) {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
         String email = kakaoProfile.getKakao_account().getEmail();
@@ -43,15 +42,17 @@ public class AuthService {
         // Access Token & Refresh Token 생성
         String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole());
         String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getEmail(), user.getRole());
+        String userId = String.valueOf(user.getId());
         log.info("Access token: {}", accessToken);
         log.info("Refresh token: {}", refreshToken);
+        log.info("userId: {}", userId);
 
 
         // Refresh Token을 Redis에 저장
         refreshTokenRepository.saveRefreshToken(user.getEmail(), refreshToken);
 
         // Access Token을 응답 헤더에 추가
-        return new TokenResponse(accessToken, refreshToken);
+        return new TokenResponse(accessToken, refreshToken,userId);
 
     }
 

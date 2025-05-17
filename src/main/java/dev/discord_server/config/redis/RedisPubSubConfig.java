@@ -80,8 +80,8 @@ public class RedisPubSubConfig {
         container.setConnectionFactory(factory);
         container.addMessageListener(dmSubscriber, new ChannelTopic("chat.dm"));
         container.addMessageListener(channelSubscriber, new PatternTopic("channel.event.*"));
-        container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg.*"));
-        container.addMessageListener(notificationSubscriber, notificationTopic()); // ✅ 수정
+        container.addMessageListener(notificationSubscriber, notificationTopic());
+        container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg"));
         return container;
     }
 }

@@ -1,10 +1,10 @@
-package dev.discord_server.domain.dmMessage.controller;
+package dev.discord_server.domain.dm_message.controller;
 
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
-import dev.discord_server.domain.dmMessage.dto.DmMessageResponse;
-import dev.discord_server.domain.dmMessage.dto.UpdateDMMessageRequest;
-import dev.discord_server.domain.dmMessage.service.DmMessageService;
+import dev.discord_server.domain.dm_message.dto.DmMessageResponse;
+import dev.discord_server.domain.dm_message.dto.UpdateDMMessageRequest;
+import dev.discord_server.domain.dm_message.service.DmMessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;

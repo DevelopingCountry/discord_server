@@ -1,4 +1,4 @@
-package dev.discord_server.domain.dmMessage.service;
+package dev.discord_server.domain.dm_message.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.discord_server.common.response.ErrorDefineCode;
@@ -8,11 +8,11 @@ import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundEx
 import dev.discord_server.config.redis.RedisPublisher;
 import dev.discord_server.domain.dm.entity.Dm;
 import dev.discord_server.domain.dm.repository.DmRepository;
-import dev.discord_server.domain.dmMessage.dto.ChatPayload;
-import dev.discord_server.domain.dmMessage.dto.DmMessageResponse;
-import dev.discord_server.domain.dmMessage.dto.WebSocketMessage;
-import dev.discord_server.domain.dmMessage.entity.DmMessage;
-import dev.discord_server.domain.dmMessage.repository.DmMessageRepository;
+import dev.discord_server.domain.dm_message.dto.ChatPayload;
+import dev.discord_server.domain.dm_message.dto.DmMessageResponse;
+import dev.discord_server.domain.dm_message.dto.WebSocketMessage;
+import dev.discord_server.domain.dm_message.entity.DmMessage;
+import dev.discord_server.domain.dm_message.repository.DmMessageRepository;
 import dev.discord_server.domain.server.service.NotificationService;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
@@ -81,7 +81,8 @@ public class DmMessageService {
                 sender.getNickname(),
                 sender.getImageUrl(),
                 saved.getContent(),
-                saved.getCreatedAt().toString()
+                saved.getCreatedAt().toString(),
+                String.valueOf(sender.getId())
         );
 
         publish(socketPayload, "SEND");
@@ -119,7 +120,8 @@ public class DmMessageService {
                 message.getUser().getNickname(),
                 message.getUser().getImageUrl(),
                 message.getContent(),
-                message.getCreatedAt().toString()
+                message.getCreatedAt().toString(),
+                String.valueOf(message.getUser().getId())
         );
 
         publish(socketPayload, "UPDATE");
@@ -143,7 +145,8 @@ public class DmMessageService {
                 message.getDm().getId().toString(),
                 message.getId().toString(),
                 null,null,null,
-                message.getCreatedAt().toString()
+                message.getCreatedAt().toString(),
+                String.valueOf(message.getUser().getId())
         );
 
         publish(socketPayload, "DELETE");
