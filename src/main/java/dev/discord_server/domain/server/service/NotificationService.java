@@ -4,7 +4,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.discord_server.config.redis.RedisPublisher;
 import dev.discord_server.domain.dmMessage.dto.DmNotificationPayload;
 import dev.discord_server.domain.friend.dto.FriendRequestPayload;
-import dev.discord_server.domain.server.dto.InviteNotificationPayload;
+import dev.discord_server.domain.server.dto.
+        InviteNotificationPayload;
 import dev.discord_server.domain.server.dto.WebSocketNotification;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,8 +16,9 @@ public class NotificationService {
     private final ObjectMapper objectMapper;
     private final RedisPublisher redisPublisher;
 
-    public void sendInviteNotification(Long toUserId, String serverName, String fromNickname, String fromImageUrl,Long serverId) {
+    public void sendInviteNotification(String serverImage, Long toUserId, String serverName, String fromNickname, String fromImageUrl,Long serverId) {
         InviteNotificationPayload payload = new InviteNotificationPayload(
+                serverImage,
                 serverName,
                 fromNickname,
                 fromImageUrl,

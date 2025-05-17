@@ -11,8 +11,8 @@
 <ul id="notification-list"></ul>
 
 <script>
-    const token1 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDczMTQ5OTEsImV4cCI6MTc0NzMyNTc5MX0.R9MiszVZ_DlroLbu1uahNxbJ3UZISwzEXtDx3_qaKfQ"; // 예: localStorage.getItem("accessToken")
-    const token2 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDczMTQzODIsImV4cCI6MTc0NzMyNTE4Mn0.6_a0JAi3YxiDVUMqfYJL5yL4370m9fdzCBBGFcq6Cw0";
+    const token1 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDc0Njg4NzUsImV4cCI6MTc0NzQ3OTY3NX0.rQhsm0h7tyPLyCCd1K3z2ZiQgZ2kWFvtGApX_QkNRZ4"; // 예: localStorage.getItem("accessToken")
+    const token2 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDc0Njg4NzUsImV4cCI6MTc0NzQ3OTY3NX0.o0HaHoYNT-eet73FC9ru2Vt6DmADgR2sZkU-JpWIiKw";
     const dmId = "12345678";
     const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token1}`);
     const stomp = Stomp.over(socket);
