@@ -96,3 +96,24 @@ CREATE TABLE dm_message (
                             FOREIGN KEY (dm_id) REFERENCES dm(id),
                             FOREIGN KEY (user_id) REFERENCES user(id)
 );
+
+
+CREATE TABLE Server_Invite (
+                               id BIGINT PRIMARY KEY,
+                               server_id BIGINT NOT NULL,
+                               from_user_id BIGINT NOT NULL,
+                               to_user_id BIGINT NOT NULL,
+                               status ENUM('PENDING', 'ACCEPTED', 'DECLINED') DEFAULT 'PENDING',
+                               created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                               updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                               FOREIGN KEY (server_id) REFERENCES Server(id),
+                               FOREIGN KEY (from_user_id) REFERENCES User(id),
+                               FOREIGN KEY (to_user_id) REFERENCES User(id)
+);
+
+
+CREATE TABLE nicknames (
+                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
+                           nickname VARCHAR(50) NOT NULL UNIQUE,
+                           is_used BOOLEAN DEFAULT FALSE
+);
