@@ -8,6 +8,7 @@ import org.springframework.web.socket.config.annotation.*;
 @Configuration
 @EnableWebSocketMessageBroker
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+
     private final JwtUtil jwtUtil;
 
     public WebSocketConfig(JwtUtil jwtUtil) {
@@ -19,15 +20,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws-chat")
                 .setAllowedOriginPatterns("*")
                 .addInterceptors(new JwtHandshakeInterceptor(jwtUtil))
+                .setHandshakeHandler(new CustomHandshakeHandler()) // ✅ 추가
                 .withSockJS();
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/app");
-        registry.enableSimpleBroker("/topic");
+        registry.setUserDestinationPrefix("/user"); // ✅ 추가
+        registry.enableSimpleBroker("/topic", "/queue"); // "/queue"도 함께 활성화
     }
-
-
-
 }

@@ -13,6 +13,7 @@ import dev.discord_server.domain.friend.dto.FriendResponse;
 import dev.discord_server.domain.friend.dto.FriendStatusResponse;
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.friend.repository.FriendRepository;
+import dev.discord_server.domain.server.service.NotificationService;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class FriendService {
     private final FriendRepository friendRepository;
     private final UserRepository userRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
+    private final NotificationService notificationService;
 
     public List<FriendResponse> findFriends(Long currentUserId) {
         List<Friend> friends = friendRepository.findByFromUserIdOrToUserId(currentUserId, currentUserId);
@@ -95,10 +97,9 @@ public class FriendService {
         }
         friendRepository.save(friend);
 
-        return new FriendAddResponse(toUser.getId().toString(),
-                toUser.getNickname(),
-                toUser.getImageUrl(),
-                FriendStatus.PENDING);
+        notificationService.sendFriendRequestNotification(toUserId, fromUser.getNickname(), fromUser.getImageUrl());
+
+        return new FriendAddResponse(toUser.getId().toString(),toUser.getNickname(), toUser.getImageUrl(), FriendStatus.PENDING);
     }
 
     public void deleteFriendRequest(Long currentUserId, Long toUserId) {
