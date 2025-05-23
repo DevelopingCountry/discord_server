@@ -10,8 +10,6 @@ import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.UUID;
-
 @RequiredArgsConstructor
 @Service
 public class UserService {
@@ -32,5 +30,17 @@ public class UserService {
         userRepository.save(user);
 
         return new UserNickNameResponse(user.getNickname());
+    }
+
+    public UserResponse getMyProfile(Long uuid) {
+        User user = userRepository.findById(uuid)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+
+        return UserResponse.builder()
+                .id(String.valueOf(user.getId()))
+                .nickname(user.getNickname())
+                .email(user.getEmail())
+                .imageUrl(user.getImageUrl())
+                .build();
     }
 }

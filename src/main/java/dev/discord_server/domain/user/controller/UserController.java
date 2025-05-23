@@ -6,6 +6,7 @@ import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.user.Enum.Role;
 import dev.discord_server.domain.user.dto.UserNickNameResponse;
 import dev.discord_server.domain.user.dto.UserNicknameRequest;
+import dev.discord_server.domain.user.dto.UserResponse;
 import dev.discord_server.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -14,8 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.UUID;
-
 @Slf4j
 @RequiredArgsConstructor
 @RestController
@@ -23,6 +22,14 @@ import java.util.UUID;
 public class UserController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
+
+    @GetMapping
+    public CommonResponse<UserResponse> getMyProfile() {
+        Long uuid = SecurityUtil.getCurrentUserId();
+        UserResponse response = userService.getMyProfile(uuid);
+
+        return new CommonResponse<>(true, HttpStatus.OK, "닉네임 변경에 성공하였습니다.", response);
+    }
 
     @PatchMapping
     @PreAuthorize("hasRole('USER')")
@@ -45,6 +52,7 @@ public class UserController {
 
 
     }
+
 
 
 }
