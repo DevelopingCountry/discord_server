@@ -15,13 +15,10 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class DmWebSocketController {
     private final DmMessageService dmMessageService;
-    private final DmSessionTracker dmSessionTracker;
 
     @MessageMapping("/dm/{dmId}")
     public void handleMessage(@DestinationVariable Long dmId, DmMsgRequest request, Message<?> message) {
         Long userId = SecurityUtil.getCurrentUserId(message);
-        dmSessionTracker.enterDm(dmId.toString(), userId);
-
         StompHeaderAccessor accessor = StompHeaderAccessor.wrap(message);
         accessor.getSessionAttributes().put("dmId", dmId.toString());
         accessor.getSessionAttributes().put("userId", userId);
