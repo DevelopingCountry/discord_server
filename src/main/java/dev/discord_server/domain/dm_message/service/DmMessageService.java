@@ -92,6 +92,7 @@ public class DmMessageService {
                 : dm.getUser1().getId();
 
         notificationService.sendDmNotification(
+                dmId,
                 receiverId,
                 sender.getNickname(),
                 sender.getImageUrl(),
