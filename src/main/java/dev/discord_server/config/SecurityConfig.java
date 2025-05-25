@@ -40,6 +40,7 @@ public class SecurityConfig {
             "/index.html",
             "/notification.html",
             "/send.html",
+            "dm-active.html",
             "/ws/voice",
             "/ws/voice/**",
             "/channel/**",

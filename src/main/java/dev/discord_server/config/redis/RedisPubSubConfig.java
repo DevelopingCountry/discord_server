@@ -73,14 +73,12 @@ public class RedisPubSubConfig {
             @Qualifier("pubSubConnectionFactory") RedisConnectionFactory factory,
             DmRedisSubscriber dmSubscriber,
             ChannelSubscriber channelSubscriber,
-            MessageRedisSubscriber messageRedisSubscriber,
-            NotificationSubscriber notificationSubscriber // ✅ 추가
+            MessageRedisSubscriber messageRedisSubscriber
     ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(factory);
         container.addMessageListener(dmSubscriber, new ChannelTopic("chat.dm"));
         container.addMessageListener(channelSubscriber, new PatternTopic("channel.event.*"));
-        container.addMessageListener(notificationSubscriber, notificationTopic());
         container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg"));
         return container;
     }
