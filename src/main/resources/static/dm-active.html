@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>📩 DM Presence 테스트</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h2>DM 열람 테스트</h2>
+<button onclick="enterDm()">📥 DM 들어가기</button>
+<button onclick="leaveDm()">📤 DM 나가기</button>
+
+<script>
+    const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDgwOTEwMTUsImV4cCI6MTc0ODEwMTgxNX0.ROtMxOFnZU-xa6ed2JXartQ2AkV7ZDW26jnhEX34rxU";
+    const dmId = "12345678";
+    let stomp;
+
+    const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token}`);
+    stomp = Stomp.over(socket);
+
+    stomp.connect({}, () => {
+        console.log("✅ WebSocket 연결 완료");
+
+        // 알림 구독
+        stomp.subscribe("/user/queue/notifications", (msg) => {
+            const data = JSON.parse(msg.body);
+            const type = data.action;
+            const payload = data.payload;
+
+            console.log("📩 DM 알림 구조 확인:", payload.senderName, payload.message);
+            console.log("📩 알림 수신:", type, payload);
+        });
+    });
+
+    function enterDm() {
+        stomp.send(`/app/dm/${dmId}/enter`, {}, JSON.stringify({}));
+        console.log("📥 enterDm() 호출됨");
+    }
+
+    function leaveDm() {
+        stomp.send(`/app/dm/${dmId}/leave`, {}, JSON.stringify({}));
+        console.log("📤 leaveDm() 호출됨");
+    }
+</script>
+</body>
+</html>

@@ -1,6 +1,7 @@
 package dev.discord_server.config.redis;
 
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -14,6 +15,11 @@ import org.springframework.data.redis.listener.RedisMessageListenerContainer;
 
 @Configuration
 public class RedisPubSubConfig {
+    @Value("${spring.data.redis.host}")
+    private String redisHost;
+
+    @Value("${spring.data.redis.port}")
+    private int redisPort;
 
     // 기본 빈을 제거하고 프로필별 빈만 유지합니다
 
@@ -30,7 +36,7 @@ public class RedisPubSubConfig {
     @Profile("prod")
     @Qualifier("pubSubConnectionFactory")
     public RedisConnectionFactory prodPubSubConnectionFactory() {
-        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration("discord-redis", 6379);
+        RedisStandaloneConfiguration config = new RedisStandaloneConfiguration(redisHost, redisPort);
         config.setDatabase(1);
         return new LettuceConnectionFactory(config);
     }
@@ -73,14 +79,12 @@ public class RedisPubSubConfig {
             @Qualifier("pubSubConnectionFactory") RedisConnectionFactory factory,
             DmRedisSubscriber dmSubscriber,
             ChannelSubscriber channelSubscriber,
-            MessageRedisSubscriber messageRedisSubscriber,
-            NotificationSubscriber notificationSubscriber // ✅ 추가
+            MessageRedisSubscriber messageRedisSubscriber
     ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(factory);
         container.addMessageListener(dmSubscriber, new ChannelTopic("chat.dm"));
         container.addMessageListener(channelSubscriber, new PatternTopic("channel.event.*"));
-        container.addMessageListener(notificationSubscriber, notificationTopic());
         container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg"));
         return container;
     }
