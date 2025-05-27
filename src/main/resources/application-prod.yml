@@ -1,38 +1,33 @@
 spring:
-  config:
-    activate:
-      on-profile: prod
+  datasource:
+    url: jdbc:mysql://discord-mysql:3306/discord_server?serverTimezone=Asia/Seoul
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
 
   data:
     redis:
-      host: discord-redis.wpvzfq.ng.0001.apn2.cache.amazonaws.com
+      host: discord-redis
       port: 6379
 
-  datasource:
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://developing.cfauuwy0urbj.ap-northeast-2.rds.amazonaws.com:3306/developing
-    username: root
-    password: dnjsqls00!!
-
-  jpa:
-    hibernate:
-      ddl-auto: validate
-    properties:
-      hibernate:
-        show_sql: false
-        format_sql: false
-        dialect: org.hibernate.dialect.MySQL8Dialect
-
-logging:
-  level:
-    org:
-      hibernate:
-        sql: warn
-        type:
-          descriptor:
-            sql:
-              BasicBinder: warn
-    root: info
+jwt:
+  accessSecret: ${JWT_ACCESS_SECRET}
+  refreshSecret: ${JWT_REFRESH_SECRET}
+  access_token_expired_at: 10800000
+  refresh_token_expired_at: 604800000
 
 server:
   port: 8080
+
+logging:
+  level:
+    root: info
