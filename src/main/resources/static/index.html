@@ -11,8 +11,8 @@
 <ul id="channel-list"></ul>
 
 <script>
-  const serverId = "567587959969157120";
-  const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI2IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDYxMDk2MzEsImV4cCI6MTc0NjEyMDQzMX0.Q2X34XlVjFj5Li0Gfy8cpxfV67Aiffft8Qkkvta4gWQ"; // JWT
+  const serverId = "575695011115438080";
+  const token = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDc5MjM5MzYsImV4cCI6MTc0NzkzNDczNn0.tjTqI4Yr-nfRLnc-rfSuiuqu9JL3Aj2gnEa-oC93n5U"; // JWT
 
   // 1. 기존 채널 목록 불러오기
   fetch(`http://localhost:8080/server/${serverId}/channel`, {
@@ -45,6 +45,12 @@
         document.getElementById("channel-list").appendChild(li);
       }else if(data.action==="update"){
         console.log("수정되었을때 로직!")
+      }else if (data.action === "delete") {
+        console.log("받은 메시지:", data);
+        const channelEl = document.getElementById(`channel-${data.id}`);
+        if (channelEl) {
+          channelEl.remove();
+        }
       }
 
 

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>🔔 통합 알림 테스트</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<h1>🧠 WebSocket 알림 수신</h1>
+<ul id="notification-list"></ul>
+
+<script>
+    const token1 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDgxNjIxMTgsImV4cCI6MTc0ODE3MjkxOH0.LobWRcKTI-LjjmG08SvVEHh_DRQ1wlOKFqUBkOo5jcQ"; // 예: localStorage.getItem("accessToken")
+    const token2 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDc0Njg4NzUsImV4cCI6MTc0NzQ3OTY3NX0.o0HaHoYNT-eet73FC9ru2Vt6DmADgR2sZkU-JpWIiKw";
+    const dmId = "12345678";
+    const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token1}`);
+    const stomp = Stomp.over(socket);
+
+    stomp.connect({}, () => {
+        console.log("✅ WebSocket 연결됨");
+
+        // 통합 알림 구독
+        stomp.subscribe("/user/queue/notifications", (msg) => {
+            const data = JSON.parse(msg.body);
+            const type = data.action;
+            const payload = data.payload;
+
+            console.log("📩 DM 알림 구조 확인:", payload.senderName, payload.message);
+
+
+            console.log("📩 알림 수신:", type, payload);
+
+            const li = document.createElement("li");
+
+            switch (type) {
+                case "INVITE":
+                    li.innerHTML = `
+            <b>[서버 초대]</b><br/>
+            ${payload.inviterName}님이 <b>${payload.serverName}</b> 서버에 초대했습니다.<br/>
+            <a href="${payload.inviteUrl}" target="_blank">👉 수락하기</a>
+          `;
+                    break;
+
+                case "DM":
+                    li.innerText = `[DM] ${payload.senderName}: ${payload.message}`;
+                    break;
+
+                case "FRIEND_REQUEST":
+                    li.innerText = `[친구 요청] ${payload.fromNickname}님이 친구 요청을 보냈습니다`;
+                    break;
+
+                default:
+                    li.innerText = `[알림] ${JSON.stringify(payload)}`;
+            }
+
+            document.getElementById("notification-list").appendChild(li);
+        });
+    });
+</script>
+</body>
+</html>

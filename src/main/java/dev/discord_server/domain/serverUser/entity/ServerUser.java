@@ -2,6 +2,7 @@ package dev.discord_server.domain.serverUser.entity;
 
 import dev.discord_server.config.BaseEntity;
 import dev.discord_server.domain.server.entity.Server;
+import dev.discord_server.domain.server.entity.Enum.InviteStatus;
 import dev.discord_server.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;

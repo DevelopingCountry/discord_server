@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/stompjs@2.3.3/lib/stomp.min.js"></script>
+</head>
+<body>
+<script>
+    // ✅ 메시지를 받을 사용자: token1 (userId = 7)
+    const token1 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI3IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDgxNjIxMTgsImV4cCI6MTc0ODE3MjkxOH0.LobWRcKTI-LjjmG08SvVEHh_DRQ1wlOKFqUBkOo5jcQ";
+
+    // ✅ 메시지를 보낼 사용자: token2 (userId = 8)
+    const token2 = "eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiI4IiwiZW1haWwiOiJsd2I5MDM2Iiwicm9sZSI6IlVTRVIiLCJpYXQiOjE3NDgxNjIxMTgsImV4cCI6MTc0ODE3MjkxOH0.Cn2W1kDQqiWwTQ0Ty7l0bgi9jfbnsX8GL8i3apQ-s04";
+
+    const dmId = "12345678";
+
+    // ✅ token2를 사용해 소켓 연결
+    const socket = new SockJS(`http://localhost:8080/ws-chat?token=${token2}`);
+    const stomp = Stomp.over(socket);
+
+    stomp.connect({}, () => {
+        console.log("✅ token2 유저로 WebSocket 연결됨");
+
+        // ✅ 메시지를 보낸 직후엔 수신 구독 필요 없음
+        stomp.send(`/app/dm/${dmId}`, {}, JSON.stringify({
+            content: "token2 → token1에게 DM 보내는 중!"
+        }));
+
+        console.log("📤 token2가 DM 보냄 완료");
+    });
+</script>
+
+
+</body>
+</html>

@@ -1,6 +1,5 @@
 package dev.discord_server.config.redis;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
@@ -14,11 +13,10 @@ public class RedisPublisher {
 
     public RedisPublisher(StringRedisTemplate redisTemplate,
                           @Qualifier("dmTopic") ChannelTopic dmTopic,
-                          @Qualifier("msgTopic") ChannelTopic messageTopic) {
+                          @Qualifier("msgTopic") ChannelTopic messageTopic){
         this.redisTemplate = redisTemplate;
         this.dmTopic = dmTopic;
         this.messageTopic = messageTopic;
-
     }
 
     public void publishDm(String message) {
@@ -28,5 +26,6 @@ public class RedisPublisher {
     public void publishMessage(String message) {
         redisTemplate.convertAndSend(messageTopic.getTopic(), message);
     }
+
 
 }

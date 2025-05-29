@@ -60,6 +60,13 @@ public class ServerController {
     }
 
 
+    @PostMapping("/{inviteId}/accept")
+    public CommonResponse<Void> acceptInvite(@PathVariable Long inviteId) {
+        serverService.acceptInvite(inviteId);
+        return new CommonResponse<>(true, HttpStatus.OK, "서버 초대 수락이 완료되었습니다.", null);
+    }
+
+
     @PatchMapping("/{serverId}/alarm")
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<ServerAlarmUpdateResponse> updateAlarm(@PathVariable String serverId,
