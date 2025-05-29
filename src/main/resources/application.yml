@@ -8,7 +8,7 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: none  # 필요에 따라 create, update, validate, none 선택
+      ddl-auto: update # 필요에 따라 create, update, validate, none 선택
     show-sql: true  # 콘솔에서 실행되는 SQL 보기
     properties:
       hibernate:
