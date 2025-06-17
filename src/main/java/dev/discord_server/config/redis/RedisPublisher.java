@@ -1,10 +1,12 @@
 package dev.discord_server.config.redis;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.listener.ChannelTopic;
 import org.springframework.stereotype.Component;
 
+@Slf4j
 @Component
 public class RedisPublisher {
     private final StringRedisTemplate redisTemplate;
@@ -31,6 +33,7 @@ public class RedisPublisher {
     }
 
     public void publishNotification(String json) {
+        log.info("Notification publish: {}", json);
         redisTemplate.convertAndSend(notificationTopic.getTopic(), json);
     }
 

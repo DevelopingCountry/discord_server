@@ -8,11 +8,11 @@ import dev.discord_server.config.exception.custom.exception.ForbiddenException40
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
 import dev.discord_server.domain.server.dto.*;
+import dev.discord_server.domain.server.entity.Enum.InviteStatus;
 import dev.discord_server.domain.server.entity.Server;
 import dev.discord_server.domain.server.entity.ServerInvite;
 import dev.discord_server.domain.server.repository.ServerInviteRepository;
 import dev.discord_server.domain.server.repository.ServerRepository;
-import dev.discord_server.domain.server.entity.Enum.InviteStatus;
 import dev.discord_server.domain.serverUser.entity.ServerUser;
 import dev.discord_server.domain.serverUser.entity.ServerUserRepository;
 import dev.discord_server.domain.user.entity.User;
@@ -21,9 +21,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * 예외처리 사용 방법
@@ -140,7 +138,7 @@ public class ServerService {
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         boolean isDuplicate = serverInviteRepository.existsByServerIdAndToUserIdAndStatus(
-                serverId, guest.getId(), InviteStatus.PENDING);
+                serverId, guest.getId(), InviteStatus.PENDING);  // accept상태도 처리해줘야됌.
 
         if (isDuplicate) {
             throw new AlreadyExistElementException409(ErrorDefineCode.EXIST_SERVER_INVITE);
@@ -166,6 +164,8 @@ public class ServerService {
                 user.getImageUrl(),
                 serverId
         );
+
+        // dm message넣어야될듯
     }
 
 

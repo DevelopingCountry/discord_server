@@ -4,6 +4,7 @@ import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.server.dto.*;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ import java.util.List;
  * 성공여부, HTTP Status, 응답 메시지, 응답데이터
  *
  */
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/server")
@@ -55,6 +57,8 @@ public class ServerController {
     public CommonResponse<Void> inviteUserToServer(@PathVariable String serverId,
                                                    @RequestBody ServerInviteRequest request) {
         Long Id = Long.parseLong(serverId);
+        log.info("serverId: {}", Id);
+        log.info("서버 초대 요청: {}", request.toString());
         serverService.inviteUser(Id, request);
         return new CommonResponse<>(true, HttpStatus.OK, "참여자 초대가 완료되었습니다.", null);
     }
