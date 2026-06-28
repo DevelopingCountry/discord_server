@@ -176,12 +176,16 @@ public class FriendService {
                 currentUser, targetUser, currentUser, targetUser
         );
         FriendStatus status = relationOpt.map(Friend::getStatus).orElse(null);
+        Boolean isSender = relationOpt.map(friend ->
+                !friend.getToUser().getId().equals(currentId)
+        ).orElse(null);
 
         FriendResponse response = new FriendResponse(
                 targetUser.getId().toString(),
                 targetUser.getNickname(),
                 targetUser.getImageUrl(),
-                status
+                status,
+                isSender
         );
 
         return Optional.of(response);

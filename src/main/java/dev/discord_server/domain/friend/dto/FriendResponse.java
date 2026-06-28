@@ -16,17 +16,21 @@ public class FriendResponse {
     private String name;
     private String imageUrl;
     private FriendStatus status;
+    private Boolean isSender;  // 추가
 
     public static FriendResponse toFriendResponse(Friend friend, Long currentUserId) {
         User targetUser = friend.getFromUser().getId().equals(currentUserId)
                 ? friend.getToUser()
                 : friend.getFromUser();
 
+        boolean isSender = !friend.getToUser().getId().equals(currentUserId);
+
         return FriendResponse.builder()
                 .friendId(targetUser.getId().toString())
                 .name(targetUser.getNickname())
                 .imageUrl(targetUser.getImageUrl())
                 .status(friend.getStatus())
+                .isSender(isSender)
                 .build();
     }
 }
