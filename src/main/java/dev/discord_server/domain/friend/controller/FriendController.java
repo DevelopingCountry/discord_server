@@ -86,4 +86,12 @@ public class FriendController {
     }
 
 
+    @GetMapping("/online")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<List<FriendResponse>> getOnlineFriends() {
+        Long uuid = SecurityUtil.getCurrentUserId();
+        List<FriendResponse> friends = friendService.findOnlineFriends(uuid);
+        return new CommonResponse<>(true, HttpStatus.OK, "온라인 친구 목록입니다.", friends);
+    }
+
 }

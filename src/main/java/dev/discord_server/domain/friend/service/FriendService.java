@@ -18,10 +18,12 @@ import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -31,6 +33,7 @@ public class FriendService {
     private final UserRepository userRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
     private final NotificationService notificationService;
+    private final RedisTemplate<String, String> redisTemplate;
 
     public List<FriendResponse> findFriends(Long currentUserId) {
         List<Friend> friends = friendRepository.findByFromUserIdOrToUserId(currentUserId, currentUserId);
@@ -112,11 +115,21 @@ public class FriendService {
                 .findByFromUserAndToUserOrToUserAndFromUser(fromUser, toUser, toUser, fromUser)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_FRIEND));
 
-        if (friend.getStatus() != FriendStatus.ACCEPTED) {
-            throw new ForbiddenException403(ErrorDefineCode.NOT_DELETABLE_FRIEND_STATUS);
+        // ACCEPTED: 양쪽 모두 삭제 가능
+        // PENDING: 요청 보낸 사람(isSender)만 취소 가능
+        if (friend.getStatus() == FriendStatus.ACCEPTED) {
+            friendRepository.delete(friend);
+            return;
         }
-
-        friendRepository.delete(friend);
+        if (friend.getStatus() == FriendStatus.PENDING) {
+            boolean isSender = !friend.getToUser().getId().equals(currentUserId);
+            if (!isSender) {
+                throw new ForbiddenException403(ErrorDefineCode.AUTH_NOT_CHANGE_FRIEND_STATUS);
+            }
+            friendRepository.delete(friend);
+            return;
+        }
+        throw new ForbiddenException403(ErrorDefineCode.NOT_DELETABLE_FRIEND_STATUS);
     }
 
     /**
@@ -190,5 +203,17 @@ public class FriendService {
 
         return Optional.of(response);
 
+    }
+
+    public List<FriendResponse> findOnlineFriends(Long currentUserId) {
+        List<Friend> friends = friendRepository.findByFromUserIdOrToUserId(currentUserId, currentUserId);
+        Set<String> onlineUsers = redisTemplate.opsForSet().members("online_users");
+        if (onlineUsers == null) return List.of();
+
+        return friends.stream()
+                .filter(f -> f.getStatus() == FriendStatus.ACCEPTED)
+                .map(f -> FriendResponse.toFriendResponse(f, currentUserId))
+                .filter(f -> onlineUsers.contains(f.getFriendId()))
+                .toList();
     }
 }

@@ -43,12 +43,18 @@ public class NotificationStreamConsumer {
 
             // 1. Consumer Group 생성 (이미 있으면 무시)
             try {
+                if (!Boolean.TRUE.equals(redisTemplate.hasKey(streamKey))) {
+                    redisTemplate.opsForStream().add(streamKey, Map.of("init", "true"));
+                }
                 streamOps.createGroup(streamKey, ReadOffset.latest(), group);
             } catch (Exception e) {
-                if (!e.getMessage().contains("BUSYGROUP")) {
-                    log.error("❌ Consumer Group 생성 실패: {}", e.getMessage());
+                String msg = e.getMessage() != null ? e.getMessage() : "";
+                String cause = e.getCause() != null ? e.getCause().getMessage() : "";
+                if (!msg.contains("BUSYGROUP") && !cause.contains("BUSYGROUP")) {
+                    log.warn("⚠️ Consumer Group 생성 실패 (무시 가능): {} / {}", msg, cause);
                 }
             }
+
 
             // 2. 무한 루프 - 알림 수신
             while (!Thread.currentThread().isInterrupted()) {
