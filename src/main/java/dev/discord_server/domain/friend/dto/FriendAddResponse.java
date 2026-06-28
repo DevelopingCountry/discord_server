@@ -11,4 +11,5 @@ public class FriendAddResponse {
     private String name;
     private String imageUrl;
     private FriendStatus status;
+    private Boolean isSender;
 }

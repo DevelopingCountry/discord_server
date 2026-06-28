@@ -74,7 +74,7 @@ public class FriendService {
                     return new FriendAddResponse(targetUser.getId().toString(),
                             targetUser.getNickname(),
                             targetUser.getImageUrl(),
-                            FriendStatus.PENDING);
+                            FriendStatus.PENDING, true);
                 }
             }
         }
@@ -99,7 +99,7 @@ public class FriendService {
 
         notificationService.sendFriendRequestNotification(toUserId, fromUser.getNickname(), fromUser.getImageUrl());
 
-        return new FriendAddResponse(toUser.getId().toString(),toUser.getNickname(), toUser.getImageUrl(), FriendStatus.PENDING);
+        return new FriendAddResponse(toUser.getId().toString(),toUser.getNickname(), toUser.getImageUrl(), FriendStatus.PENDING, true);
     }
 
     public void deleteFriendRequest(Long currentUserId, Long toUserId) {
