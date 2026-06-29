@@ -30,7 +30,7 @@ CREATE TABLE Friend (
 CREATE TABLE Server (
                         id BIGINT PRIMARY KEY ,
                         name VARCHAR(20) NOT NULL,
-                        image_url VARCHAR(50),
+                        image_url TEXT,
                         host_id BIGINT NOT NULL,
                         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
