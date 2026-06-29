@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.socket.messaging.SessionConnectedEvent;
 import org.springframework.web.socket.messaging.SessionDisconnectEvent;
 
+import java.security.Principal;
+
 @Component
 @RequiredArgsConstructor
 public class WebSocketEventListener {
@@ -17,21 +19,17 @@ public class WebSocketEventListener {
 
     @EventListener
     public void handleConnect(SessionConnectedEvent event) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        if (accessor.getSessionAttributes() == null) return;
-        Long userId = (Long) accessor.getSessionAttributes().get("userId");
-        if (userId != null) {
-            redisTemplate.opsForSet().add(ONLINE_KEY, userId.toString());
+        Principal user = event.getUser();
+        if (user != null) {
+            redisTemplate.opsForSet().add(ONLINE_KEY, user.getName());
         }
     }
 
     @EventListener
     public void handleDisconnect(SessionDisconnectEvent event) {
-        StompHeaderAccessor accessor = StompHeaderAccessor.wrap(event.getMessage());
-        if (accessor.getSessionAttributes() == null) return;
-        Long userId = (Long) accessor.getSessionAttributes().get("userId");
-        if (userId != null) {
-            redisTemplate.opsForSet().remove(ONLINE_KEY, userId.toString());
+        Principal user = event.getUser();
+        if (user != null) {
+            redisTemplate.opsForSet().remove(ONLINE_KEY, user.getName());
         }
     }
 }

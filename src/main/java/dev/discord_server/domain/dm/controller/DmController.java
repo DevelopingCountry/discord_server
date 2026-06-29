@@ -35,8 +35,7 @@ public class DmController {
         return new CommonResponse<>(true, HttpStatus.OK, "DM 생성 성공", dmAddResponse);
     }
 
-    @PostMapping
-    @RequestMapping("/visible")
+    @PostMapping("/visible")
     public CommonResponse<DmVisibleResponse> notVisibleDm(@RequestBody DmVisibleRequest request) {
         DmVisibleResponse dmVisibleResponse = dmService.nonVisibleDm(request);
         return new CommonResponse<>(true, HttpStatus.OK, "DM 숨기기 완료", dmVisibleResponse);

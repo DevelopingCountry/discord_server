@@ -53,15 +53,23 @@ public class DmService {
                 userId, targetUserId, userId, targetUserId
         );
 
-        Long dmId = existing.map(Dm::getId)
-                .orElseGet(() -> dmRepository.save(Dm.builder()
-                        .id(snowflakeIdGenerator.generateId())
-                        .isVisible(true)
-                        .user1(currentUser)
-                        .user2(targetUser)
-                        .build()).getId());
+        if (existing.isPresent()) {
+            Dm dm = existing.get();
+            if (!dm.isVisible()) {
+                dm.setVisible(true);  // 숨겼던 DM 재개시 다시 표시
+                dmRepository.save(dm);
+            }
+            return new DmAddResponse(dm.getId().toString(), targetUser.getId().toString(), targetUser.getImageUrl(), targetUser.getNickname());
+        }
 
-        return new DmAddResponse(dmId.toString(),targetUser.getId().toString(),targetUser.getImageUrl(),targetUser.getNickname());
+        Long dmId = dmRepository.save(Dm.builder()
+                .id(snowflakeIdGenerator.generateId())
+                .isVisible(true)
+                .user1(currentUser)
+                .user2(targetUser)
+                .build()).getId();
+
+        return new DmAddResponse(dmId.toString(), targetUser.getId().toString(), targetUser.getImageUrl(), targetUser.getNickname());
     }
 
 
