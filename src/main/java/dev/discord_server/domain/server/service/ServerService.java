@@ -18,12 +18,15 @@ import dev.discord_server.domain.serverUser.entity.ServerUserRepository;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * 예외처리 사용 방법
@@ -43,6 +46,8 @@ public class ServerService {
     private final SnowflakeIdGenerator snowflakeIdGenerator;
     private final ServerInviteRepository serverInviteRepository;
     private final NotificationService notificationService;
+    private final RedisTemplate<String, String> redisTemplate;
+    private static final String ONLINE_KEY = "online_users";
 
     public List<ServerResponse> findServers() {
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -164,7 +169,8 @@ public class ServerService {
                 server.getServerName(),
                 user.getNickname(),
                 user.getImageUrl(),
-                serverId
+                serverId,
+                invite.getId()
         );
     }
 
@@ -247,7 +253,22 @@ public class ServerService {
     }
 
 
+    public List<ServerMemberResponse> getServerMembers(Long serverId) {
+        Set<String> onlineUsers = redisTemplate.opsForSet().members(ONLINE_KEY);
 
+        return serverUserRepository.findByServerId(serverId).stream()
+                .map(su -> {
+                    User user = su.getUser();
+                    boolean isOnline = onlineUsers != null && onlineUsers.contains(String.valueOf(user.getId()));
+                    return ServerMemberResponse.builder()
+                            .userId(String.valueOf(user.getId()))
+                            .nickname(user.getNickname())
+                            .imageUrl(user.getImageUrl())
+                            .online(isOnline)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
 
 
 

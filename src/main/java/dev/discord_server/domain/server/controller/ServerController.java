@@ -94,9 +94,9 @@ public class ServerController {
     }
 
 
-
-
-
-
+    @GetMapping("/{serverId}/members")
+    public CommonResponse<List<ServerMemberResponse>> getServerMembers(@PathVariable Long serverId) {
+        return new CommonResponse<>(true, HttpStatus.OK, "멤버 조회 성공", serverService.getServerMembers(serverId));
+    }
 
 }

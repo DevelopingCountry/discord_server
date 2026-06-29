@@ -19,8 +19,9 @@ public class NotificationService {
     private final NotificationStreamProducer notificationStreamProducer;
     private final DmSessionTracker dmSessionTracker;
 
-    public void sendInviteNotification(String serverImage, Long toUserId, String serverName, String fromNickname, String fromImageUrl, Long serverId) {
+    public void sendInviteNotification(String serverImage, Long toUserId, String serverName, String fromNickname, String fromImageUrl, Long serverId, Long inviteId) {
         InviteNotificationPayload payload = new InviteNotificationPayload(
+                inviteId,
                 serverImage,
                 serverName,
                 fromNickname,
