@@ -35,6 +35,7 @@ public class SecurityConfig {
             "/auth/login/kakao/**",
             "/auth/login/kakao",
             "/auth/refresh",
+            "/auth/dev-login",
             "/ws-chat/**",
             "/ws-chat",
             "/index.html",
