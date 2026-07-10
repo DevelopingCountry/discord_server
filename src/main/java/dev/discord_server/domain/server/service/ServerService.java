@@ -159,6 +159,7 @@ public class ServerService {
 
 
         notificationService.sendInviteNotification(
+                invite.getId(),
                 server.getImage(),
                 guest.getId(),
                 server.getServerName(),

@@ -19,8 +19,9 @@ public class NotificationService {
     private final NotificationStreamProducer notificationStreamProducer;
     private final DmSessionTracker dmSessionTracker;
 
-    public void sendInviteNotification(String serverImage, Long toUserId, String serverName, String fromNickname, String fromImageUrl, Long serverId) {
+    public void sendInviteNotification(Long inviteId, String serverImage, Long toUserId, String serverName, String fromNickname, String fromImageUrl, Long serverId) {
         InviteNotificationPayload payload = new InviteNotificationPayload(
+                inviteId,
                 serverImage,
                 serverName,
                 fromNickname,
@@ -53,7 +54,7 @@ public class NotificationService {
             log.info("📵 DM 채널 접속 중 - 알림 생략: {}", toUserId);
             return;
         }
-        DmNotificationPayload payload = new DmNotificationPayload(fromNickname, fromImageUrl, content);
+        DmNotificationPayload payload = new DmNotificationPayload(dmId, fromNickname, fromImageUrl, content);
         WebSocketNotification notification = new WebSocketNotification("DM", payload, toUserId);
 
         try {
