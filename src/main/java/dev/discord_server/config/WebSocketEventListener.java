@@ -1,5 +1,6 @@
 package dev.discord_server.config;
 
+import dev.discord_server.domain.friend.service.FriendService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -15,6 +16,7 @@ import java.security.Principal;
 public class WebSocketEventListener {
 
     private final RedisTemplate<String, String> redisTemplate;
+    private final FriendService friendService;
     private static final String ONLINE_KEY = "online_users";
 
     @EventListener
@@ -22,6 +24,7 @@ public class WebSocketEventListener {
         Principal user = event.getUser();
         if (user != null) {
             redisTemplate.opsForSet().add(ONLINE_KEY, user.getName());
+            friendService.notifyFriendsPresenceChange(Long.parseLong(user.getName()), true);
         }
     }
 
@@ -30,6 +33,7 @@ public class WebSocketEventListener {
         Principal user = event.getUser();
         if (user != null) {
             redisTemplate.opsForSet().remove(ONLINE_KEY, user.getName());
+            friendService.notifyFriendsPresenceChange(Long.parseLong(user.getName()), false);
         }
     }
 }

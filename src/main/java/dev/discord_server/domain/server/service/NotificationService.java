@@ -5,11 +5,14 @@ import dev.discord_server.config.redis.DmSessionTracker;
 import dev.discord_server.config.redis.NotificationStreamProducer;
 import dev.discord_server.domain.dm_message.dto.DmNotificationPayload;
 import dev.discord_server.domain.friend.dto.FriendRequestPayload;
+import dev.discord_server.domain.friend.dto.FriendResponse;
 import dev.discord_server.domain.server.dto.InviteNotificationPayload;
 import dev.discord_server.domain.server.dto.WebSocketNotification;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -61,6 +64,26 @@ public class NotificationService {
             notificationStreamProducer.publishToUserStream(toUserId, notification);
         } catch (Exception e) {
             throw new RuntimeException("❌ DM 알림 스트림 전송 실패", e);
+        }
+    }
+
+    public void sendFriendOnlineNotification(Long toUserId, FriendResponse friendInfo) {
+        WebSocketNotification notification = new WebSocketNotification("FRIEND_ONLINE", friendInfo, toUserId);
+
+        try {
+            notificationStreamProducer.publishToUserStream(toUserId, notification);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 친구 온라인 알림 스트림 전송 실패", e);
+        }
+    }
+
+    public void sendFriendOfflineNotification(Long toUserId, String friendId) {
+        WebSocketNotification notification = new WebSocketNotification("FRIEND_OFFLINE", Map.of("friendId", friendId), toUserId);
+
+        try {
+            notificationStreamProducer.publishToUserStream(toUserId, notification);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 친구 오프라인 알림 스트림 전송 실패", e);
         }
     }
 }

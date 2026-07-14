@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -215,5 +216,26 @@ public class FriendService {
                 .map(f -> FriendResponse.toFriendResponse(f, currentUserId))
                 .filter(f -> onlineUsers.contains(f.getFriendId()))
                 .toList();
+    }
+
+    /**
+     * 유저의 접속/해제를 친구들에게 실시간으로 알림
+     * @param userId
+     * @param online
+     */
+    @Transactional(readOnly = true)
+    public void notifyFriendsPresenceChange(Long userId, boolean online) {
+        friendRepository.findByFromUserIdOrToUserId(userId, userId).stream()
+                .filter(f -> f.getStatus() == FriendStatus.ACCEPTED)
+                .forEach(f -> {
+                    Long targetUserId = f.getFromUser().getId().equals(userId)
+                            ? f.getToUser().getId() : f.getFromUser().getId();
+                    if (online) {
+                        notificationService.sendFriendOnlineNotification(
+                                targetUserId, FriendResponse.toFriendResponse(f, targetUserId));
+                    } else {
+                        notificationService.sendFriendOfflineNotification(targetUserId, userId.toString());
+                    }
+                });
     }
 }
