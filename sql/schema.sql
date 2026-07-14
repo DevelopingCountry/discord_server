@@ -117,3 +117,14 @@ CREATE TABLE nicknames (
                            nickname VARCHAR(50) NOT NULL UNIQUE,
                            is_used BOOLEAN DEFAULT FALSE
 );
+
+CREATE TABLE notification (
+                              id BIGINT PRIMARY KEY,
+                              user_id BIGINT NOT NULL,
+                              type VARCHAR(30) NOT NULL,
+                              payload TEXT NOT NULL,
+                              is_read BOOLEAN NOT NULL DEFAULT FALSE,
+                              created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                              updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                              FOREIGN KEY (user_id) REFERENCES User(id)
+);
