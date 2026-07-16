@@ -158,6 +158,10 @@ public class FriendService {
                 ? friend.getToUser().getId()
                 : friend.getFromUser().getId();
 
+
+        notifyFriendsPresenceChange(targetId,true);
+        notifyFriendsPresenceChange(uuid,true);
+
         return new FriendStatusResponse(targetId.toString(),friend.getStatus());
     }
 
