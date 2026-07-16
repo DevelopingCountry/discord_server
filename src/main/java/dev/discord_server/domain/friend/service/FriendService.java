@@ -83,22 +83,12 @@ public class FriendService {
             }
         }
 
-        Friend friend;
-        if (currentUserId < toUserId) {
-            friend = Friend.builder()
-                    .id(snowflakeIdGenerator.generateId())
-                    .fromUser(fromUser)
-                    .toUser(toUser)
-                    .status(FriendStatus.PENDING)
-                    .build();
-        } else {
-            friend = Friend.builder()
-                    .id(snowflakeIdGenerator.generateId())
-                    .fromUser(toUser)
-                    .toUser(fromUser)
-                    .status(FriendStatus.PENDING)
-                    .build();
-        }
+        Friend friend = Friend.builder()
+                .id(snowflakeIdGenerator.generateId())
+                .fromUser(fromUser)
+                .toUser(toUser)
+                .status(FriendStatus.PENDING)
+                .build();
         friendRepository.save(friend);
 
         notificationService.sendFriendRequestNotification(toUserId, fromUser.getNickname(), fromUser.getImageUrl());
