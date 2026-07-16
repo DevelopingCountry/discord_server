@@ -3,12 +3,6 @@ CREATE DATABASE IF NOT EXISTS discord_server;
 USE discord_server;
 
 
--- 닉네임 테이블 생성
-CREATE TABLE nicknames (
-                           id BIGINT AUTO_INCREMENT PRIMARY KEY,
-                           nickname VARCHAR(50) UNIQUE NOT NULL,
-                           is_used BOOLEAN DEFAULT FALSE
-);
 
 -- User 테이블 생성
 CREATE TABLE User (
@@ -86,6 +80,7 @@ CREATE TABLE message (
 
 CREATE TABLE dm (
                     id BIGINT PRIMARY KEY ,
+                    is_visible BOOLEAN NOT NULL DEFAULT TRUE,
                     user1_id BIGINT NOT NULL,
                     user2_id BIGINT NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
