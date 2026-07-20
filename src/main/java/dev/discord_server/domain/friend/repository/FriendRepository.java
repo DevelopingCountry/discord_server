@@ -3,6 +3,7 @@ package dev.discord_server.domain.friend.repository;
 import dev.discord_server.domain.friend.entity.Friend;
 import dev.discord_server.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,5 +14,14 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
     Optional<Friend> findByFromUserIdAndToUserIdOrFromUserIdAndToUserId(
             Long fromId1, Long toId1, Long fromId2, Long toId2
     );
-
+    @Query("""
+        SELECT f
+        FROM Friend f
+        JOIN FETCH f.fromUser
+        JOIN FETCH f.toUser
+        WHERE
+        (f.fromUser.id = :userId OR f.toUser.id = :userId)
+        AND f.status = 'ACCEPTED'
+    """)
+    List<Friend> findAcceptedFriends(Long userId);
 }

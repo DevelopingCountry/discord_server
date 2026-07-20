@@ -44,10 +44,13 @@ src/main/java/dev/discord_server/
     ├── dm_message/    # DM 메시지 REST + WebSocket + Presence tracking
     ├── friend/        # 친구 요청/수락/거절, 온라인 상태
     ├── serverUser/    # 서버 멤버십 (alarm 설정 포함)
+    ├── notification/  # 알림함 (초대/DM/친구요청 알림 조회 및 읽음 처리)
     └── nickname/      # 랜덤 닉네임 풀 관리
 ```
 
 각 도메인 패키지는 `controller / service / entity / repository / dto` 구조를 따른다.
+
+`auth/controller/DevAuthController.java`는 `@Profile("!prod")`로만 등록되는 로컬 개발 전용 로그인 우회(`POST /auth/dev-login`, 이메일/닉네임만으로 즉시 토큰 발급)를 제공합니다. prod 프로필에서는 컨트롤러 자체가 스프링 컨텍스트에 등록되지 않습니다. `discord_ui_spa`의 로그인 화면이 dev 모드에서 이 엔드포인트를 호출합니다.
 
 ## 도메인 모델
 
@@ -62,6 +65,7 @@ src/main/java/dev/discord_server/
 | `DmMessage` | id, content, dmId, userId | — |
 | `ServerUser` | id, serverId, userId, alarm | — |
 | `ServerInvite` | id, serverId, fromUserId, toUserId, status | `InviteStatus`: PENDING, ACCEPTED, DECLINED |
+| `Notification` | id, userId, type, payload(JSON string), isRead | — |
 | `Nickname` | id, nickname, isUsed | — |
 
 모든 Entity는 `BaseEntity`를 상속해 `createdAt` / `updatedAt` 자동 기록.  
@@ -73,6 +77,7 @@ ID는 DB auto-increment 대신 **Snowflake ID** 사용 (`SnowflakeIdGenerator.ja
 # 인증
 GET  /auth/login/kakao          # Kakao OAuth 로그인
 POST /auth/refresh              # Access Token 재발급
+POST /auth/dev-login            # 개발용 로그인 (email/nickname만으로 토큰 발급, prod 프로필에서 비활성)
 
 # 유저
 GET  /me                        # 내 프로필 조회
@@ -85,6 +90,7 @@ POST   /server                  # 서버 생성
 PATCH  /server/{id}             # 서버 이름/이미지 수정
 DELETE /server/{id}             # 서버 삭제 (호스트 전용)
 POST   /server/{id}/invite      # 유저 초대
+GET    /server/{id}/invite      # PENDING 상태로 초대된 유저 ID 목록 조회
 POST   /server/{inviteId}/accept # 초대 수락
 PATCH  /server/{id}/alarm       # 알림 토글
 DELETE /server/{id}/leave       # 서버 탈퇴
@@ -117,7 +123,13 @@ POST /dm/visible                # DM 숨김/표시 토글
 GET    /dm/{dmId}                          # DM 메시지 목록
 PATCH  /dm/{dmId}/message/{msgId}          # DM 메시지 수정
 DELETE /dm/{dmId}/message/{msgId}          # DM 메시지 삭제
+
+# 알림함
+GET   /notifications                       # 알림 목록 + 안읽음 개수 조회
+PATCH /notifications/read                  # 전체 읽음 처리
 ```
+
+**`discord_ui_spa`의 `ChannelPage.tsx`는 `GET /server/{serverId}/members`를 호출하지만 이 엔드포인트는 존재하지 않습니다** (`ServerController`/`ChannelController` 어디에도 `/members` 라우트 없음). 채널 화면 우측 멤버 패널을 실제로 채우려면 이 엔드포인트를 새로 만들어야 합니다.
 
 ## WebSocket
 

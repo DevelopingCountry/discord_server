@@ -6,6 +6,7 @@ import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.config.redis.DmSessionTracker;
 import dev.discord_server.config.redis.NotificationStreamProducer;
 import dev.discord_server.domain.dm_message.dto.DmNotificationPayload;
+import dev.discord_server.domain.friend.Enum.FriendStatus;
 import dev.discord_server.domain.friend.dto.FriendRequestPayload;
 import dev.discord_server.domain.friend.dto.FriendResponse;
 import dev.discord_server.domain.notification.dto.NotificationListResponse;
@@ -99,6 +100,22 @@ public class NotificationService {
         }
     }
 
+    /**
+     * 친구 요청을 보냈던 원 요청자에게 상대방의 수락/거절 결과를 알림
+     * @param toUserId 원 요청자 id
+     * @param friendInfo 상대방(수락/거절한 쪽) 정보 — friendInfo.getStatus()로 액션 결정
+     */
+    public void sendFriendStatusChangeNotification(Long toUserId, FriendResponse friendInfo) {
+        String action = friendInfo.getStatus() == FriendStatus.ACCEPTED ? "FRIEND_ACCEPTED" : "FRIEND_REJECTED";
+        WebSocketNotification notification = new WebSocketNotification(action, friendInfo, toUserId);
+
+        try {
+            notificationStreamProducer.publishToUserStream(toUserId, notification);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 친구 상태 변경 알림 스트림 전송 실패", e);
+        }
+    }
+
     private void saveNotification(Long toUserId, String type, Object payload) {
         try {
             Notification notification = Notification.builder()
@@ -128,13 +145,27 @@ public class NotificationService {
         notificationRepository.markAllAsRead(userId);
     }
 
-    private NotificationResponse toNotificationResponse(Notification notification) {
+    public NotificationResponse toNotificationResponse(Notification notification) {
         try {
             Object payload = objectMapper.readValue(notification.getPayload(), Object.class);
             return new NotificationResponse(
                     notification.getId().toString(), notification.getType(), payload, notification.isRead(), notification.getCreatedAt());
         } catch (JsonProcessingException e) {
             throw new RuntimeException("❌ 알림 역직렬화 실패", e);
+        }
+    }
+    /**
+     * 친구 삭제 시 양쪽에 알림
+     * @param toUserId 원 요청자 id
+     * @param friendInfo 상대방(수락/거절한 쪽) 정보 — friendInfo.getStatus()로 액션 결정
+     */
+    public void sendFriendDeleted(Long currentUserId, Long toUserId) {
+        WebSocketNotification notification = new WebSocketNotification("FRIEND_DELETED", Map.of("friendId", currentUserId.toString()), toUserId);
+
+        try {
+            notificationStreamProducer.publishToUserStream(toUserId, notification);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 친구 상태 변경 알림 스트림 전송 실패", e);
         }
     }
 }

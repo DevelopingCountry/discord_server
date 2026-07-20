@@ -108,8 +108,11 @@ public class FriendService {
 
         // ACCEPTED: 양쪽 모두 삭제 가능
         // PENDING: 요청 보낸 사람(isSender)만 취소 가능
+
         if (friend.getStatus() == FriendStatus.ACCEPTED) {
             friendRepository.delete(friend);
+            notificationService.sendFriendDeleted(currentUserId, toUserId);
+
             return;
         }
         if (friend.getStatus() == FriendStatus.PENDING) {
@@ -153,11 +156,14 @@ public class FriendService {
 
         friendRepository.save(friend);
 
-        // 상대방 id
+        // 상대방 id (= 원래 친구 요청을 보냈던 사람)
         Long targetId = friend.getFromUser().getId().equals(uuid)
                 ? friend.getToUser().getId()
                 : friend.getFromUser().getId();
 
+        // 원 요청자에게 수락/거절 결과를 실시간으로 알림
+        notificationService.sendFriendStatusChangeNotification(
+                targetId, FriendResponse.toFriendResponse(friend, targetId));
 
         notifyFriendsPresenceChange(targetId,true);
         notifyFriendsPresenceChange(uuid,true);
