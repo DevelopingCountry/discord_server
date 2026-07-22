@@ -89,8 +89,8 @@ GET    /server                  # 내 서버 목록
 POST   /server                  # 서버 생성
 PATCH  /server/{id}             # 서버 이름/이미지 수정
 DELETE /server/{id}             # 서버 삭제 (호스트 전용)
-POST   /server/{id}/invite      # 유저 초대
-GET    /server/{id}/invite      # PENDING 상태로 초대된 유저 ID 목록 조회
+POST   /server/{id}/invite         # 유저 초대
+GET    /server/{id}/invite-friends # 초대 가능한 친구 목록 조회 (ACCEPTED 친구 전체 + 각자 이 서버에 PENDING 초대가 있는지 invited: boolean)
 POST   /server/{inviteId}/accept # 초대 수락
 PATCH  /server/{id}/alarm       # 알림 토글
 DELETE /server/{id}/leave       # 서버 탈퇴
