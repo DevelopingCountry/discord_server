@@ -23,8 +23,8 @@ public class WebSocketEventListener {
     public void handleConnect(SessionConnectedEvent event) {
         Principal user = event.getUser();
         if (user != null) {
-            redisTemplate.opsForSet().add(ONLINE_KEY, user.getName());
-            friendService.notifyFriendsPresenceChange(Long.parseLong(user.getName()), true);
+            redisTemplate.opsForSet().add(ONLINE_KEY, user.getName()); // 접속 시(로그인) redis에 저장
+            friendService.notifyFriendsPresenceChange(Long.parseLong(user.getName()), true); // 친구들에게 접속했다고 알림
         }
     }
 
@@ -32,8 +32,8 @@ public class WebSocketEventListener {
     public void handleDisconnect(SessionDisconnectEvent event) {
         Principal user = event.getUser();
         if (user != null) {
-            redisTemplate.opsForSet().remove(ONLINE_KEY, user.getName());
-            friendService.notifyFriendsPresenceChange(Long.parseLong(user.getName()), false);
+            redisTemplate.opsForSet().remove(ONLINE_KEY, user.getName()); // !접속 시(로그아웃) redis에서 삭제
+            friendService.notifyFriendsPresenceChange(Long.parseLong(user.getName()), false); // 친구들에게 로그아웃 했다고 알림
         }
     }
 }
