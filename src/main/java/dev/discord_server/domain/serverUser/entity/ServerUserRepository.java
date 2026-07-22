@@ -10,4 +10,5 @@ import java.util.zip.ZipFile;
 public interface ServerUserRepository extends JpaRepository<ServerUser, Long> {
     Optional<ServerUser> findByServerIdAndUserId(Long serverId, Long currentUserId);
     List<ServerUser> findByServerId(Long serverId);
+    boolean existsByServerIdAndUserId(Long serverId, Long userId);
 }

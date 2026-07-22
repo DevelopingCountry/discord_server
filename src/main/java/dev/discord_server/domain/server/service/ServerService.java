@@ -21,6 +21,7 @@ import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,6 +52,8 @@ public class ServerService {
     private final ServerInviteRepository serverInviteRepository;
     private final NotificationService notificationService;
     private final FriendRepository friendRepository;
+    private final RedisTemplate<String, String> redisTemplate;
+    private static final String ONLINE_KEY = "online_users";
 
     public List<ServerResponse> findServers() {
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -173,8 +176,7 @@ public class ServerService {
                 server.getServerName(),
                 user.getNickname(),
                 user.getImageUrl(),
-                serverId,
-                invite.getId()
+                serverId
         );
     }
 
@@ -308,7 +310,6 @@ public class ServerService {
 
         return resultt;
 
-
 //        Set<Long> invitedIds = serverInviteRepository.findByServerId(serverId).stream()
 //                .filter(invite -> invite.getStatus() == InviteStatus.PENDING)
 //                .map(invite -> invite.getToUser().getId())
@@ -326,5 +327,22 @@ public class ServerService {
 //                    );
 //                })
 //                .toList();
+    }
+
+    public List<ServerMemberResponse> getServerMembers(Long serverId) {
+        Set<String> onlineUsers = redisTemplate.opsForSet().members(ONLINE_KEY);
+
+        return serverUserRepository.findByServerId(serverId).stream()
+                .map(su -> {
+                    User user = su.getUser();
+                    boolean isOnline = onlineUsers != null && onlineUsers.contains(String.valueOf(user.getId()));
+                    return ServerMemberResponse.builder()
+                            .userId(String.valueOf(user.getId()))
+                            .nickname(user.getNickname())
+                            .imageUrl(user.getImageUrl())
+                            .online(isOnline)
+                            .build();
+                })
+                .collect(Collectors.toList());
     }
 }
