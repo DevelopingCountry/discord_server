@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import java.util.List;
  * 성공여부, HTTP Status, 응답 메시지, 응답데이터
  *
  */
+@Slf4j
 @Tag(name = "서버 API", description = "서버(길드) 생성/조회/수정/삭제, 초대, 알림 설정 API")
 @RequiredArgsConstructor
 @RestController
@@ -71,10 +73,11 @@ public class ServerController {
     @Operation(summary = "서버 초대 목록 조회", description = "해당 서버에 초대할 친구 목록들을 반환한다..")
     @GetMapping("/{serverId}/invite-friends")
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<List<String>> getFriendInvite(@Parameter(description = "서버 ID", example = "123456789012345") @PathVariable String serverId) {
+    public CommonResponse<List<FriendInvitedListDto>> getFriendInvite(@Parameter(description = "서버 ID", example = "123456789012345") @PathVariable String serverId) {
         Long Id = Long.parseLong(serverId);
-        List<String> invitedUserIds = serverService.getInvitedUsers(Id);
-        return new CommonResponse<>(true, HttpStatus.OK, "초대된 유저 목록입니다.", invitedUserIds);
+        List<FriendInvitedListDto> friends = serverService.getInvitedUsers(Id);
+        log.info(friends.toString());
+        return new CommonResponse<>(true, HttpStatus.OK, "초대할 친구 목록입니다.", friends);
     }
 
 
