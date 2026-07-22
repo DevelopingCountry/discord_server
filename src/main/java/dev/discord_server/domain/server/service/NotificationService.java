@@ -32,6 +32,7 @@ public class NotificationService {
     private final NotificationRepository notificationRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
 
+
     public void sendInviteNotification(Long inviteId, String serverImage, Long toUserId, String serverName, String fromNickname, String fromImageUrl, Long serverId) {
         InviteNotificationPayload payload = new InviteNotificationPayload(
                 inviteId.toString(),
