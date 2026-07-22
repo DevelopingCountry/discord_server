@@ -31,4 +31,10 @@ public class Friend extends BaseEntity {
     @Column(name = "status", nullable = false)
     private FriendStatus status;
 
+
+    public Long getFriendId(Long currentUserId) {
+        return fromUser.getId().equals(currentUserId)
+                ? toUser.getId()
+                : fromUser.getId();
+    }
 }

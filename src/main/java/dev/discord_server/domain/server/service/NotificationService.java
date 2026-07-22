@@ -116,6 +116,17 @@ public class NotificationService {
         }
     }
 
+    public void sendServerInviteAcceptedNotification(Long toUserId, Long serverId) {
+        WebSocketNotification notification = new WebSocketNotification(
+                "SERVER_INVITE_ACCEPTED", Map.of("serverId", serverId.toString()), toUserId);
+
+        try {
+            notificationStreamProducer.publishToUserStream(toUserId, notification);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 서버 초대 수락 알림 스트림 전송 실패", e);
+        }
+    }
+
     private void saveNotification(Long toUserId, String type, Object payload) {
         try {
             Notification notification = Notification.builder()

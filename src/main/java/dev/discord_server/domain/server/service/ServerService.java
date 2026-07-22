@@ -7,6 +7,8 @@ import dev.discord_server.config.exception.custom.exception.AlreadyExistElementE
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
+import dev.discord_server.domain.friend.entity.Friend;
+import dev.discord_server.domain.friend.repository.FriendRepository;
 import dev.discord_server.domain.server.dto.*;
 import dev.discord_server.domain.server.entity.Server;
 import dev.discord_server.domain.server.entity.ServerInvite;
@@ -18,12 +20,13 @@ import dev.discord_server.domain.serverUser.entity.ServerUserRepository;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * 예외처리 사용 방법
@@ -32,6 +35,7 @@ import java.util.Optional;
  */
 
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 @Transactional(readOnly = true)
@@ -43,6 +47,7 @@ public class ServerService {
     private final SnowflakeIdGenerator snowflakeIdGenerator;
     private final ServerInviteRepository serverInviteRepository;
     private final NotificationService notificationService;
+    private final FriendRepository friendRepository;
 
     public List<ServerResponse> findServers() {
         Long currentUserId = SecurityUtil.getCurrentUserId();
@@ -170,6 +175,8 @@ public class ServerService {
     }
 
 
+
+
     @Transactional
     public void acceptInvite(Long inviteId) {
         ServerInvite invite = serverInviteRepository.findById(inviteId)
@@ -187,6 +194,9 @@ public class ServerService {
 
         serverUserRepository.save(serverUser);
         invite.setStatus(InviteStatus.ACCEPTED);
+
+        notificationService.sendServerInviteAcceptedNotification(
+                invite.getFromUser().getId(), invite.getServer().getId());
     }
 
 
@@ -248,8 +258,69 @@ public class ServerService {
     }
 
 
+    public List<FriendInvitedListDto> getInvitedUsers(Long serverId) {
+        Long currentUserId = SecurityUtil.getCurrentUserId();
+
+        serverRepository.findById(serverId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_SERVER));
+        //1. 친구 조회
+        List<Friend> acceptedFriends = friendRepository.findAcceptedFriends(currentUserId);
+        log.info("친구를 조회합니다.");
+        log.info(String.valueOf(acceptedFriends));
+        //2. 현 서버에 소속 되어있나?
+        List<Long>[] list = new ArrayList[2];
+
+        list[0] = new ArrayList<>();
+        list[1] = new ArrayList<>();
+        for(Friend friend : acceptedFriends){
+            Long friendUserId = friend.getFriendId(currentUserId);
+            // 3. 초대를 한상태인가?
+            if(!serverUserRepository.existsByServerIdAndUserId(serverId,friendUserId)){
+                //3-1. yes
+                if(serverInviteRepository.existsByServerIdAndToUserIdAndStatus(serverId,friendUserId,InviteStatus.PENDING)){
+                    list[0].add(friendUserId);
+                }
+                //3-2. no
+                else{
+                    list[1].add(friendUserId);
+                }
+            }
+        }
+        log.info("초대한 사람 id");
+        log.info(String.valueOf(list[0].size()));
+        log.info("초대안 사람 id");
+        log.info(String.valueOf(list[1].size()));
+        //4. 초대를 한사람들과 안한사람들을 구분짓기
+        List<FriendInvitedListDto> inviteY = userRepository.findInviteY(list[0]);
+        log.info("초대한 사람 조회.");
+        log.info(String.valueOf(inviteY));
+        List<FriendInvitedListDto> inviteN = userRepository.findInviteN(list[1]);
+        log.info("초대안 사람 조회.");
+        log.info(String.valueOf(inviteY));
+        List<FriendInvitedListDto> resultt = new ArrayList<>(inviteY);
+        log.info(String.valueOf(resultt));
+        resultt.addAll(inviteN);
 
 
+        return resultt;
 
 
+//        Set<Long> invitedIds = serverInviteRepository.findByServerId(serverId).stream()
+//                .filter(invite -> invite.getStatus() == InviteStatus.PENDING)
+//                .map(invite -> invite.getToUser().getId())
+//                .collect(Collectors.toSet());
+//
+//        return acceptedFriends.stream()
+//                .map(friend -> {
+//                    User target = friend.getFromUser().getId().equals(currentUserId)
+//                            ? friend.getToUser() : friend.getFromUser();
+//                    return new InvitableFriendResponse(
+//                            target.getId().toString(),
+//                            target.getNickname(),
+//                            target.getImageUrl(),
+//                            invitedIds.contains(target.getId())
+//                    );
+//                })
+//                .toList();
+    }
 }
