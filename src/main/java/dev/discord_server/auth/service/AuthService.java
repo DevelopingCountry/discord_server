@@ -56,6 +56,25 @@ public class AuthService {
 
     }
 
+    // 로컬 개발용 - 카카오 OAuth 없이 이메일만으로 로그인/가입 (SecurityConfig에서 !prod 프로필에서만 노출)
+    public TokenResponse devLogin(String email, String nickname) {
+        User user = userRepository.findByEmail(email)
+                .orElseGet(() -> userRepository.save(AuthConverter.toUser(
+                        snowflakeIdGenerator.generateId(),
+                        email,
+                        nickname != null && !nickname.isBlank() ? nickname : nicknameService.assignRandomNickname(),
+                        Role.USER
+                )));
+
+        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getRole());
+        String refreshToken = jwtUtil.createRefreshToken(user.getId(), user.getEmail(), user.getRole());
+        String userId = String.valueOf(user.getId());
+
+        refreshTokenRepository.saveRefreshToken(user.getEmail(), refreshToken);
+
+        return new TokenResponse(accessToken, refreshToken, userId);
+    }
+
     public String refreshAccessToken(String refreshToken) {
 
         String email;

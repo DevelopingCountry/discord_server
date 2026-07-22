@@ -4,6 +4,8 @@ import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.friend.dto.*;
 import dev.discord_server.domain.friend.service.FriendService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Tag(name = "친구 API", description = "친구 목록/신청/수락/거절/삭제, 닉네임 검색, 온라인 상태 조회 API")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/friend")
@@ -23,6 +26,7 @@ public class FriendController {
      *
      * @return
      */
+    @Operation(summary = "전체 친구 목록 조회", description = "로그인한 유저의 전체 친구 목록을 반환합니다.")
     @GetMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<FriendResponse>> getFriendList() {
@@ -37,6 +41,7 @@ public class FriendController {
      * @param request
      * @return
      */
+    @Operation(summary = "친구 신청", description = "다른 유저에게 친구 신청을 보냅니다. 상태는 PENDING으로 생성됩니다.")
     @PostMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendAddResponse> postFriend(
@@ -54,6 +59,7 @@ public class FriendController {
      * @param request
      * @return
      */
+    @Operation(summary = "친구 삭제", description = "친구 관계를 삭제합니다.")
     @DeleteMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendDeleteResponse> deleteFriend(@RequestBody FriendDeleteRequest request) {
@@ -68,6 +74,7 @@ public class FriendController {
      * @param request
      * @return
      */
+    @Operation(summary = "친구 신청 수락/거절", description = "받은 친구 신청을 ACCEPTED 또는 REJECTED 상태로 변경합니다.")
     @PatchMapping
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendStatusResponse> changeFriendStatus(@RequestBody FriendStatusRequest request) {
@@ -77,6 +84,7 @@ public class FriendController {
 
     }
 
+    @Operation(summary = "닉네임으로 유저 검색", description = "닉네임으로 유저를 검색해 친구 신청 대상 정보를 반환합니다.")
     @PostMapping("/search")
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<Optional<FriendResponse>> getFriendByNickname(@RequestBody FriendSearchRequest request) {
@@ -86,6 +94,7 @@ public class FriendController {
     }
 
 
+    @Operation(summary = "온라인 친구 목록 조회", description = "현재 접속 중인 친구 목록을 반환합니다.")
     @GetMapping("/online")
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<List<FriendResponse>> getOnlineFriends() {

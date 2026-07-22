@@ -20,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -82,22 +83,12 @@ public class FriendService {
             }
         }
 
-        Friend friend;
-        if (currentUserId < toUserId) {
-            friend = Friend.builder()
-                    .id(snowflakeIdGenerator.generateId())
-                    .fromUser(fromUser)
-                    .toUser(toUser)
-                    .status(FriendStatus.PENDING)
-                    .build();
-        } else {
-            friend = Friend.builder()
-                    .id(snowflakeIdGenerator.generateId())
-                    .fromUser(toUser)
-                    .toUser(fromUser)
-                    .status(FriendStatus.PENDING)
-                    .build();
-        }
+        Friend friend = Friend.builder()
+                .id(snowflakeIdGenerator.generateId())
+                .fromUser(fromUser)
+                .toUser(toUser)
+                .status(FriendStatus.PENDING)
+                .build();
         friendRepository.save(friend);
 
         notificationService.sendFriendRequestNotification(toUserId, fromUser.getNickname(), fromUser.getImageUrl());
@@ -117,8 +108,11 @@ public class FriendService {
 
         // ACCEPTED: 양쪽 모두 삭제 가능
         // PENDING: 요청 보낸 사람(isSender)만 취소 가능
+
         if (friend.getStatus() == FriendStatus.ACCEPTED) {
             friendRepository.delete(friend);
+            notificationService.sendFriendDeleted(currentUserId, toUserId);
+
             return;
         }
         if (friend.getStatus() == FriendStatus.PENDING) {
@@ -162,10 +156,17 @@ public class FriendService {
 
         friendRepository.save(friend);
 
-        // 상대방 id
+        // 상대방 id (= 원래 친구 요청을 보냈던 사람)
         Long targetId = friend.getFromUser().getId().equals(uuid)
                 ? friend.getToUser().getId()
                 : friend.getFromUser().getId();
+
+        // 원 요청자에게 수락/거절 결과를 실시간으로 알림
+        notificationService.sendFriendStatusChangeNotification(
+                targetId, FriendResponse.toFriendResponse(friend, targetId));
+
+        notifyFriendsPresenceChange(targetId,true);
+        notifyFriendsPresenceChange(uuid,true);
 
         return new FriendStatusResponse(targetId.toString(),friend.getStatus());
     }
@@ -215,5 +216,26 @@ public class FriendService {
                 .map(f -> FriendResponse.toFriendResponse(f, currentUserId))
                 .filter(f -> onlineUsers.contains(f.getFriendId()))
                 .toList();
+    }
+
+    /**
+     * 유저의 접속/해제를 친구들에게 실시간으로 알림
+     * @param userId
+     * @param online
+     */
+    @Transactional(readOnly = true)
+    public void notifyFriendsPresenceChange(Long userId, boolean online) {
+        friendRepository.findByFromUserIdOrToUserId(userId, userId).stream()
+                .filter(f -> f.getStatus() == FriendStatus.ACCEPTED)
+                .forEach(f -> {
+                    Long targetUserId = f.getFromUser().getId().equals(userId)
+                            ? f.getToUser().getId() : f.getFromUser().getId();
+                    if (online) {
+                        notificationService.sendFriendOnlineNotification(
+                                targetUserId, FriendResponse.toFriendResponse(f, targetUserId));
+                    } else {
+                        notificationService.sendFriendOfflineNotification(targetUserId, userId.toString());
+                    }
+                });
     }
 }
