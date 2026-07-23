@@ -24,4 +24,14 @@ public interface FriendRepository extends JpaRepository<Friend, Long> {
         AND f.status = 'ACCEPTED'
     """)
     List<Friend> findAcceptedFriends(Long userId);
+
+    @Query("""
+SELECT COUNT(f) > 0
+FROM Friend f
+WHERE
+(f.fromUser.id = :user1 AND f.toUser.id = :user2)
+OR
+(f.fromUser.id = :user2 AND f.toUser.id = :user1)
+""")
+    boolean existsFriend(Long user1, Long user2);
 }

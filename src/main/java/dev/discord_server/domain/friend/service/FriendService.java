@@ -44,57 +44,7 @@ public class FriendService {
                 .toList();
     }
 
-    /**
-     * 친구 추가
-     * @param currentUserId
-     * @param toUserId
-     * @return
-     */
-    public FriendAddResponse sendFriendRequest(Long currentUserId, Long toUserId) {
-        User fromUser = userRepository.findById(currentUserId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
-        User toUser = userRepository.findById(toUserId)
-                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
-        if (currentUserId.equals(toUserId)) {
-            throw new AlreadyExistElementException409(ErrorDefineCode.SELF_FRIEND_REQUEST);
-        }
-        Optional<Friend> existingFriendOpt = friendRepository.findByFromUserAndToUserOrToUserAndFromUser(
-                fromUser, toUser, toUser, fromUser);
-
-
-        if (existingFriendOpt.isPresent()) {
-            Friend friend = existingFriendOpt.get();
-            switch (friend.getStatus()) {
-                case PENDING, ACCEPTED -> throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_FRIEND);
-                case REJECTED -> {
-                    friend.setStatus(FriendStatus.PENDING);
-                    friendRepository.save(friend);
-
-                    User targetUser = friend.getToUser();
-                    if (friend.getToUser().getId().equals(currentUserId)) {
-                        targetUser = friend.getFromUser();
-                    }
-                    return new FriendAddResponse(targetUser.getId().toString(),
-                            targetUser.getNickname(),
-                            targetUser.getImageUrl(),
-                            FriendStatus.PENDING, true);
-                }
-            }
-        }
-
-        Friend friend = Friend.builder()
-                .id(snowflakeIdGenerator.generateId())
-                .fromUser(fromUser)
-                .toUser(toUser)
-                .status(FriendStatus.PENDING)
-                .build();
-        friendRepository.save(friend);
-
-        notificationService.sendFriendRequestNotification(toUserId, fromUser.getNickname(), fromUser.getImageUrl());
-
-        return new FriendAddResponse(toUser.getId().toString(),toUser.getNickname(), toUser.getImageUrl(), FriendStatus.PENDING, true);
-    }
 
     public void deleteFriendRequest(Long currentUserId, Long toUserId) {
         User fromUser = userRepository.findById(currentUserId)
@@ -237,5 +187,33 @@ public class FriendService {
                         notificationService.sendFriendOfflineNotification(targetUserId, userId.toString());
                     }
                 });
+    }
+
+    public FriendAddResponse sendFriendRequest(Long uuid, String targetNickname) {
+        //1. 존재하는가?
+        User targetUser = userRepository.findByNickname(targetNickname)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+        //2. 나인가?
+        User currentUser = userRepository.findById(uuid)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
+        if(currentUser.getNickname().equals(targetNickname)){
+            throw new AlreadyExistElementException409(ErrorDefineCode.SELF_FRIEND_REQUEST);
+        }
+        //3. 이미 친구 상태인가?
+        if(friendRepository.existsFriend(currentUser.getId(), targetUser.getId())){
+            throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_FRIEND);
+        }
+
+        Friend friend = Friend.builder()
+                .id(snowflakeIdGenerator.generateId())
+                .fromUser(currentUser)
+                .toUser(targetUser)
+                .status(FriendStatus.PENDING)
+                .build();
+        friendRepository.save(friend);
+
+        notificationService.sendFriendRequestNotification(targetUser.getId(), currentUser.getNickname(), currentUser.getImageUrl());
+
+        return new FriendAddResponse(targetUser.getId().toString(),targetUser.getNickname(), targetUser.getImageUrl(), FriendStatus.PENDING, true);
     }
 }

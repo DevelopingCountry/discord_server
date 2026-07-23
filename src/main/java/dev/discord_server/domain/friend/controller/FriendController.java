@@ -7,6 +7,7 @@ import dev.discord_server.domain.friend.service.FriendService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Optional;
 
+@Slf4j
 @Tag(name = "친구 API", description = "친구 목록/신청/수락/거절/삭제, 닉네임 검색, 온라인 상태 조회 API")
 @RequiredArgsConstructor
 @RestController
@@ -35,6 +37,7 @@ public class FriendController {
         return new CommonResponse<>(true, HttpStatus.OK, "모든 친구가 반환되었습니다.", friends);
     }
 
+
     /**
      * 친구 추가
      *
@@ -46,13 +49,12 @@ public class FriendController {
     @PreAuthorize("hasRole('USER')")
     public CommonResponse<FriendAddResponse> postFriend(
             @RequestBody FriendAddRequest request) {
-
+        log.info("친구 요청 들어옴");
         Long uuid = SecurityUtil.getCurrentUserId();
-        FriendAddResponse friendAddResponse = friendService.sendFriendRequest(uuid, Long.valueOf(request.getTargetId()));
+        FriendAddResponse friendAddResponse = friendService.sendFriendRequest(uuid, request.getTargetNickname());
 
         return new CommonResponse<>(true, HttpStatus.OK, "친구 추가 성공했습니다.", friendAddResponse);
     }
-
     /**
      * 친구 삭제
      *
