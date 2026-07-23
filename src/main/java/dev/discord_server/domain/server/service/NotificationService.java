@@ -57,9 +57,9 @@ public class NotificationService {
         FriendRequestPayload payload = new FriendRequestPayload(fromNickname, fromImageUrl);
         WebSocketNotification notification = new WebSocketNotification("FRIEND_REQUEST", payload, toUserId);
 
+        // 친구 요청은 대기중 탭 배지로 대체됨 — 알림함에 저장하지 않고 실시간 push만 보냄(프론트가 이걸로 친구 목록을 갱신)
         try {
             notificationStreamProducer.publishToUserStream(toUserId, notification);
-            saveNotification(toUserId, "FRIEND_REQUEST", payload);
         } catch (Exception e) {
             throw new RuntimeException("❌ 친구 요청 알림 스트림 전송 실패", e);
         }
