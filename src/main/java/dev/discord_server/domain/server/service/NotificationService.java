@@ -128,6 +128,20 @@ public class NotificationService {
         }
     }
 
+    // 서버 이름/이미지 변경을 멤버들에게 실시간으로 반영 — 알림함엔 저장하지 않고 캐시 갱신용 push만 보냄
+    public void sendServerUpdatedNotification(Long toUserId, Long serverId, String serverName, String imageUrl) {
+        WebSocketNotification notification = new WebSocketNotification(
+                "SERVER_UPDATED",
+                Map.of("serverId", serverId.toString(), "serverName", serverName, "imageUrl", imageUrl == null ? "" : imageUrl),
+                toUserId);
+
+        try {
+            notificationStreamProducer.publishToUserStream(toUserId, notification);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 서버 업데이트 알림 스트림 전송 실패", e);
+        }
+    }
+
     private void saveNotification(Long toUserId, String type, Object payload) {
         try {
             Notification notification = Notification.builder()
