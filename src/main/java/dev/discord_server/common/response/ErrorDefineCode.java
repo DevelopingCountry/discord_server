@@ -31,6 +31,7 @@ public enum ErrorDefineCode {
     EXIST_SERVER_INVITE("SER_04","이미 초대를 보냈습니다."),
     EMPTY_CHANNEL("CHA_01", "채널이 존재하지 않습니다."),
     CHANNEL_NOT_IN_SERVER("CHA_02", "해당 서버에 속한 채널이 아닙니다."),
+    DUPLICATE_CHANNEL("CHA_03","채널 이름이 존재합니다."),
     NOT_FOUND_DM("dm_01","해당되는 dm이 없습니다."),
     NOT_PARTICIPANT_DM("dm_02","해당 DM에 참여 중인 유저가 아닙니다."),
     DM_MESSAGE_MISMATCH("dm_03","메시지와 DM ID가 일치하지 않습니다."),
