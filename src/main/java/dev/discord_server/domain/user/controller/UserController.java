@@ -4,9 +4,7 @@ import dev.discord_server.auth.util.JwtUtil;
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.CommonResponse;
 import dev.discord_server.domain.user.Enum.Role;
-import dev.discord_server.domain.user.dto.UserNickNameResponse;
-import dev.discord_server.domain.user.dto.UserNicknameRequest;
-import dev.discord_server.domain.user.dto.UserResponse;
+import dev.discord_server.domain.user.dto.*;
 import dev.discord_server.domain.user.service.UserService;
 import io.swagger.v3.oas.annotations.Hidden;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,16 +32,16 @@ public class UserController {
 
         return new CommonResponse<>(true, HttpStatus.OK, "닉네임 변경에 성공하였습니다.", response);
     }
-
-    @Operation(summary = "닉네임 변경", description = "로그인한 유저 본인의 닉네임을 변경합니다.")
+    @Operation(summary = "프로필 변경", description = "로그인한 유저 본인의 닉네임/프로필 이미지를 변경합니다.")
     @PatchMapping
     @PreAuthorize("hasRole('USER')")
-    public CommonResponse<UserNickNameResponse> changeNickname(@RequestBody UserNicknameRequest request) {
+    public CommonResponse<UserProfileResponse> changeProfile(@RequestBody UserProfileRequest request) {
         Long uuid = SecurityUtil.getCurrentUserId();
-        UserNickNameResponse response = userService.changeNickname(uuid, request.getNickname());
+        UserProfileResponse response = userService.changeProfile(uuid, request);
 
-        return new CommonResponse<>(true, HttpStatus.OK, "닉네임 변경에 성공하였습니다.", response);
+        return new CommonResponse<>(true, HttpStatus.OK, "프로필이 변경되었습니다.", response);
     }
+
 
 
     @Hidden
