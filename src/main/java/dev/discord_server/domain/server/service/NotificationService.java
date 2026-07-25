@@ -75,7 +75,6 @@ public class NotificationService {
 
         try {
             notificationStreamProducer.publishToUserStream(toUserId, notification);
-            saveNotification(toUserId, "DM", payload);
         } catch (Exception e) {
             throw new RuntimeException("❌ DM 알림 스트림 전송 실패", e);
         }

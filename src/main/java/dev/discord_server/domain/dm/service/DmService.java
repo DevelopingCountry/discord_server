@@ -10,12 +10,14 @@ import dev.discord_server.domain.dm.dto.DmVisibleRequest;
 import dev.discord_server.domain.dm.dto.DmVisibleResponse;
 import dev.discord_server.domain.dm.entity.Dm;
 import dev.discord_server.domain.dm.repository.DmRepository;
+import dev.discord_server.domain.dm_message.repository.DmMessageRepository;
 import dev.discord_server.domain.user.entity.User;
 import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,6 +26,7 @@ import java.util.Optional;
 public class DmService {
     private final DmRepository dmRepository;
     private final UserRepository userRepository;
+    private final DmMessageRepository dmMessageRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
 
     public List<DmUserResponse> findDmUsers(Long currentId) {
@@ -34,9 +37,21 @@ public class DmService {
                     User target = room.getUser1().getId().equals(currentId)
                             ? room.getUser2()
                             : room.getUser1();
-                    return new DmUserResponse(room.getId().toString(),target.getId().toString(),  target.getImageUrl(),target.getNickname());
+
+                    LocalDateTime lastReadAt = room.getLastReadAt(currentId);
+                    long unreadCount = lastReadAt == null ? 0
+                            : dmMessageRepository.countByDmIdAndCreatedAtAfterAndUserIdNot(room.getId(), lastReadAt, currentId);
+
+                    return new DmUserResponse(room.getId().toString(), target.getId().toString(), target.getImageUrl(), target.getNickname(), unreadCount);
                 })
                 .toList();
+    }
+
+    @Transactional
+    public void markRead(Long dmId, Long userId) {
+        Dm dm = dmRepository.findById(dmId)
+                .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.NOT_FOUND_DM));
+        dm.markRead(userId);
     }
 
     public DmAddResponse findOrCreateDm(Long userId, Long targetUserId) {
@@ -62,11 +77,14 @@ public class DmService {
             return new DmAddResponse(dm.getId().toString(), targetUser.getId().toString(), targetUser.getImageUrl(), targetUser.getNickname());
         }
 
+        LocalDateTime now = LocalDateTime.now();
         Long dmId = dmRepository.save(Dm.builder()
                 .id(snowflakeIdGenerator.generateId())
                 .isVisible(true)
                 .user1(currentUser)
                 .user2(targetUser)
+                .user1LastReadAt(now)
+                .user2LastReadAt(now)
                 .build()).getId();
 
         return new DmAddResponse(dmId.toString(), targetUser.getId().toString(), targetUser.getImageUrl(), targetUser.getNickname());

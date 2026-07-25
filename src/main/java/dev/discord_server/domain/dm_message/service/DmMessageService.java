@@ -5,9 +5,11 @@ import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.redis.ChatMessagePublisher;
+import dev.discord_server.config.redis.DmSessionTracker;
 import dev.discord_server.config.redis.dto.ChatMessagePayload;
 import dev.discord_server.domain.dm.entity.Dm;
 import dev.discord_server.domain.dm.repository.DmRepository;
+import dev.discord_server.domain.dm.service.DmService;
 import dev.discord_server.domain.dm_message.dto.DmMessageResponse;
 import dev.discord_server.domain.dm_message.entity.DmMessage;
 import dev.discord_server.domain.dm_message.repository.DmMessageRepository;
@@ -32,6 +34,8 @@ public class DmMessageService {
     private final SnowflakeIdGenerator snowflakeIdGenerator;
     private final ChatMessagePublisher chatMessagePublisher;
     private final NotificationService notificationService;
+    private final DmSessionTracker dmSessionTracker;
+    private final DmService dmService;
 
 
     private boolean isParticipant(Dm dm, Long userId) {
@@ -87,6 +91,10 @@ public class DmMessageService {
         Long receiverId = dm.getUser1().getId().equals(senderId)
                 ? dm.getUser2().getId()
                 : dm.getUser1().getId();
+
+        if (dmSessionTracker.isUserActiveInDm(dmId.toString(), receiverId)) {
+            dmService.markRead(dmId, receiverId);
+        }
 
         notificationService.sendDmNotification(
                 dmId,

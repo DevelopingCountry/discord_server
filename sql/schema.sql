@@ -83,6 +83,8 @@ CREATE TABLE dm (
                     is_visible BOOLEAN NOT NULL DEFAULT TRUE,
                     user1_id BIGINT NOT NULL,
                     user2_id BIGINT NOT NULL,
+                    user1_last_read_at TIMESTAMP NULL,
+                    user2_last_read_at TIMESTAMP NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     FOREIGN KEY (user1_id) REFERENCES user(id),
