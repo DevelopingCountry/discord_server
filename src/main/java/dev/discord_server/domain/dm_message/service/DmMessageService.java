@@ -1,16 +1,14 @@
 package dev.discord_server.domain.dm_message.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
-import dev.discord_server.config.redis.RedisPublisher;
+import dev.discord_server.config.redis.ChatMessagePublisher;
+import dev.discord_server.config.redis.dto.ChatMessagePayload;
 import dev.discord_server.domain.dm.entity.Dm;
 import dev.discord_server.domain.dm.repository.DmRepository;
-import dev.discord_server.domain.dm_message.dto.ChatPayload;
 import dev.discord_server.domain.dm_message.dto.DmMessageResponse;
-import dev.discord_server.domain.dm_message.dto.WebSocketMessage;
 import dev.discord_server.domain.dm_message.entity.DmMessage;
 import dev.discord_server.domain.dm_message.repository.DmMessageRepository;
 import dev.discord_server.domain.server.service.NotificationService;
@@ -32,8 +30,7 @@ public class DmMessageService {
     private final DmRepository dmRepository;
     private final UserRepository userRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
-    private final RedisPublisher redisPublisher;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ChatMessagePublisher chatMessagePublisher;
     private final NotificationService notificationService;
 
 
@@ -75,7 +72,7 @@ public class DmMessageService {
 
         log.info("✅ 저장된 메시지 ID: {}", saved.getId());
 
-        var socketPayload = new ChatPayload(
+        var socketPayload = new ChatMessagePayload(
                 dm.getId().toString(),
                 saved.getId().toString(),
                 sender.getNickname(),
@@ -85,7 +82,7 @@ public class DmMessageService {
                 String.valueOf(sender.getId())
         );
 
-        publish(socketPayload, "SEND");
+        chatMessagePublisher.publishDmMessage("SEND", socketPayload);
 
         Long receiverId = dm.getUser1().getId().equals(senderId)
                 ? dm.getUser2().getId()
@@ -115,7 +112,7 @@ public class DmMessageService {
 
         message.updateContent(content);
 
-        var socketPayload = new ChatPayload(
+        var socketPayload = new ChatMessagePayload(
                 message.getDm().getId().toString(),
                 message.getId().toString(),
                 message.getUser().getNickname(),
@@ -125,7 +122,7 @@ public class DmMessageService {
                 String.valueOf(message.getUser().getId())
         );
 
-        publish(socketPayload, "UPDATE");
+        chatMessagePublisher.publishDmMessage("UPDATE", socketPayload);
     }
 
     public void deleteMessage(Long dmId, Long messageId, Long userId) {
@@ -142,7 +139,7 @@ public class DmMessageService {
 
         dmMessageRepository.delete(message);
 
-        var socketPayload = new ChatPayload(
+        var socketPayload = new ChatMessagePayload(
                 message.getDm().getId().toString(),
                 message.getId().toString(),
                 null,null,null,
@@ -150,18 +147,6 @@ public class DmMessageService {
                 String.valueOf(message.getUser().getId())
         );
 
-        publish(socketPayload, "DELETE");
+        chatMessagePublisher.publishDmMessage("DELETE", socketPayload);
     }
-
-    private void publish(ChatPayload message, String type) {
-        try {
-            log.info("📤 Redis 전송 [{}] - messageId: {}, content: {}", type, message.messageId(), message.content());
-            String payload = objectMapper.writeValueAsString(new WebSocketMessage(type, message));
-            redisPublisher.publishDm(payload);
-        } catch (Exception e) {
-            log.error("❌ Redis 메시지 전송 실패", e);
-        }
-    }
-
-
 }

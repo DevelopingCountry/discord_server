@@ -77,15 +77,14 @@ public class RedisPubSubConfig {
     @Bean
     public RedisMessageListenerContainer redisMessageListenerContainer(
             @Qualifier("pubSubConnectionFactory") RedisConnectionFactory factory,
-            DmRedisSubscriber dmSubscriber,
-            ChannelSubscriber channelSubscriber,
-            MessageRedisSubscriber messageRedisSubscriber
+            ChatRedisSubscriber chatRedisSubscriber,
+            ChannelSubscriber channelSubscriber
     ) {
         RedisMessageListenerContainer container = new RedisMessageListenerContainer();
         container.setConnectionFactory(factory);
-        container.addMessageListener(dmSubscriber, new ChannelTopic("chat.dm"));
+        container.addMessageListener(chatRedisSubscriber, new ChannelTopic("chat.dm"));
+        container.addMessageListener(chatRedisSubscriber, new PatternTopic("channel.msg"));
         container.addMessageListener(channelSubscriber, new PatternTopic("channel.event.*"));
-        container.addMessageListener(messageRedisSubscriber, new PatternTopic("channel.msg"));
         return container;
     }
 }

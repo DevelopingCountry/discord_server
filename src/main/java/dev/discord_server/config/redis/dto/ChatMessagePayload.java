@@ -1,7 +1,7 @@
-package dev.discord_server.domain.message.dto;
+package dev.discord_server.config.redis.dto;
 
-public record ChannelChatPayload(
-        String channelId,
+public record ChatMessagePayload(
+        String targetId,
         String messageId,
         String nickName,
         String imageUrl,
