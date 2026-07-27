@@ -53,7 +53,7 @@ public class FriendService {
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
 
         Friend friend = friendRepository
-                .findByFromUserAndToUserOrToUserAndFromUser(fromUser, toUser, toUser, fromUser)
+                .findByFromUserAndToUserOrToUserAndFromUser(fromUser, toUser, fromUser, toUser)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_FRIEND));
 
         // ACCEPTED: 양쪽 모두 삭제 가능

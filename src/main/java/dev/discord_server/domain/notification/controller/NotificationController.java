@@ -34,4 +34,13 @@ public class NotificationController {
         notificationService.markAllAsRead(uuid);
         return new CommonResponse<>(true, HttpStatus.OK, "알림을 모두 읽음 처리했습니다.", null);
     }
+
+    @Operation(summary = "서버 초대 알림 삭제", description = "해당 초대에 대한 알림함 항목을 삭제합니다(초대 수락 후 재수락 방지용).")
+    @DeleteMapping("/invite/{inviteId}")
+    @PreAuthorize("hasRole('USER')")
+    public CommonResponse<Void> deleteInviteNotification(@PathVariable String inviteId) {
+        Long uuid = SecurityUtil.getCurrentUserId();
+        notificationService.deleteInviteNotification(uuid, inviteId);
+        return new CommonResponse<>(true, HttpStatus.OK, "알림을 삭제했습니다.", null);
+    }
 }

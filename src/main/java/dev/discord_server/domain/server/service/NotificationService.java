@@ -170,6 +170,21 @@ public class NotificationService {
         notificationRepository.markAllAsRead(userId);
     }
 
+    // 초대 수락 후 알림함에서 해당 초대 알림을 제거 (payload가 JSON 텍스트라 inviteId로 걸러서 지움)
+    @Transactional
+    public void deleteInviteNotification(Long userId, String inviteId) {
+        notificationRepository.findByUserIdAndType(userId, "INVITE").stream()
+                .filter(n -> {
+                    try {
+                        InviteNotificationPayload payload = objectMapper.readValue(n.getPayload(), InviteNotificationPayload.class);
+                        return inviteId.equals(payload.inviteId());
+                    } catch (JsonProcessingException e) {
+                        return false;
+                    }
+                })
+                .forEach(notificationRepository::delete);
+    }
+
     public NotificationResponse toNotificationResponse(Notification notification) {
         try {
             Object payload = objectMapper.readValue(notification.getPayload(), Object.class);
