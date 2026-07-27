@@ -1,0 +1,67 @@
+services:
+  discord-mysql:
+    image: mysql:8.0
+    container_name: discord-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: discord_server
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: Asia/Seoul
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  discord-redis:
+    image: redis:7
+    container_name: discord-redis
+    restart: always
+    volumes:
+      - redis-data:/data
+
+  discord-app:
+    build: .
+    container_name: discord-app
+    restart: always
+    depends_on:
+      discord-mysql:
+        condition: service_healthy
+      discord-redis:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+      KAKAO_REDIRECT_URI: ${KAKAO_REDIRECT_URI}
+    expose:
+      - "8080"
+
+  caddy:
+    image: caddy:2
+    container_name: discord-caddy
+    restart: always
+    depends_on:
+      - discord-app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./frontend-dist:/srv/frontend:ro
+      - caddy-data:/data
+      - caddy-config:/config
+
+volumes:
+  mysql-data:
+  redis-data:
+  caddy-data:
+  caddy-config:

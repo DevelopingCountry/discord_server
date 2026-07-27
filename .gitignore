@@ -1,6 +1,7 @@
 HELP.md
 .gradle
 .env
+frontend-dist/
 build/
 !gradle/wrapper/gradle-wrapper.jar
 !**/src/main/**/build/

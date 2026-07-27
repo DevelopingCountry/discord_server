@@ -37,3 +37,7 @@ jwt:
 error:
   printStackTrace: true # Stack trace 출력 여부
   printStackTraceLine: 10 # Stack trace 출력 줄 수
+
+app:
+  cors:
+    allowed-origin: http://localhost:3000
