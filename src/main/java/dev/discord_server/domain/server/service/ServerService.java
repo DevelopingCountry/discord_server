@@ -80,7 +80,9 @@ public class ServerService {
 
         User user = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
-
+        if(serverRepository.existsByServerName(serverCreateRequest.getServerName())){
+            throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_SERVERNAME);
+        }
 
         Server server = Server.createServer(
                 snowflakeIdGenerator.generateId(),
@@ -121,8 +123,16 @@ public class ServerService {
         if (!server.getHost().getId().equals(currentUserId)) {
             throw new ForbiddenException403(ErrorDefineCode.AUTHORIZATION_FAIL);
         }
+        if(serverRepository.existsByServerName(serverInfoUpdateRequest.getServerName())){
+            throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_SERVERNAME);
+        }
         server.setServerName(serverInfoUpdateRequest.getServerName());
         server.setImage(serverInfoUpdateRequest.getImageUrl());
+
+        serverUserRepository.findByServerId(serverId).forEach(su ->
+                notificationService.sendServerUpdatedNotification(
+                        su.getUser().getId(), serverId, server.getServerName(), server.getImage())
+        );
 
         return new ServerUpdateResponse(
                 String.valueOf(serverId),

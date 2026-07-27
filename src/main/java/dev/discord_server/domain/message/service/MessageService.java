@@ -1,15 +1,13 @@
 package dev.discord_server.domain.message.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.SnowflakeIdGenerator;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
-import dev.discord_server.config.redis.RedisPublisher;
-import dev.discord_server.domain.channel.dto.ChannelWebSocketMessage;
+import dev.discord_server.config.redis.ChatMessagePublisher;
+import dev.discord_server.config.redis.dto.ChatMessagePayload;
 import dev.discord_server.domain.channel.entity.Channel;
 import dev.discord_server.domain.channel.entity.ChannelRepository;
-import dev.discord_server.domain.message.dto.ChannelChatPayload;
 import dev.discord_server.domain.message.dto.MessageResponse;
 import dev.discord_server.domain.message.entity.Message;
 import dev.discord_server.domain.message.repository.MessageRepository;
@@ -20,12 +18,14 @@ import dev.discord_server.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Transactional
 public class MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
@@ -33,8 +33,7 @@ public class MessageService {
     private final ServerUserRepository serverUserRepository;
     private final UserRepository userRepository;
     private final SnowflakeIdGenerator snowflakeIdGenerator;
-    private final RedisPublisher redisPublisher;
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ChatMessagePublisher chatMessagePublisher;
 
     public List<MessageResponse> getMessages(Long channelId) {
         return messageRepository.findByChannelIdOrderByCreatedAtAsc(channelId).stream()
@@ -64,7 +63,7 @@ public class MessageService {
                 .content(content)
                 .build());
 
-        var socketPayload = new ChannelChatPayload(
+        var socketPayload = new ChatMessagePayload(
                 channel.getId().toString(),
                 saved.getId().toString(),
                 sender.getNickname(),
@@ -74,7 +73,7 @@ public class MessageService {
                 sender.getId().toString()
         );
 
-        publish(socketPayload, "SEND");
+        chatMessagePublisher.publishChannelMessage("SEND", socketPayload);
     }
 
     public void updateMessage(Long channelId, Long messageId, Long userId, String content) {
@@ -91,7 +90,7 @@ public class MessageService {
 
         message.updateContent(content);
 
-        var socketPayload = new ChannelChatPayload(
+        var socketPayload = new ChatMessagePayload(
                 message.getChannel().getId().toString(),
                 message.getId().toString(),
                 message.getUser().getNickname(),
@@ -101,7 +100,7 @@ public class MessageService {
                 message.getUser().getId().toString()
         );
 
-        publish(socketPayload, "UPDATE");
+        chatMessagePublisher.publishChannelMessage("UPDATE", socketPayload);
     }
 
     public void deleteMessage(Long channelId, Long messageId, Long userId) {
@@ -118,7 +117,7 @@ public class MessageService {
 
         messageRepository.delete(message);
 
-        var socketPayload = new ChannelChatPayload(
+        var socketPayload = new ChatMessagePayload(
                 message.getChannel().getId().toString(),
                 message.getId().toString(),
                 null, null, null,
@@ -126,16 +125,6 @@ public class MessageService {
                 message.getUser().getId().toString()
         );
 
-        publish(socketPayload, "DELETE");
-    }
-
-    private void publish(ChannelChatPayload message, String type) {
-        try {
-            log.info("📤 Redis 전송 [{}] - messageId: {}, content: {}", type, message.messageId(), message.content());
-            String payload = objectMapper.writeValueAsString(new ChannelWebSocketMessage(type, message));
-            redisPublisher.publishMessage(payload);
-        } catch (Exception e) {
-            log.error("❌ Redis 메시지 전송 실패", e);
-        }
+        chatMessagePublisher.publishChannelMessage("DELETE", socketPayload);
     }
 }

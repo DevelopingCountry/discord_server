@@ -17,4 +17,6 @@ public class DmUserResponse {
     private String targetImageUrl;
     @Schema(description = "상대방 닉네임", example = "홍길동")
     private String targetNickname;
+    @Schema(description = "안읽은 메시지 개수", example = "3")
+    private long unreadCount;
 }

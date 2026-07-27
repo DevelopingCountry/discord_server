@@ -57,9 +57,9 @@ public class NotificationService {
         FriendRequestPayload payload = new FriendRequestPayload(fromNickname, fromImageUrl);
         WebSocketNotification notification = new WebSocketNotification("FRIEND_REQUEST", payload, toUserId);
 
+        // 친구 요청은 대기중 탭 배지로 대체됨 — 알림함에 저장하지 않고 실시간 push만 보냄(프론트가 이걸로 친구 목록을 갱신)
         try {
             notificationStreamProducer.publishToUserStream(toUserId, notification);
-            saveNotification(toUserId, "FRIEND_REQUEST", payload);
         } catch (Exception e) {
             throw new RuntimeException("❌ 친구 요청 알림 스트림 전송 실패", e);
         }
@@ -75,7 +75,6 @@ public class NotificationService {
 
         try {
             notificationStreamProducer.publishToUserStream(toUserId, notification);
-            saveNotification(toUserId, "DM", payload);
         } catch (Exception e) {
             throw new RuntimeException("❌ DM 알림 스트림 전송 실패", e);
         }
@@ -128,6 +127,20 @@ public class NotificationService {
         }
     }
 
+    // 서버 이름/이미지 변경을 멤버들에게 실시간으로 반영 — 알림함엔 저장하지 않고 캐시 갱신용 push만 보냄
+    public void sendServerUpdatedNotification(Long toUserId, Long serverId, String serverName, String imageUrl) {
+        WebSocketNotification notification = new WebSocketNotification(
+                "SERVER_UPDATED",
+                Map.of("serverId", serverId.toString(), "serverName", serverName, "imageUrl", imageUrl == null ? "" : imageUrl),
+                toUserId);
+
+        try {
+            notificationStreamProducer.publishToUserStream(toUserId, notification);
+        } catch (Exception e) {
+            throw new RuntimeException("❌ 서버 업데이트 알림 스트림 전송 실패", e);
+        }
+    }
+
     private void saveNotification(Long toUserId, String type, Object payload) {
         try {
             Notification notification = Notification.builder()
@@ -155,6 +168,21 @@ public class NotificationService {
     @Transactional
     public void markAllAsRead(Long userId) {
         notificationRepository.markAllAsRead(userId);
+    }
+
+    // 초대 수락 후 알림함에서 해당 초대 알림을 제거 (payload가 JSON 텍스트라 inviteId로 걸러서 지움)
+    @Transactional
+    public void deleteInviteNotification(Long userId, String inviteId) {
+        notificationRepository.findByUserIdAndType(userId, "INVITE").stream()
+                .filter(n -> {
+                    try {
+                        InviteNotificationPayload payload = objectMapper.readValue(n.getPayload(), InviteNotificationPayload.class);
+                        return inviteId.equals(payload.inviteId());
+                    } catch (JsonProcessingException e) {
+                        return false;
+                    }
+                })
+                .forEach(notificationRepository::delete);
     }
 
     public NotificationResponse toNotificationResponse(Notification notification) {

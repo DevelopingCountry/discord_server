@@ -40,4 +40,6 @@ public interface UserRepository extends JpaRepository<User, Long> {
     WHERE u.id IN :ids
 """)
     List<FriendInvitedListDto> findInviteN(@Param("ids") List<Long> ids);
+
+    boolean existsByNickname(String nickname);
 }

@@ -80,4 +80,9 @@ public class User extends BaseEntity {
         this.nickname = nickname;
     }
 
+    public void changeProfile(String nickname, String imageUrl) {
+        this.nickname = nickname;
+        this.imageUrl = imageUrl;
+    }
+
 }

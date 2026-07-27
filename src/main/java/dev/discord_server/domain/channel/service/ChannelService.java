@@ -3,6 +3,7 @@ package dev.discord_server.domain.channel.service;
 import dev.discord_server.auth.util.SecurityUtil;
 import dev.discord_server.common.response.ErrorDefineCode;
 import dev.discord_server.config.SnowflakeIdGenerator;
+import dev.discord_server.config.exception.custom.exception.AlreadyExistElementException409;
 import dev.discord_server.config.exception.custom.exception.ForbiddenException403;
 import dev.discord_server.config.exception.custom.exception.NoSuchElementFoundException404;
 import dev.discord_server.config.exception.custom.exception.PreconditionFailException412;
@@ -41,7 +42,9 @@ public class ChannelService {
 
         User creator = userRepository.findById(currentUserId)
                 .orElseThrow(() -> new NoSuchElementFoundException404(ErrorDefineCode.EMPTY_USER));
-
+        if(channelRepository.existsByServerIdAndName(serverId,request.getChannelName())){
+            throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_CHANNEL);
+        }
 
         Channel channel = Channel.builder()
                 .id(snowflakeIdGenerator.generateId())
@@ -110,7 +113,9 @@ public class ChannelService {
         if (!channel.getServer().getId().equals(serverId)) {
             throw new PreconditionFailException412(ErrorDefineCode.CHANNEL_NOT_IN_SERVER);
         }
-
+        if(channelRepository.existsByServerIdAndName(serverId,request.getChannelName())){
+            throw new AlreadyExistElementException409(ErrorDefineCode.DUPLICATE_CHANNEL);
+        }
         channel.setName(request.getChannelName());
         channel = channelRepository.save(channel);
 
