@@ -8,15 +8,15 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.MySQL8Dialect
     hibernate:
-      ddl-auto: update # 필요에 따라 create, update, validate, none 선택
-    show-sql: true  # 콘솔에서 실행되는 SQL 보기
+      ddl-auto: update
+    show-sql: true
     properties:
       hibernate:
-        format_sql: true  # SQL을 보기 좋게 출력
+        format_sql: true
 
   kakao:
     auth:
-      client: d0e33acc669d3d7994242e6879cefb32
+      client: d828d9798d9a32b22b7c6c47d6e9c1b2
       redirect: http://localhost:3000/auth/kakao
 
   data:
