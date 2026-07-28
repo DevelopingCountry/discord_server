@@ -110,7 +110,7 @@ public class AuthService {
 
     private String resolveEmail(KakaoDTO.KakaoProfile kakaoProfile) {
         String email = kakaoProfile.getKakao_account().getEmail();
-        return email != null ? email : "kakao_" + kakaoProfile.getId() + "@kakao.local";
+        return email != null ? email : "k" + kakaoProfile.getId();
     }
 
 }
