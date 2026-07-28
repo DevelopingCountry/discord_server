@@ -2,11 +2,11 @@
 # Caddy가 각 도메인에 대해 Let's Encrypt 인증서를 자동으로 발급/갱신합니다 —
 # DNS가 이 VM의 공인 IP를 가리키고 있어야 하고, 80/443 포트가 방화벽에서 열려 있어야 합니다.
 
-discord-api.duckdns.org {
+discord-api-harmonica.duckdns.org  {
     reverse_proxy discord-app:8080
 }
 
-discord-app.duckdns.org {
+discord-app-harmonica.duckdns.org {
     root * /srv/frontend
     encode gzip
     try_files {path} /index.html
