@@ -33,10 +33,10 @@ public class AuthService {
     public TokenResponse oAuthLogin(String accessCode) {
         KakaoDTO.OAuthToken oAuthToken = kakaoUtil.requestToken(accessCode);
         KakaoDTO.KakaoProfile kakaoProfile = kakaoUtil.requestProfile(oAuthToken);
-        String email = kakaoProfile.getKakao_account().getEmail();
+        String email = resolveEmail(kakaoProfile);
 
         User user = userRepository.findByEmail(email)
-                .orElseGet(() -> createNewUser(kakaoProfile));
+                .orElseGet(() -> createNewUser(email));
 
 
         // Access Token & Refresh Token 생성
@@ -97,15 +97,20 @@ public class AuthService {
 
 
 
-    private User createNewUser(KakaoDTO.KakaoProfile kakaoProfile) {
+    private User createNewUser(String email) {
         User newUser = AuthConverter.toUser(
                 snowflakeIdGenerator.generateId(),
-                kakaoProfile.getKakao_account().getEmail(),
+                email,
                 nicknameService.assignRandomNickname(),
                 Role.USER
 
         );
         return userRepository.save(newUser);
+    }
+
+    private String resolveEmail(KakaoDTO.KakaoProfile kakaoProfile) {
+        String email = kakaoProfile.getKakao_account().getEmail();
+        return email != null ? email : "kakao_" + kakaoProfile.getId() + "@kakao.local";
     }
 
 }
