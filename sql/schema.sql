@@ -7,7 +7,7 @@ USE discord_server;
 -- User 테이블 생성
 CREATE TABLE User (
                       id BIGINT PRIMARY KEY ,
-                      nickname VARCHAR(10) NOT NULL UNIQUE,
+                      nickname VARCHAR(50) NOT NULL UNIQUE,
                       password VARCHAR(20),
                       email VARCHAR(20) NOT NULL UNIQUE,
                       image_url VARCHAR(255),
