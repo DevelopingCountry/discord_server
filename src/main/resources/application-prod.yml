@@ -1,42 +1,88 @@
-spring:
-  datasource:
-    url: jdbc:mysql://discord-mysql:3306/discord_server?serverTimezone=Asia/Seoul
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
+services:
+  discord-mysql:
+    image: mysql:8.0
+    container_name: discord-mysql
+    restart: always
+    environment:
+      MYSQL_DATABASE: discord_server
+      MYSQL_USER: ${DB_USERNAME}
+      MYSQL_PASSWORD: ${DB_PASSWORD}
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+      TZ: Asia/Seoul
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_ROOT_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
 
-  jpa:
-    database-platform: org.hibernate.dialect.MySQL8Dialect
-    hibernate:
-      ddl-auto: update
-    show-sql: false
-    properties:
-      hibernate:
-        format_sql: false
+  discord-redis:
+    image: redis:7
+    container_name: discord-redis
+    restart: always
+    volumes:
+      - redis-data:/data
 
-  kakao:
-    auth:
-      client: ${KAKAO_CLIENT_ID}
-      redirect: ${KAKAO_REDIRECT_URI}
+  discord-app:
+    build: .
+    container_name: discord-app
+    restart: always
+    depends_on:
+      discord-mysql:
+        condition: service_healthy
+      discord-redis:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_USERNAME: ${DB_USERNAME}
+      DB_PASSWORD: ${DB_PASSWORD}
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      CORS_ALLOWED_ORIGIN: ${CORS_ALLOWED_ORIGIN}
+      KAKAO_CLIENT_ID: ${KAKAO_CLIENT_ID}
+      KAKAO_REDIRECT_URI: ${KAKAO_REDIRECT_URI}
+      KAKAO_CLIENT_SECRET: ${KAKAO_CLIENT_SECRET:-}
+    expose:
+      - "8080"
 
-  data:
-    redis:
-      host: discord-redis
-      port: 6379
+  caddy:
+    image: caddy:2
+    container_name: discord-caddy
+    restart: always
+    depends_on:
+      - discord-app
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile
+      - ./frontend-dist:/srv/frontend:ro
+      - caddy-data:/data
+      - caddy-config:/config
 
-app:
-  cors:
-    allowed-origin: ${CORS_ALLOWED_ORIGIN}
+  coturn:
+    image: coturn/coturn:latest
+    container_name: discord-coturn
+    restart: always
+    # UDP 미디어 릴레이 포트가 매번 임의로(range 내에서) 선택되므로, Docker 브리지로
+    # 포트를 하나씩 매핑하는 대신 호스트 네트워크를 그대로 사용한다.
+    network_mode: host
+    command:
+      - "-n"
+      - "--log-file=stdout"
+      - "--listening-port=3478"
+      - "--min-port=49160"
+      - "--max-port=49200"
+      - "--realm=discord-harmonica"
+      - "--lt-cred-mech"
+      - "--user=${TURN_USERNAME}:${TURN_PASSWORD}"
+      - "--external-ip=${TURN_EXTERNAL_IP}"
+      - "--no-cli"
+      - "--fingerprint"
 
-jwt:
-  accessSecret: ${JWT_ACCESS_SECRET}
-  refreshSecret: ${JWT_REFRESH_SECRET}
-  access_token_expired_at: 10800000
-  refresh_token_expired_at: 604800000
-
-server:
-  port: 8080
-
-logging:
-  level:
-    root: info
+volumes:
+  mysql-data:
+  redis-data:
+  caddy-data:
+  caddy-config:
