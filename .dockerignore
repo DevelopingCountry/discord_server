@@ -1,0 +1,12 @@
+.git
+.gradle
+.idea
+*.iml
+*.ipr
+*.iws
+.vscode
+frontend-dist
+.env
+.env.*
+!.env.prod.example
+*.log
